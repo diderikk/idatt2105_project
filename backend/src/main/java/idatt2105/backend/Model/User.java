@@ -27,4 +27,5 @@ public class User {
     private String phoneNumber;
     private String hash;
     private LocalDate expirationDate;
+    private boolean isAdmin;
 }
