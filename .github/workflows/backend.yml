@@ -6,11 +6,6 @@ on:
       - 'backend/**'
       - '.github/workflows/backend.yml'
 
-defaults:
-  run:
-    shell: bash
-    working-directory: backend
-
 jobs:
 
   tests:
@@ -24,4 +19,20 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Test with Maven
-        run: ./mvnw test
+        run: ./backend/mvnw test
+  
+  deploy:
+    name: Deploy
+    needs: test
+    env:
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+          private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: mkdir ~/.ssh
+      - run: echo "$known_hosts" > ~/.ssh/known_hosts
+      - run: echo "$private_key" > ~/.ssh/id_rsa
+      - run: chmod 600 ~/.ssh/id_rsa
+      - run: scp -r backend backend@13.69.249.213:~/
+      - run: ssh backend@13.69.249.213 ./backend/mvnw spring-boot:run
