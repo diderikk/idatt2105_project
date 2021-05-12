@@ -32,9 +32,14 @@ public class JwtTokenFilter extends OncePerRequestFilter{
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         LOGGER.info("doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) is called");
-        
 
         String token = request.getHeader("Authorization");
+
+        if(token == null || token.isEmpty() || !token.startsWith("Bearer ")){
+            filterChain.doFilter(request,response);
+            return;
+        }
+
         JwtComponent.verifyToken(token);
             // Sends the request to the next filter, which will be exception-handler and then the controller
         filterChain.doFilter(request, response);
