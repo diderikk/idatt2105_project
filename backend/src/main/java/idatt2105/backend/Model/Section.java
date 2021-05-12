@@ -22,4 +22,8 @@ public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long sectionId;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "roomCode", referencedColumnName = "roomCode")
+    private Room room;
 }

@@ -1,7 +1,11 @@
 package idatt2105.backend.Model;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,5 +19,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class Room {
     @Id
-    private String roomName;
+    private String roomCode;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    private List<Section> sections;
 }
