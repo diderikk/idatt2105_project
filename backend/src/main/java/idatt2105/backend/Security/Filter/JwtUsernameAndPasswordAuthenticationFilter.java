@@ -60,7 +60,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
             return auth;
 
         } catch (IOException ex) {
-            LOGGER.info("Something went wrong trying to authenticate. Exception: {}", ex.getLocalizedMessage(), ex.fillInStackTrace());
+            LOGGER.info("Something went wrong trying to authenticate. Exception: {}", ex.getLocalizedMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         }
         return null;
