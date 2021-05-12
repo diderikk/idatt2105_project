@@ -1,5 +1,4 @@
 name: backend-ci
-runs-on: ubuntu-18.04
 
 on:
   pull_request:
@@ -16,6 +15,7 @@ jobs:
 
   tests:
     name: Application tests
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
