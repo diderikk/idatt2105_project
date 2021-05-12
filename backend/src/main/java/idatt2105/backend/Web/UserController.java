@@ -16,6 +16,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    // TODO: Delete this later!
     @GetMapping("/hello")
     public ResponseEntity<String> hello() {
         return new ResponseEntity<>("Hello from backend!", HttpStatus.OK);

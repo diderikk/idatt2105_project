@@ -1,6 +1,6 @@
 package idatt2105.backend.Model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,20 +11,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * User class for storing information about a room
- * with userId as primary key
+ * Entity class for storing information about a reservation
+ * with reservationId as primary key
  */
 @Entity
 @NoArgsConstructor
 @Data
-public class User {
+public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long userId;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String phoneNumber;
-    private String hash;
-    private LocalDate expirationDate;
+    private long reservationId;
+
+    private LocalDateTime reservationStartTime;
+    private LocalDateTime reservationEndTime;
 }

@@ -20,5 +20,4 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long roomId;
     private String roomName;
-    
 }
