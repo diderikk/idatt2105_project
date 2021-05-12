@@ -8,4 +8,4 @@ backend_build:
 	@docker build -t backend-server ./backend
 
 backend_run:
-	@docker run -d -p 8080:8080 --name backend --rm backend-server
+	@docker run -p 8080:8080 --name backend --rm backend-server
