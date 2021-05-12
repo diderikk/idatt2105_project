@@ -1,6 +1,7 @@
 import { useStore } from "@/store";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
+import { store } from "@/store";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -15,15 +16,12 @@ const routes: Array<RouteRecordRaw> = [
         component: Home,
       },
     ],
-    meta: {
-      requiresLoggedIn: true,
-    },
   },
   {
     path: "/about",
     name: "About",
     meta: {
-      requiresAdmin: true,
+      permission: "Admin",
     },
     component: () => import("../views/About.vue"),
   },
@@ -39,10 +37,9 @@ const router = createRouter({
   routes,
 });
 
-const store = useStore();
 router.beforeEach((to, from, next) => {
-  if (to.matched.some((record) => record.meta.requiresAdmin)) {
-    if (store.getters.users.isAdmin) {
+  if (to.matched.some((record) => record.meta.permission == "Admin")) {
+    if (store.getters.getUser.isAdmin) {
       next();
       return;
     }
@@ -53,15 +50,16 @@ router.beforeEach((to, from, next) => {
         : router.back();
       return;
     }
-    router.replace("log-in");
+    console.log("hd");
+    router.replace("/log-in");
     return;
   }
-  if (to.matched.some((record) => record.meta.requiresLoggedIn)) {
+  if (to.matched.some((record) => record.meta.permission == "User")) {
     if (store.getters.isUserLoggedIn) {
       next();
       return;
     }
-    router.replace("log-in");
+    router.replace("/log-in");
   }
   next();
 });

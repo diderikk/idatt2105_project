@@ -27,7 +27,8 @@ export const store = createStore<State>({
     },
   },
   getters: {
-    getUser: (state): User => JSON.parse(state.user),
+    getUser: (state): User | Record<string, unknown> =>
+      state.user === "" ? {} : JSON.parse(state.user),
     isUserLoggedIn: (state) => !!state.token,
     getIsLoading: (state) => state.isLoading,
   },
@@ -38,6 +39,7 @@ export const store = createStore<State>({
       return true;
     },
     async login() {
+      //TODO change
       return true;
     },
     async deleteUser({ commit, getters }, user): Promise<boolean> {
