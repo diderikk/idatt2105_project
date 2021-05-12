@@ -13,6 +13,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
  * Configuration for Database
  */
 @Configuration
+@Profile("dev")
 @PropertySource("classpath:config.properties")
 public class DatabaseConfiguration {
 
@@ -29,7 +30,6 @@ public class DatabaseConfiguration {
      * @return DataSource object
      */
     @Bean
-    @Profile("dev")
     public DataSource getDataSource() {
         DriverManagerDataSource dataSourceBuilder = new DriverManagerDataSource();
         dataSourceBuilder.setDriverClassName("com.mysql.cj.jdbc.Driver");
