@@ -2,9 +2,6 @@ name: backend-CI
 
 on:
   pull_request:
-    branches:
-      - dev
-      - master
     paths:
       - 'backend/**'
       - '.github/workflows/backend.yml'
