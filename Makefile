@@ -4,7 +4,7 @@ backend_stop:
 	-docker stop backend
 
 backend_build:
-	mvn -f ./backend package
+	mvn -B -f ./backend package
 	@docker build -t backend-server ./backend
 
 backend_run:
