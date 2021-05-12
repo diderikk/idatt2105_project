@@ -2,6 +2,9 @@ name: backend-CI
 
 on:
   pull_request:
+    branches:
+      - dev
+      - master
     paths:
       - 'backend/**'
       - '.github/workflows/backend.yml'
@@ -25,7 +28,7 @@ jobs:
   deploy:
     name: Deploy
     needs: tests
-    if: github.event.pull_request.base.ref == 'master'
+    if: github.event.pull_request.base.ref == 'master' && github.event.pull_request.merged
     env:
           known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
           private_key: ${{ secrets.SSH_PRIVATE_KEY }}
