@@ -23,7 +23,7 @@ jobs:
   
   deploy:
     name: Deploy
-    needs: test
+    needs: tests
     env:
           known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
           private_key: ${{ secrets.SSH_PRIVATE_KEY }}
