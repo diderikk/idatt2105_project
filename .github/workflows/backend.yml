@@ -38,5 +38,5 @@ jobs:
           echo "$known_hosts" > ~/.ssh/known_hosts
           echo "$private_key" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-      - run: scp -r backend Makefile backend@13.69.249.213:~/
-      - run: ssh backend@13.69.249.213 make backend
+      - run: scp -r backend Makefile backend@13.79.145.175:~/
+      - run: ssh backend@13.79.145.175 make backend
