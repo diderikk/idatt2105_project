@@ -38,4 +38,4 @@ jobs:
           echo "$private_key" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
       - run: scp -r backend backend@13.69.249.213:~/
-      - run: ssh backend@13.69.249.213 mvn -f /backend spring-boot:run
+      - run: ssh backend@13.69.249.213 mvn -f ./backend spring-boot:run
