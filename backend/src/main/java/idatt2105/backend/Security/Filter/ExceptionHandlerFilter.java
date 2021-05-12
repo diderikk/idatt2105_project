@@ -35,7 +35,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter{
         try{
             filterChain.doFilter(request, response);
         }catch(RuntimeException ex){
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.getWriter().write(objectMapper.writeValueAsString(ex));
         }
         
