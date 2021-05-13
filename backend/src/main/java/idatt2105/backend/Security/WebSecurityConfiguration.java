@@ -16,7 +16,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import idatt2105.backend.Component.CORSConfigComponent;
 import idatt2105.backend.Security.Filter.ExceptionHandlerFilter;
 import idatt2105.backend.Security.Filter.JwtTokenFilter;
 import idatt2105.backend.Security.Filter.JwtUsernameAndPasswordAuthenticationFilter;
@@ -45,10 +44,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.cors().and()
-        .requiresChannel().anyRequest().requiresSecure().and()
         .csrf().disable()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-        .addFilterBefore(new CORSConfigComponent(), JwtUsernameAndPasswordAuthenticationFilter.class)
         .addFilter(getJwtAuthenticationFilter(authenticationManager()))
         .addFilterAfter(new JwtTokenFilter(), JwtUsernameAndPasswordAuthenticationFilter.class)
         .addFilterAfter(new ExceptionHandlerFilter(), JwtTokenFilter.class)
