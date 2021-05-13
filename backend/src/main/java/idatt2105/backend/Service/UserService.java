@@ -52,7 +52,7 @@ public class UserService implements UserDetailsService {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            return new UserDTO(userId, user.getFirstName(), user.getLastName(), user.getEmail(), user.getEmail(),
+            return new UserDTO(userId, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhoneNumber(),
                     user.getExpirationDate(), user.isAdmin());
         }
         return null;
@@ -116,9 +116,8 @@ public class UserService implements UserDetailsService {
                 else return null;
             }
             reservation.setSections(registerSections);
-            reservation = reservationRepository.save(reservation);
-            user.getReservations().add(reservation);
-            userRepository.save(user);
+            reservation.setUser(user);
+            reservationRepository.save(reservation);
             return dto;
         }
         return null;
@@ -129,7 +128,7 @@ public class UserService implements UserDetailsService {
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
         if(optionalReservation.isPresent() && optionalUser.isPresent()){
             Reservation reservation = optionalReservation.get();
-            for(Section section: reservation.getSections()) reservation.getSections().remove(section);
+            reservation.getSections().clear();
             reservation = reservationRepository.save(reservation);
             reservationRepository.delete(reservation);
             return true;

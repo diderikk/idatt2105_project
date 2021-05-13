@@ -2,7 +2,6 @@ package idatt2105.backend.Model;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -28,7 +27,7 @@ public class Section {
     private long sectionId;
     private int seatAmount;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "roomCode", referencedColumnName = "roomCode")
     private Room room;
 
