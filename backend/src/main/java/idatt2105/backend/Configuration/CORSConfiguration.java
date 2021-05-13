@@ -22,7 +22,7 @@ public class CORSConfiguration {
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/api/**")
 				.allowedMethods("GET", "POST", "PUT", "DELETE")
-				.allowedOrigins("http://localhost:3000");
+				.allowedOriginPatterns("*");
 			}
 		};
 	}
