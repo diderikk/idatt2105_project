@@ -1,7 +1,9 @@
 package idatt2105.backend.Model.DTO;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import idatt2105.backend.Model.Room;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,4 +12,9 @@ import lombok.NoArgsConstructor;
 public class RoomDTO {
     private String roomCode;
     private List<SectionDTO> sections;
+
+    public RoomDTO(Room room) {
+        roomCode = room.getRoomCode();
+        sections = room.getSections().stream().map(section -> new SectionDTO(section)).collect(Collectors.toList());
+    }
 }

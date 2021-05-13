@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import idatt2105.backend.Model.Room;
 
 @Repository
-public interface RoomRepository extends JpaRepository<Room, Long> {
+public interface RoomRepository extends JpaRepository<Room, String> {
 }
