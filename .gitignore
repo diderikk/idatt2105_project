@@ -34,3 +34,6 @@ build/
 
 ### Configuration Properties ###
 config.properties
+
+### Keystore ###
+keystore/*
