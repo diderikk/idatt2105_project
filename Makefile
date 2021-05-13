@@ -1,4 +1,4 @@
-backend: backend_stop keystore backend_build backend_run
+backend: backend_stop backend_keystore backend_build backend_run
 
 backend_stop:
 	-docker stop backend
@@ -10,7 +10,7 @@ backend_build:
 backend_run:
 	@docker run -p 8080:8080 --name backend --rm backend-server
 
-keystore:
+backend_keystore:
 	-rm backend/src/main/resources/keystore/*
 	keytool -genkeypair -dname "cn=, ou=, o=, c=NO" -alias fullstack -storepass password -keypass password -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore backend/src/main/resources/keystore/mykeystore.p12 -validity 3650
 	
