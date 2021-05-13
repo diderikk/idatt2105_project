@@ -31,6 +31,7 @@ public class Reservation {
 
     private LocalDateTime reservationStartTime;
     private LocalDateTime reservationEndTime;
+    private String reservationText;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
