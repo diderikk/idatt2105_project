@@ -1,6 +1,6 @@
 <template>
   <div class="field">
-    <label class="label">{{ config.title }}</label>
+    <label v-if="'title' in config" class="label">{{ config.title }}</label>
     <slot></slot>
     <p v-if="isSuccess" class="help is-success">
       <span v-if="'successHelperMessage' in config">{{

@@ -85,13 +85,13 @@
         </select>
       </div>
     </base-form-field-input>
-    <p v-if="availableSections.length === 0">
+    <label class="label">Choose Sections</label>
+    <p v-if="availableSections.length === 0" class="help is-danger">
       No sections available for this room during the selected time.
     </p>
     <base-form-field-input
       v-else
       :config="{
-        title: 'Choose sections',
         errorHelperMessage: 'Choose at least one section',
         feedbackStatus: sectionStatus,
       }"
