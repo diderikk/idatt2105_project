@@ -26,6 +26,7 @@ public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long sectionId;
+    private int seatAmount;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "roomCode", referencedColumnName = "roomCode")

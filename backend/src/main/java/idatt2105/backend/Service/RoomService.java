@@ -13,9 +13,10 @@ import org.springframework.stereotype.Service;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
-import idatt2105.backend.Model.DTO.ReservationDTO;
+import idatt2105.backend.Model.DTO.GETReservationDTO;
+import idatt2105.backend.Model.DTO.GETSectionDTO;
+import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.RoomDTO;
-import idatt2105.backend.Model.DTO.SectionDTO;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
 
@@ -59,14 +60,14 @@ public class RoomService {
      * @param sectionId
      * @return SectionDTO, or null if room does not exist or section not found
      */
-    public SectionDTO getSectionOfRoom(String roomCode, long sectionId)
+    public GETSectionDTO getSectionOfRoom(String roomCode, long sectionId)
     {
         LOGGER.info("getSectionOfRoom(String roomCode, long sectionId) called with roomCode: {}, and sectionId: {}", roomCode, sectionId);
         Optional<Room> roomOptional = roomRepository.findById(roomCode);
         if(roomOptional.isPresent()) {
             if(roomOptional.get().getSections() == null) return null;
             for(Section section : roomOptional.get().getSections()) {
-                if(section.getSectionId() == sectionId) return new SectionDTO(section);
+                if(section.getSectionId() == sectionId) return new GETSectionDTO(section);
             }
         }
         return null;
@@ -77,11 +78,11 @@ public class RoomService {
      * @param roomCode
      * @return List of sections
      */
-    public List<SectionDTO> getSectionsOfRoom(String roomCode)
+    public List<GETSectionDTO> getSectionsOfRoom(String roomCode)
     {
         LOGGER.info("getSectionsOfRoom(String roomCode) called with roomCode: {}", roomCode);
         Optional<Room> roomOptional = roomRepository.findById(roomCode);
-        if(roomOptional.isPresent() && roomOptional.get().getSections() != null) return roomOptional.get().getSections().stream().map(section -> new SectionDTO(section)).collect(Collectors.toList());
+        if(roomOptional.isPresent() && roomOptional.get().getSections() != null) return roomOptional.get().getSections().stream().map(section -> new GETSectionDTO(section)).collect(Collectors.toList());
         return new ArrayList<>();
     }
 
@@ -117,7 +118,7 @@ public class RoomService {
         Room newRoom = new Room();
         newRoom.setRoomCode(roomDTO.getRoomCode());
 
-        List<SectionDTO> sectionDTOs = roomDTO.getSections();
+        List<GETSectionDTO> sectionDTOs = roomDTO.getSections();
         List<Section> sections = sectionDTOs.stream().map(sectionDTO -> {
             Section section = new Section();
             section.setSectionId(sectionDTO.getSectionId());
@@ -135,7 +136,7 @@ public class RoomService {
      * @param roomCode
      * @return List of reservationDTOs
      */
-    public List<ReservationDTO> getReservationsOfRoom(String roomCode)
+    public List<GETReservationDTO> getReservationsOfRoom(String roomCode)
     {
         LOGGER.info("getReservationsOfRoom(String roomCode) called with roomCode: {}", roomCode);
         Optional<Room> room = roomRepository.findById(roomCode);
@@ -148,7 +149,7 @@ public class RoomService {
         for(Section section : sections) {
             reservations.addAll(section.getReservations());
         }
-        return reservations.stream().map(reservation -> new ReservationDTO(reservation)).collect(Collectors.toList());
+        return reservations.stream().map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
     }
 
     /**
@@ -157,7 +158,7 @@ public class RoomService {
      * @param sectionDTO
      * @return List of reservationDTOs, null if no section or section is not of the specific room
      */
-    public List<ReservationDTO> getReservationsOfSection(String roomCode, long sectionId)
+    public List<GETReservationDTO> getReservationsOfSection(String roomCode, long sectionId)
     {
         LOGGER.info("getReservationsOfSection(String roomCode, long sectionId) called with roomCode: {}, and sectionID: {}", roomCode, sectionId);
         Optional<Section> sectionOptional = sectionRepository.findById(sectionId);
@@ -165,7 +166,7 @@ public class RoomService {
         //Return null if no section is present
         if(!sectionOptional.isPresent()) return null;
 
-        List<ReservationDTO> reservations = sectionOptional.get().getReservations().stream().map(reservation -> new ReservationDTO(reservation)).collect(Collectors.toList());
+        List<GETReservationDTO> reservations = sectionOptional.get().getReservations().stream().map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
 
         // Should return if section is in the right room
         if(sectionOptional.get().getRoom() != null && sectionOptional.get().getRoom().getRoomCode().equals(roomCode)) return reservations;
@@ -179,7 +180,7 @@ public class RoomService {
      * @param sectionDTO
      * @return RoomDTO object
      */
-    public RoomDTO addSectionToRoom(String roomCode, SectionDTO sectionDTO)
+    public RoomDTO addSectionToRoom(String roomCode, POSTSectionDTO sectionDTO)
     {
         LOGGER.info("addSectionToRoom(String roomCode, SectionDTO sectionDTO) called with roomCode: {}", roomCode);
 
@@ -190,6 +191,7 @@ public class RoomService {
 
         Section newSection = new Section();
         newSection.setRoom(room.get());
+        //ÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆ
         List<Section> sections = room.get().getSections();
         sections.add(newSection);
         room.get().setSections(sections);

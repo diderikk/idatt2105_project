@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import idatt2105.backend.Model.DTO.ReservationDTO;
+import idatt2105.backend.Model.DTO.GETReservationDTO;
+import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.RoomDTO;
-import idatt2105.backend.Model.DTO.SectionDTO;
 import idatt2105.backend.Service.RoomService;
 
 @RestController
@@ -53,8 +53,8 @@ public class RoomController {
     }
 
     @GetMapping("/{room_code}/reservations")
-    public ResponseEntity<List<ReservationDTO>> getReservationsOfRoom(@PathVariable("room_code") String roomCode) {
-        List<ReservationDTO> reservations = roomService.getReservationsOfRoom(roomCode);
+    public ResponseEntity<List<GETReservationDTO>> getReservationsOfRoom(@PathVariable("room_code") String roomCode) {
+        List<GETReservationDTO> reservations = roomService.getReservationsOfRoom(roomCode);
         if (reservations == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -62,8 +62,8 @@ public class RoomController {
     }
 
     @GetMapping("/{room_id}/sections/{section_id}/reservations")
-    public ResponseEntity<List<ReservationDTO>> getReservationsOfSection(@PathVariable("room_code") String roomCode, @PathVariable("section_id") long sectionId) {
-        List<ReservationDTO> reservations = roomService.getReservationsOfSection(roomCode, sectionId);
+    public ResponseEntity<List<GETReservationDTO>> getReservationsOfSection(@PathVariable("room_code") String roomCode, @PathVariable("section_id") long sectionId) {
+        List<GETReservationDTO> reservations = roomService.getReservationsOfSection(roomCode, sectionId);
         if (reservations == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -71,7 +71,7 @@ public class RoomController {
     }
 
     @PostMapping("/{room_code}/sections")
-    public ResponseEntity<RoomDTO> addSectionToRoom(@PathVariable("room_code") String roomCode, @RequestBody SectionDTO sectionDTO) {
+    public ResponseEntity<RoomDTO> addSectionToRoom(@PathVariable("room_code") String roomCode, @RequestBody POSTSectionDTO sectionDTO) {
         RoomDTO roomDTO = roomService.addSectionToRoom(roomCode, sectionDTO);
         if (roomDTO == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

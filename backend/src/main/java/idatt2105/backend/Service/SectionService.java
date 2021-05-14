@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import idatt2105.backend.Model.Section;
-import idatt2105.backend.Model.DTO.ReservationDTO;
+import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Repository.SectionRepository;
 
 @Service
@@ -26,12 +26,12 @@ public class SectionService {
      * @param sectionId
      * @return List of reservationDTOs
      */
-    public List<ReservationDTO> getReservationsOfSection(long sectionId)
+    public List<GETReservationDTO> getReservationsOfSection(long sectionId)
     {
         LOGGER.info("getReservationsOfSection(long sectionId) called with sectionId: {}", sectionId);
         Optional<Section> sectionOptional = sectionRepository.findById(sectionId);
         //Return null if no section is present
         if(!sectionOptional.isPresent()) return null;
-        return sectionOptional.get().getReservations().stream().map(reservation -> new ReservationDTO(reservation)).collect(Collectors.toList());
+        return sectionOptional.get().getReservations().stream().map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
     }
 }

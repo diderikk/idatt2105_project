@@ -12,10 +12,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.DTO.RoomDTO;
-import idatt2105.backend.Model.DTO.SectionDTO;
+import idatt2105.backend.Model.DTO.GETReservationDTO;
+import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
 
@@ -42,6 +44,8 @@ public class RoomServiceTest {
     Room room2;
     Section section1;
     Section section2;
+    Reservation reservation1;
+    Reservation reservation2;
     
     @BeforeEach
     public void setup() {
@@ -50,9 +54,12 @@ public class RoomServiceTest {
         room2 = new Room();
         room2.setRoomCode("A2");
 
+
+
         section1 = new Section();
         section1.setRoom(room1);
         section1.setSectionId(1);
+        section1.set
 
         section2 = new Section();
         section2.setRoom(room1);
@@ -110,7 +117,7 @@ public class RoomServiceTest {
     @Test
     public void getSectionOfRoom_SectionExists_ReturnsSection()
     {
-        SectionDTO section = roomService.getSectionOfRoom(room1.getRoomCode(), section1.getSectionId());
+        GETSectionDTO section = roomService.getSectionOfRoom(room1.getRoomCode(), section1.getSectionId());
         assertNotNull(section);
         assertThat(section.getSectionId()).isEqualTo(section1.getSectionId());
         assertThat(section.getRoomCode()).isEqualTo(section1.getRoom().getRoomCode());
@@ -119,28 +126,28 @@ public class RoomServiceTest {
     @Test
     public void getSectionOfRoom_RoomNotExist_ReturnsNull()
     {
-        SectionDTO section = roomService.getSectionOfRoom("-1", section1.getSectionId());
+        GETSectionDTO section = roomService.getSectionOfRoom("-1", section1.getSectionId());
         assertNull(section);
     }
 
     @Test
     public void getSectionOfRoom_SectionNotExist_ReturnsNull()
     {
-        SectionDTO section = roomService.getSectionOfRoom(room1.getRoomCode(), -1);
+        GETSectionDTO section = roomService.getSectionOfRoom(room1.getRoomCode(), -1);
         assertNull(section);
     }
 
     @Test
     public void getSectionOfRoom_SectionNotInRightRoom_ReturnsNull()
     {
-        SectionDTO section = roomService.getSectionOfRoom(room2.getRoomCode(), section1.getSectionId());
+        GETSectionDTO section = roomService.getSectionOfRoom(room2.getRoomCode(), section1.getSectionId());
         assertNull(section);
     }
 
     @Test
     public void getSectionsOfRoom_RoomExists_ReturnsSections()
     {
-        List<SectionDTO> sections = roomService.getSectionsOfRoom(room1.getRoomCode());
+        List<GETSectionDTO> sections = roomService.getSectionsOfRoom(room1.getRoomCode());
         assertNotNull(sections);
         assertThat(sections.get(0).getSectionId()).isEqualTo(section1.getSectionId());
         assertThat(sections.get(0).getRoomCode()).isEqualTo(section1.getRoom().getRoomCode());
@@ -151,14 +158,14 @@ public class RoomServiceTest {
     @Test
     public void getSectionsOfRoom_RoomNotExist_ReturnsEmptyList()
     {
-        List<SectionDTO> sections = roomService.getSectionsOfRoom("-1");
+        List<GETSectionDTO> sections = roomService.getSectionsOfRoom("-1");
         assertTrue(sections.isEmpty());
     }
 
     @Test
     public void getSectionsOfRoom_RoomHasNoSections_ReturnsEmptyList()
     {
-        List<SectionDTO> sections = roomService.getSectionsOfRoom(room2.getRoomCode());
+        List<GETSectionDTO> sections = roomService.getSectionsOfRoom(room2.getRoomCode());
         assertTrue(sections.isEmpty());
     }
 
@@ -178,11 +185,11 @@ public class RoomServiceTest {
         RoomDTO roomDTO = new RoomDTO();
         roomDTO.setRoomCode(roomCode);
 
-        SectionDTO section3 = new SectionDTO();
+        GETSectionDTO section3 = new GETSectionDTO();
         section3.setRoomCode(roomCode);
         section3.setSectionId(2);
 
-        SectionDTO section4 = new SectionDTO();
+        GETSectionDTO section4 = new GETSectionDTO();
         section4.setRoomCode(roomCode);
         section4.setSectionId(3);
 
@@ -200,11 +207,20 @@ public class RoomServiceTest {
     @Test
     public void getReservationsOfRoom_RoomExists_ReturnsListOfReservations()
     {
+        List<GETReservationDTO> reservationDTOs = roomService.getReservationsOfRoom("-1")
         String roomCode = "A3";
         RoomDTO room = roomService.createRoom(roomCode);
         assertNotNull(room);
         assertThat(room.getRoomCode()).isEqualTo(roomCode);
     }
+
+    @Test
+    public void getReservationsOfRoom_RoomDoesNotExists_ReturnsNull()
+    {
+        List<GETReservationDTO> reservationDTOs = roomService.getReservationsOfRoom("-1")
+        assertNull(reservationDTOs);
+    }
+
 
 
 }
