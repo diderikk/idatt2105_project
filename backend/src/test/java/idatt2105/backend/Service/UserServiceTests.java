@@ -78,6 +78,7 @@ public class UserServiceTests {
         reservation.setReservationId(1);
         reservation.setReservationText("reservationText");
         reservation.setAmountOfPeople(1);
+        reservation.setUser(user);
 
         user.setReservations(List.of(reservation));
 

@@ -24,7 +24,6 @@ import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.UserSecurityDetails;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
-import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.UserDTO;
@@ -90,13 +89,7 @@ public class UserService implements UserDetailsService {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            return user.getReservations().stream().map(reservation -> new GETReservationDTO(
-                    reservation.getReservationId(), reservation.getReservationStartTime(),
-                    reservation.getReservationEndTime(), reservation.getReservationText(),
-                    reservation.getAmountOfPeople(), userId,
-                    reservation.getSections().stream()
-                            .map(section -> new GETSectionDTO(section.getSectionId(), section.getRoom().getRoomCode()))
-                            .collect(Collectors.toList())))
+            return user.getReservations().stream().map(reservation -> new GETReservationDTO(reservation))
                     .collect(Collectors.toList());
         }
         return List.of();
