@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Section;
@@ -30,6 +31,7 @@ import idatt2105.backend.Service.UserService;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -193,5 +195,17 @@ public class UserControllerTest {
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.reservationText", equalTo(dto.getReservationText())))
         .andExpect(jsonPath("$.amountOfPeople", is(dto.getAmountOfPeople())));
+    }
+
+    @Test
+    public void removeUserReservation_ReservationExists_ReservationDeleted() throws Exception{
+        mockMvc.perform(delete("/api/v1/users/" + user.getUserId() + "/reservations/" + reservation.getReservationId()))
+        .andExpect(status().isOk());
+
+        MvcResult result = mockMvc.perform(get("/api/v1/users/"+user.getUserId()+"/reservations"))
+        .andExpect(status().isOk())
+        .andReturn();
+
+        assertEquals("[]", result.getResponse().getContentAsString());
     }
 }
