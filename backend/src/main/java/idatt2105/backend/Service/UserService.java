@@ -1,6 +1,7 @@
 package idatt2105.backend.Service;
 
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -154,6 +155,10 @@ public class UserService implements UserDetailsService {
             userSecurityDetails.setPassword(user.getHash());
             userSecurityDetails.setGrantedAuthorities(grantedAuthorities);
             userSecurityDetails.setUserId(user.getUserId());
+            if(user.getExpirationDate() != null){
+                boolean expired = user.getExpirationDate().isAfter(LocalDate.now());
+                userSecurityDetails.setAccountNonExpired(!expired);
+            }
             return userSecurityDetails;
         } else {
             LOGGER.warn("Could not find user with email: {}. Throwing exception", email);
