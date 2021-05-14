@@ -54,6 +54,7 @@
         v-model="phoneNationalCode"
         @blur="checkPhoneNumberValidity"
         type="text"
+        placeholder="47"
         id="phoneNationalCode"
         class="input"
       />
