@@ -21,6 +21,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "CreateUser",
     component: () => import("../views/CreateUser.vue"),
   },
+  {
+    path: "/createReservation",
+    name: "CreateReservation",
+    component: () => import("../views/CreateReservation.vue"),
+  },
 ];
 
 const router = createRouter({
