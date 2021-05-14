@@ -1,11 +1,16 @@
 <template>
   <div>
-    <h1>Log in</h1>
-    <label>Email</label>
-    <input v-model="email" type="text" alt="email" />
-    <label>Password</label>
-    <input v-model="password" type="password" alt="password" />
-    <button @click="logIn">Log in</button>
+    <h1 class="title">Log in</h1>
+    <div class="field">
+      <label class="label">Email</label>
+      <input v-model="email" type="text" alt="email" class="input" />
+    </div>
+
+    <div class="field">
+      <label class="label">Password</label>
+      <input v-model="password" type="password" alt="password" class="input" />
+    </div>
+    <button @click="logIn" class="button is-link is-primary">Log in</button>
   </div>
 </template>
 
