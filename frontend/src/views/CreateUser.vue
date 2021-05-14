@@ -1,143 +1,207 @@
 <template>
   <div>
     <h1>Create user</h1>
-    <label>First name</label>
-    <input v-model="firstName" type="text" placeholder="First name" />
-    <p>Enter a first name</p>
-    <label>Last name</label>
-    <input v-model="lastName" type="text" placeholder="Last name" />
-    <p>Enter a last name</p>
-    <label>Email</label>
-    <input v-model="email" type="email" placeholder="example@example.com" />
-    <p v-if="!validEmail && !emailIsEmpty">
-      Email needs to contain a @ and a .
-    </p>
-    <p v-else-if="!emailIsEmpty">Valid email</p>
-    <label>Phone number</label>
-    <input v-model="phoneNumber" type="tel" placeholder="Example:12345678" />
-    <label>Expiration date</label>
-    <select v-model="expirationYear">
-      <option value="0" hidden disabled>Select year</option>
-      <option
-        v-for="(year, index) in availableYears"
-        :value="year"
-        :key="index"
-      >
-        {{ year }}
-      </option>
-    </select>
-    <select v-model="expirationMonth">
-      <option value="0" hidden disabled>Select month</option>
-      <option v-for="index in 12" :value="index" :key="index">
-        {{ index }}
-      </option>
-    </select>
-    <select v-model="expirationDayOfMonth">
-      <option value="0" hidden disabled>Select date</option>
-      <option v-for="index in daysInCurrentMonth" :value="index" :key="index">
-        {{ index }}
-      </option>
-    </select>
+    <base-form-field-input
+      :config="{
+        title: 'First name',
+        errorHelperMessage: 'Enter a first name',
+        successHelperMessage: 'Valid!',
+        feedbackStatus: firstNameStatus,
+      }"
+      ><input
+        @blur="checkFirstNameValidity"
+        v-model="firstName"
+        type="text"
+        placeholder="First name"
+    /></base-form-field-input>
+
+    <base-form-field-input
+      :config="{
+        title: 'Last name',
+        errorHelperMessage: 'Enter a last name',
+        successHelperMessage: 'Valid!',
+        feedbackStatus: lastNameStatus,
+      }"
+      ><input
+        @blur="checkLastNameValidity"
+        v-model="lastName"
+        type="text"
+        placeholder="Last name"
+    /></base-form-field-input>
+
+    <base-form-field-input
+      :config="{
+        title: 'Email',
+        errorHelperMessage: 'Enter an email (which includes a @ and a.)',
+        successHelperMessage: 'Valid!',
+        feedbackStatus: emailStatus,
+      }"
+      ><input
+        @blur="checkEmailValidity"
+        v-model="email"
+        type="email"
+        placeholder="example@example.com"
+    /></base-form-field-input>
+    <base-form-field-input
+      :config="{
+        title: 'Phone number',
+        errorHelperMessage: 'Enter the users national code and phone number',
+        successHelperMessage: 'Valid!',
+        feedbackStatus: phoneNumberStatus,
+      }"
+    >
+      +<input
+        v-model="phoneNationalCode"
+        @blur="checkPhoneNumberValidity"
+        type="text"
+        id="phoneNationalCode"
+      />
+      <input
+        v-model="phoneNumber"
+        @blur="checkPhoneNumberValidity"
+        type="tel"
+        placeholder="Example:12345678"
+      />
+    </base-form-field-input>
+
+    <base-form-field-input
+      :config="{
+        title: 'Last name',
+        errorHelperMessage: 'Enter an upcoming date',
+        successHelperMessage: 'Valid!',
+        feedbackStatus: expirationDateStatus,
+      }"
+      ><input
+        @blur="checkExpirationDateValidity"
+        v-model="expirationDate"
+        :min="tommorrowAsString"
+        type="date"
+        placeholder="Expiration date"
+    /></base-form-field-input>
     <button @click="register">Create user</button>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from "vue";
+import { computed, defineComponent, reactive, Ref, ref, toRefs } from "vue";
+import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
+import BaseFormFieldInput from "../components/BaseFormFieldInput.vue";
+import { dateToString, removeTimeFromDate } from "../utils/date";
 export default defineComponent({
   name: "CreateUser",
+  components: {
+    BaseFormFieldInput,
+  },
   setup() {
     const registerInformation = reactive({
       firstName: "",
       lastName: "",
       email: "",
+      phoneNationalCode: "",
       phoneNumber: "",
-      expirationYear: 0,
-      expirationMonth: 0,
-      expirationDayOfMonth: 0,
+      expirationDate: "",
     });
 
-    const expirationDate = computed(
-      () =>
-        registerInformation.expirationYear +
-        "-" +
-        (registerInformation.expirationMonth < 10 ? "0" : "") +
-        registerInformation.expirationMonth +
-        "-" +
-        (registerInformation.expirationDayOfMonth < 10 ? "0" : "") +
-        registerInformation.expirationDayOfMonth
-    );
-
-    const daysInCurrentMonth = computed(() => {
-      //Need to get year here to make the computed variable also react to a change of year
-      const chosenYear = registerInformation.expirationYear;
-      switch (registerInformation.expirationMonth) {
-        case 1:
-        case 3:
-        case 5:
-        case 7:
-        case 8:
-        case 10:
-        case 12:
-          return 31;
-        case 2:
-          return isLeapYear(chosenYear) ? 29 : 28;
-        case 4:
-        case 6:
-        case 9:
-        case 11:
-          return 30;
-        default:
-          return 0;
-      }
-    });
-
-    const isLeapYear = (year: number) => {
-      return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+    const firstNameStatus = ref(InputFieldFeedbackStatus.NONE);
+    const checkFirstNameValidity = () => {
+      firstNameStatus.value =
+        registerInformation.firstName.trim() !== ""
+          ? InputFieldFeedbackStatus.SUCCESS
+          : InputFieldFeedbackStatus.ERROR;
+    };
+    const lastNameStatus = ref(InputFieldFeedbackStatus.NONE);
+    const checkLastNameValidity = () => {
+      lastNameStatus.value =
+        registerInformation.lastName.trim() !== ""
+          ? InputFieldFeedbackStatus.SUCCESS
+          : InputFieldFeedbackStatus.ERROR;
     };
 
-    const user = computed(() => {
-      return {
-        firstName: registerInformation.firstName,
-        lastName: registerInformation.lastName,
-        email: registerInformation.email,
-        phoneNumber: registerInformation.phoneNumber,
-        expirationDate: expirationDate.value,
-      };
-    });
-    const register = () => {
-      console.log(user.value);
-      //TODO POST to user to users
-    };
-
-    //Dont need to be inn computed because the year is static 99% of the year
-    const currentYear = new Date().getFullYear();
-    const availableYears = [];
-    for (let i = currentYear; i < currentYear + 5; i++) {
-      availableYears.push(i);
-    }
-
-    //Error checks
-    const validEmail = computed(
-      () =>
+    const emailStatus = ref(InputFieldFeedbackStatus.NONE);
+    const checkEmailValidity = () => {
+      emailStatus.value =
+        registerInformation.email.trim() !== "" &&
         registerInformation.email.includes("@") &&
         registerInformation.email.includes(".")
-    );
-    const emailIsEmpty = computed(
-      () => registerInformation.email.trim() === ""
+          ? InputFieldFeedbackStatus.SUCCESS
+          : InputFieldFeedbackStatus.ERROR;
+    };
+
+    const phoneNumberStatus = ref(InputFieldFeedbackStatus.NONE);
+    const checkPhoneNumberValidity = () => {
+      phoneNumberStatus.value =
+        //Solomon islands have 5 digits, thats the smallest I could find
+        registerInformation.phoneNumber.trim().length >= 5 &&
+        registerInformation.phoneNationalCode.trim().length >= 1
+          ? InputFieldFeedbackStatus.SUCCESS
+          : InputFieldFeedbackStatus.ERROR;
+    };
+
+    const expirationDateStatus = ref(InputFieldFeedbackStatus.NONE);
+
+    const currentDate = removeTimeFromDate(new Date());
+    const tommorrow = new Date(currentDate);
+    tommorrow.setDate(currentDate.getDate() + 1);
+    const tommorrowAsString = ref(dateToString(tommorrow));
+
+    const expirationDateAsDate = computed(
+      () => new Date(registerInformation.expirationDate)
     );
 
-    const isValidForm = computed(() => validEmail.value && !emailIsEmpty.value);
+    const checkExpirationDateValidity = () => {
+      expirationDateStatus.value =
+        registerInformation.expirationDate.trim() !== "" &&
+        expirationDateAsDate.value >= tommorrow
+          ? InputFieldFeedbackStatus.SUCCESS
+          : InputFieldFeedbackStatus.ERROR;
+    };
+
+    const register = () => {
+      //Want to give the user all feddback immedeatly, and not one at a time
+      checkFirstNameValidity();
+      checkLastNameValidity();
+      checkEmailValidity();
+      checkPhoneNumberValidity();
+      checkExpirationDateValidity();
+      const statuses = [
+        firstNameStatus,
+        lastNameStatus,
+        emailStatus,
+        phoneNumberStatus,
+        expirationDateStatus,
+      ];
+      let numberOfPassedStatuses = 0;
+      statuses.forEach((status) => {
+        if (status.value === InputFieldFeedbackStatus.SUCCESS)
+          numberOfPassedStatuses++;
+      });
+      if (numberOfPassedStatuses === statuses.length) {
+        //TODO POST to user to users
+        console.log(registerInformation);
+      }
+    };
+
     return {
       ...toRefs(registerInformation),
-      availableYears,
+      firstNameStatus,
+      checkFirstNameValidity,
+      lastNameStatus,
+      checkLastNameValidity,
+      emailStatus,
+      checkEmailValidity,
+      phoneNumberStatus,
+      checkPhoneNumberValidity,
       register,
-      daysInCurrentMonth,
-      validEmail,
-      emailIsEmpty,
+      expirationDateStatus,
+      tommorrowAsString,
+      checkExpirationDateValidity,
     };
   },
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+#phoneNationalCode {
+  width: 1vw;
+}
+</style>
