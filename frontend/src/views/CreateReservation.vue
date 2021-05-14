@@ -633,4 +633,8 @@ export default defineComponent({
 #left-time-input {
   margin-right: 2%;
 }
+
+button {
+  margin-right: 5px;
+}
 </style>
