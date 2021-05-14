@@ -17,6 +17,7 @@ import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.RoomDTO;
+import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
 
@@ -29,6 +30,8 @@ public class RoomService {
     private RoomRepository roomRepository;
     @Autowired
     private SectionRepository sectionRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     /**
      * Returns room based on roomCode stored in the database
@@ -119,14 +122,17 @@ public class RoomService {
         newRoom.setRoomCode(roomDTO.getRoomCode());
 
         List<GETSectionDTO> sectionDTOs = roomDTO.getSections();
-        List<Section> sections = sectionDTOs.stream().map(sectionDTO -> {
+        List<Section> sections = new ArrayList<>();
+        for(GETSectionDTO sectionDTO : sectionDTOs) {
             Section section = new Section();
             section.setSectionId(sectionDTO.getSectionId());
             section.setRoom(newRoom);
-            return section;
-        }).collect(Collectors.toList());
+            section.setSectionName(sectionDTO.getSectionName());
+            sections.add(section);
+        }
         newRoom.setSections(sections);
 
+        sectionRepository.saveAll(sections);
         roomRepository.save(newRoom);
         return new RoomDTO(newRoom);
     }
@@ -209,7 +215,20 @@ public class RoomService {
     public boolean deleteRoom(String roomCode)
     {
         LOGGER.info("deleteRoom(String roomCode) called with roomCode: {}", roomCode);
-        roomRepository.deleteById(roomCode);
+
+        Optional<Room> room = roomRepository.findById(roomCode);
+        if(room.isPresent()) {
+            if(room.get().getSections() != null) {
+                for(Section section : room.get().getSections()) {
+                    Optional<List<Long>> reservationIds = sectionRepository.getAllReservationIdsOfSection(section.getSectionId());
+                    if(reservationIds.isPresent()) {
+                        reservationRepository.deleteGivenReservations(reservationIds.get());
+                    }
+                    sectionRepository.delete(section);
+                }
+            }
+            roomRepository.deleteById(roomCode);
+        }
         return !roomRepository.existsById(roomCode);
     }
 
@@ -230,7 +249,12 @@ public class RoomService {
         if(!roomOptional.isPresent()) return false;
 
         // Delete only if section is of this room
-        if(sectionOptional.get().getRoom() != null && sectionOptional.get().getRoom().getRoomCode().equals(roomCode) && roomOptional.get().getSections().remove(sectionOptional.get())) {
+        if(sectionOptional.get().getRoom() != null && sectionOptional.get().getRoom().getRoomCode().equals(roomCode)) {
+            // Delete reservations first
+            Optional<List<Long>> reservationIds = sectionRepository.getAllReservationIdsOfSection(sectionId);
+            if(reservationIds.isPresent()) {
+                reservationRepository.deleteGivenReservations(reservationIds.get());
+            }
             sectionRepository.deleteById(sectionId);
             return !sectionRepository.existsById(sectionId);
         }

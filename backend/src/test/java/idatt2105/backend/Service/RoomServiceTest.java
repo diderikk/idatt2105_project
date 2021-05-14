@@ -90,6 +90,13 @@ public class RoomServiceTest {
         .thenReturn(java.util.Optional.of(room2));
 
         Mockito.lenient()
+        .when(roomRepository.save(room1))
+        .thenReturn(room1);
+        Mockito.lenient()
+        .when(roomRepository.save(room2))
+        .thenReturn(room2);
+
+        Mockito.lenient()
         .when(sectionRepository.findById(section1.getSectionId()))
         .thenReturn(java.util.Optional.of(section1));
         Mockito.lenient()
@@ -214,8 +221,8 @@ public class RoomServiceTest {
         assertNotNull(room);
         assertThat(room.getRoomCode()).isEqualTo(roomCode);
         assertThat(room.getSections().get(0).getSectionId()).isEqualTo(section3.getSectionId());
-        assertThat(room.getSections().get(1).getSectionId()).isEqualTo(section4.getSectionId());
         assertThat(room.getSections().get(0).getRoomCode()).isEqualTo(section3.getRoomCode());
+        assertThat(room.getSections().get(1).getSectionId()).isEqualTo(section4.getSectionId());
         assertThat(room.getSections().get(1).getRoomCode()).isEqualTo(section4.getRoomCode());
     }
 
@@ -296,5 +303,48 @@ public class RoomServiceTest {
         assertFalse(room.getSections().isEmpty());
     }
 
+    @Test
+    public void addSectionToRoom_RoomDoeNotExist_ReturnsNull()
+    {
+        POSTSectionDTO sectionDTO = new POSTSectionDTO();
+        sectionDTO.setRoomCode("-1");
+        sectionDTO.setSectionName("Section");
+        RoomDTO room = roomService.addSectionToRoom(sectionDTO);
+        assertNull(room);
+    }
 
+    @Test
+    public void deleteRoom_RoomIsDeleted_ReturnsTrue()
+    {
+        boolean isDeleted = roomService.deleteRoom(room2.getRoomCode());
+        assertTrue(isDeleted);
+    }
+
+    @Test
+    public void deleteSectionOfRoom_SectionIsDeleted_ReturnsTrue()
+    {
+        boolean isDeleted = roomService.deleteSectionOfRoom(room1.getRoomCode(), section2.getSectionId());
+        assertTrue(isDeleted);
+    }
+
+    @Test
+    public void deleteSectionOfRoom_SectionDoesNotExist_ReturnsFalse()
+    {
+        boolean isDeleted = roomService.deleteSectionOfRoom(room1.getRoomCode(), -1);
+        assertFalse(isDeleted);
+    }
+
+    @Test
+    public void deleteSectionOfRoom_RoomDoesNotExist_ReturnsFalse()
+    {
+        boolean isDeleted = roomService.deleteSectionOfRoom("-1", section2.getSectionId());
+        assertFalse(isDeleted);
+    }
+
+    @Test
+    public void deleteSectionOfRoom_SectionIsNotOfThisRoom_ReturnsFalse()
+    {
+        boolean isDeleted = roomService.deleteSectionOfRoom(room2.getRoomCode(), section2.getSectionId());
+        assertFalse(isDeleted);
+    }
 }

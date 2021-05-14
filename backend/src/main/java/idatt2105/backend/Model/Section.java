@@ -29,7 +29,7 @@ public class Section {
     private int seatAmount;
     private String sectionName;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "roomCode", referencedColumnName = "roomCode")
     private Room room;
 

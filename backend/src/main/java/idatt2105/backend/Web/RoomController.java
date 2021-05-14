@@ -49,7 +49,7 @@ public class RoomController {
         if (room == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(room, HttpStatus.OK);
+        return new ResponseEntity<>(room, HttpStatus.CREATED);
     }
 
     @GetMapping("/{room_code}/reservations")
@@ -72,7 +72,7 @@ public class RoomController {
 
     @PostMapping("/{room_code}/sections")
     public ResponseEntity<RoomDTO> addSectionToRoom(@PathVariable("room_code") String roomCode, @RequestBody POSTSectionDTO sectionDTO) {
-        RoomDTO roomDTO = roomService.addSectionToRoom(roomCode, sectionDTO);
+        RoomDTO roomDTO = roomService.addSectionToRoom(sectionDTO);
         if (roomDTO == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
