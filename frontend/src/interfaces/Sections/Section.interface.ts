@@ -1,3 +1,4 @@
 export default interface Section {
-  name: string;
+  sectioName: string;
+  roomCode?: string;
 }
