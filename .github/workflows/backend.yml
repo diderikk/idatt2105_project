@@ -39,4 +39,5 @@ jobs:
           echo "$private_key" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
       - run: scp -r backend Makefile backend@40.87.146.194:~/
+      - run: ssh backend@40.87.146.194 cp ~/config.properties ~/backend/src/main/resources
       - run: ssh backend@40.87.146.194 docker stop backend
