@@ -20,7 +20,7 @@ jobs:
           distribution: 'adopt'
       - name: Test with Maven
         working-directory: backend
-        run: ./mvnw test
+        run: ./mvnw -B test
   
   deploy:
     name: Deploy
