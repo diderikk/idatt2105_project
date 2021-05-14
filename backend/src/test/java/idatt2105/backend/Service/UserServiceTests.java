@@ -122,7 +122,7 @@ public class UserServiceTests {
         .thenReturn(Optional.of(user));
 
         Mockito.lenient()
-        .when(sectionRepository.findSectionBySectionName("sectionName"))
+        .when(sectionRepository.findSectionBySectionNameAndRoomCode("sectionName", "roomCode"))
         .thenReturn(Optional.of(section));
     }
 
@@ -194,7 +194,7 @@ public class UserServiceTests {
     @Test
     public void addUserReservation_CorrectInput_ReservationAdded(){
         user.setReservations(new ArrayList<>());
-        List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO("sectionName"));
+        List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO(section.getSectionName(),room.getRoomCode()));
         POSTReservationDTO dto = new POSTReservationDTO(null, null, "reservationText", 100, tempSections);
         dto = userService.addUserReservation(1, dto);
 
@@ -204,7 +204,7 @@ public class UserServiceTests {
     @Test
     public void addUserReservation_WrongSectionId_ReservationNotAdded(){
         user.setReservations(new ArrayList<>());
-        List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO("fake"));
+        List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO("fake", room.getRoomCode()));
         POSTReservationDTO dto = new POSTReservationDTO(null, null, "reservationText", 100, tempSections);
         dto = userService.addUserReservation(1, dto);
 
@@ -214,7 +214,7 @@ public class UserServiceTests {
     @Test
     public void addUserReservation_WrongUserId_ReservationNotAdded(){
         user.setReservations(new ArrayList<>());
-        List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO("sectionName"));
+        List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO("sectionName", room.getRoomCode()));
         POSTReservationDTO dto = new POSTReservationDTO(null, null, "reservationText", 100, tempSections);
         dto = userService.addUserReservation(2, dto);
 

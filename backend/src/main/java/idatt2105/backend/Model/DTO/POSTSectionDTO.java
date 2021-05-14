@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class POSTSectionDTO {
     private String sectionName;
+    private String roomCode;
 }
