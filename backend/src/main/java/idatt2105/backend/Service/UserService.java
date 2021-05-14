@@ -175,7 +175,7 @@ public class UserService implements UserDetailsService {
 
     /**
      * n² complexity
-     * 
+     * Section is already checked if it exists
      * @param sectionDTO
      * @param reservationDTO
      * @return
