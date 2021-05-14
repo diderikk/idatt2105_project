@@ -32,7 +32,7 @@ public class UserController {
     public ResponseEntity<UserDTO> getUser(@PathVariable("user_id") long userId){
         UserDTO user = userService.getUser(userId);
         if(user == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
@@ -57,7 +57,7 @@ public class UserController {
 
     @GetMapping("/{user_id}/reservations")
     public ResponseEntity<List<GETReservationDTO>> getAllUserReservations(@PathVariable("user_id") long userId){
-        if(userService.getUser(userId) == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(userService.getUser(userId) == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(userService.getUserReservations(userId), HttpStatus.OK);
     }
 
@@ -74,7 +74,7 @@ public class UserController {
     public ResponseEntity<String> removeUserReservation(@PathVariable("user_id") long userId, @PathVariable("reservation_id") long reservationId){
         boolean successful = userService.removeUserReservation(userId, reservationId);
         if(!successful){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
