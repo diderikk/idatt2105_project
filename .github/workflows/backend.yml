@@ -20,7 +20,7 @@ jobs:
           distribution: 'adopt'
       - name: Test with Maven
         working-directory: backend
-        run: ./mvnw test
+        run: ./mvnw -B test
   
   deploy:
     name: Deploy
@@ -38,5 +38,5 @@ jobs:
           echo "$known_hosts" > ~/.ssh/known_hosts
           echo "$private_key" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-      - run: scp -r backend Makefile backend@52.178.222.52:~/
-      - run: ssh backend@52.178.222.52 docker stop backend
+      - run: scp -r backend Makefile backend@40.87.146.194:~/
+      - run: ssh backend@40.87.146.194 docker stop backend
