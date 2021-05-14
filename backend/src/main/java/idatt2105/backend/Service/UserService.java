@@ -106,7 +106,8 @@ public class UserService implements UserDetailsService {
             reservation.setAmountOfPeople(dto.getAmountOfPeople());
             List<Section> registerSections = new ArrayList<>();
             for (POSTSectionDTO section : dto.getSections()) {
-                Optional<Section> optionalSection = sectionRepository.findById(section.getSectionId());
+                Optional<Section> optionalSection = sectionRepository
+                        .findSectionBySectionNameAndRoomCode(section.getSectionName(), section.getRoomCode());
                 if (optionalSection.isPresent() && checkIfNotAlreadyBooked(section, dto)) {
                     registerSections.add(optionalSection.get());
                 } else
@@ -174,14 +175,16 @@ public class UserService implements UserDetailsService {
     }
 
     /**
-     * n² complexity
-     * Section is already checked if it exists
+     * n² complexity Section is already checked if it exists
+     * 
      * @param sectionDTO
      * @param reservationDTO
      * @return
      */
     private boolean checkIfNotAlreadyBooked(POSTSectionDTO sectionDTO, POSTReservationDTO reservationDTO) {
-        for (Reservation reservation : sectionRepository.findById(sectionDTO.getSectionId()).get().getReservations()) {
+        for (Reservation reservation : sectionRepository
+                .findSectionBySectionNameAndRoomCode(sectionDTO.getSectionName(), sectionDTO.getRoomCode()).get()
+                .getReservations()) {
             if ((reservationDTO.getReservationStartTime().isAfter(reservation.getReservationStartTime())
                     || reservationDTO.getReservationStartTime().isEqual(reservation.getReservationStartTime()))
                     && (reservationDTO.getReservationEndTime().isBefore(reservation.getReservationEndTime())

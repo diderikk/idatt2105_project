@@ -1,6 +1,7 @@
 package idatt2105.backend.Model.DTO;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,9 +29,10 @@ public class GETReservationDTO {
         this.reservationStartTime = reservation.getReservationStartTime();
         this.reservationEndTime = reservation.getReservationEndTime();
         this.amountOfPeople = reservation.getAmountOfPeople();
-        this.userId = reservation.getUser().getUserId();
-        this.sections = reservation.getSections().stream()
-        .map(section -> new GETSectionDTO(section.getSectionId(), section.getRoom().getRoomCode()))
+        if(reservation.getUser() != null) this.userId = reservation.getUser().getUserId();
+        if(reservation.getSections() != null) this.sections = reservation.getSections().stream()
+        .map(section -> new GETSectionDTO(section.getSectionId(), section.getSectionName(), section.getRoom().getRoomCode()))
         .collect(Collectors.toList());
+        else this.sections = new ArrayList<>();
     }
 }

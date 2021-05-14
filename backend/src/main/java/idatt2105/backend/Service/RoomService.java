@@ -145,9 +145,10 @@ public class RoomService {
         if(!room.isPresent()) return null;
 
         List<Section> sections = room.get().getSections();
+        if(sections == null) sections = new ArrayList<>();
         List<Reservation> reservations = new ArrayList<>();
         for(Section section : sections) {
-            reservations.addAll(section.getReservations());
+            if(section.getReservations() != null) reservations.addAll(section.getReservations());
         }
         return reservations.stream().map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
     }
@@ -180,19 +181,20 @@ public class RoomService {
      * @param sectionDTO
      * @return RoomDTO object
      */
-    public RoomDTO addSectionToRoom(String roomCode, POSTSectionDTO sectionDTO)
+    public RoomDTO addSectionToRoom(POSTSectionDTO sectionDTO)
     {
-        LOGGER.info("addSectionToRoom(String roomCode, SectionDTO sectionDTO) called with roomCode: {}", roomCode);
+        LOGGER.info("addSectionToRoom(SectionDTO sectionDTO) called with roomCode: {}", sectionDTO.getRoomCode());
 
         // TODO: add ADMIN verification?
 
-        Optional<Room> room = roomRepository.findById(roomCode);
+        Optional<Room> room = roomRepository.findById(sectionDTO.getRoomCode());
         if(!room.isPresent()) return null;
 
         Section newSection = new Section();
         newSection.setRoom(room.get());
-        //ÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆ
+        newSection.setSectionName(sectionDTO.getSectionName());
         List<Section> sections = room.get().getSections();
+        if(sections == null) sections = new ArrayList<>();
         sections.add(newSection);
         room.get().setSections(sections);
         sectionRepository.save(newSection);
@@ -234,5 +236,4 @@ public class RoomService {
         }
         return false;
     }
-
 }

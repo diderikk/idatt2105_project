@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GETSectionDTO {
     private long sectionId;
+    private String sectionName;
     private String roomCode;
 
     public GETSectionDTO(Section section) {

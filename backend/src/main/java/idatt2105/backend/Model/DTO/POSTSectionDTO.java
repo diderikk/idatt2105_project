@@ -9,9 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class POSTSectionDTO {
-    private long sectionId;
+    private String sectionName;
+    private String roomCode;
 
     public POSTSectionDTO(Section section) {
-        sectionId = section.getSectionId();
+        sectionName = section.getSectionName();
+        if(section.getRoom() != null) roomCode = section.getRoom().getRoomCode();
     }
 }
