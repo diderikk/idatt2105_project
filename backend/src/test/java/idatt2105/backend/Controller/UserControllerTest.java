@@ -89,6 +89,7 @@ public class UserControllerTest {
         section = new Section();
         section.setSeatAmount(10);
         section.setRoom(room);
+        section.setSectionName("sectionName");
         section = sectionRepository.save(section);
 
         reservation = new Reservation();

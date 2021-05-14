@@ -26,6 +26,7 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long sectionId;
     private int seatAmount;
+    private String sectionName;
 
     @ManyToOne
     @JoinColumn(name = "roomCode", referencedColumnName = "roomCode")

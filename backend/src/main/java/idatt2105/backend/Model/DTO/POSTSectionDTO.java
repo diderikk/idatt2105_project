@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class POSTSectionDTO {
-    private long sectionId;
+    private String sectionName;
+    private String roomCode;
 }

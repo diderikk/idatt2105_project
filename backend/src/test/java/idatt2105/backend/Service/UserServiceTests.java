@@ -95,6 +95,7 @@ public class UserServiceTests {
         section.setSectionId(1);
         section.setReservations(List.of());
         section.setRoom(room);
+        section.setSectionName("sectionName");
         reservation.setSections(List.of(section));
 
         userDTO = new UserDTO(2, "firstName", "lastName", "email", "phoneNumber", null, false);
@@ -119,6 +120,10 @@ public class UserServiceTests {
         Mockito.lenient()
         .when(userRepository.findUserByEmail("email"))
         .thenReturn(Optional.of(user));
+
+        Mockito.lenient()
+        .when(sectionRepository.findSectionBySectionNameAndRoomCode("sectionName", "roomCode"))
+        .thenReturn(Optional.of(section));
     }
 
     @Test
@@ -189,7 +194,7 @@ public class UserServiceTests {
     @Test
     public void addUserReservation_CorrectInput_ReservationAdded(){
         user.setReservations(new ArrayList<>());
-        List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO(1));
+        List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO(section.getSectionName(),room.getRoomCode()));
         POSTReservationDTO dto = new POSTReservationDTO(null, null, "reservationText", 100, tempSections);
         dto = userService.addUserReservation(1, dto);
 
@@ -199,7 +204,7 @@ public class UserServiceTests {
     @Test
     public void addUserReservation_WrongSectionId_ReservationNotAdded(){
         user.setReservations(new ArrayList<>());
-        List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO(2));
+        List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO("fake", room.getRoomCode()));
         POSTReservationDTO dto = new POSTReservationDTO(null, null, "reservationText", 100, tempSections);
         dto = userService.addUserReservation(1, dto);
 
@@ -209,7 +214,7 @@ public class UserServiceTests {
     @Test
     public void addUserReservation_WrongUserId_ReservationNotAdded(){
         user.setReservations(new ArrayList<>());
-        List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO(1));
+        List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO("sectionName", room.getRoomCode()));
         POSTReservationDTO dto = new POSTReservationDTO(null, null, "reservationText", 100, tempSections);
         dto = userService.addUserReservation(2, dto);
 
