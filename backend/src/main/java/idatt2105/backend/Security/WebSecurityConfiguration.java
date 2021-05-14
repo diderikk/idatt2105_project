@@ -50,7 +50,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .addFilterAfter(new JwtTokenFilter(), JwtUsernameAndPasswordAuthenticationFilter.class)
         .addFilterAfter(new ExceptionHandlerFilter(), JwtTokenFilter.class)
         .authorizeRequests()
-        .antMatchers("api/v1/**").permitAll()
+        .antMatchers("/api/v1/**").permitAll()
         .anyRequest().authenticated();
     }
 

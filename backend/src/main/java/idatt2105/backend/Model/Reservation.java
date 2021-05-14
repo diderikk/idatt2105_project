@@ -3,7 +3,6 @@ package idatt2105.backend.Model;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -34,7 +33,7 @@ public class Reservation {
     private String reservationText;
     private int amountOfPeople;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "Reservation_Section",
             joinColumns = @JoinColumn(name = "reservationId"),
@@ -42,7 +41,7 @@ public class Reservation {
     )
     private List<Section> sections;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "userId", referencedColumnName = "userId")
     private User user;
 }

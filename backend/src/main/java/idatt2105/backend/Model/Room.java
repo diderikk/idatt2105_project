@@ -2,7 +2,6 @@ package idatt2105.backend.Model;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -21,6 +20,6 @@ public class Room {
     @Id
     private String roomCode;
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "room")
     private List<Section> sections;
 }

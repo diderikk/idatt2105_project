@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
+import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.UserDTO;
 import idatt2105.backend.Service.UserService;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -58,6 +59,15 @@ public class UserController {
     public ResponseEntity<List<GETReservationDTO>> getAllUserReservations(@PathVariable("user_id") long userId){
         if(userService.getUser(userId) == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(userService.getUserReservations(userId), HttpStatus.OK);
+    }
+
+    @PostMapping("/{user_id}/reservations")
+    public ResponseEntity<POSTReservationDTO> addUserReservation(@PathVariable("user_id") long userId, @RequestBody POSTReservationDTO dto){
+        dto = userService.addUserReservation(userId, dto);
+        if(dto == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{user_id}/reservations/{reservation_id}")
