@@ -156,7 +156,7 @@ public class UserService implements UserDetailsService {
             userSecurityDetails.setGrantedAuthorities(grantedAuthorities);
             userSecurityDetails.setUserId(user.getUserId());
             if(user.getExpirationDate() != null){
-                boolean expired = (user.getExpirationDate().isAfter(LocalDate.now()));
+                boolean expired = user.getExpirationDate().isAfter(LocalDate.now());
                 userSecurityDetails.setAccountNonExpired(!expired);
             }
             return userSecurityDetails;
