@@ -32,6 +32,7 @@ public class Reservation {
     private LocalDateTime reservationStartTime;
     private LocalDateTime reservationEndTime;
     private String reservationText;
+    private int amountOfPeople;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
