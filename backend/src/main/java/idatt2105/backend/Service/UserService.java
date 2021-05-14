@@ -106,7 +106,7 @@ public class UserService implements UserDetailsService {
             reservation.setAmountOfPeople(dto.getAmountOfPeople());
             List<Section> registerSections = new ArrayList<>();
             for (POSTSectionDTO section : dto.getSections()) {
-                Optional<Section> optionalSection = sectionRepository.findById(section.getSectionId());
+                Optional<Section> optionalSection = sectionRepository.findSectionBySectionName(section.getSectionName());
                 if (optionalSection.isPresent() && checkIfNotAlreadyBooked(section, dto)) {
                     registerSections.add(optionalSection.get());
                 } else
@@ -181,7 +181,7 @@ public class UserService implements UserDetailsService {
      * @return
      */
     private boolean checkIfNotAlreadyBooked(POSTSectionDTO sectionDTO, POSTReservationDTO reservationDTO) {
-        for (Reservation reservation : sectionRepository.findById(sectionDTO.getSectionId()).get().getReservations()) {
+        for (Reservation reservation : sectionRepository.findSectionBySectionName(sectionDTO.getSectionName()).get().getReservations()) {
             if ((reservationDTO.getReservationStartTime().isAfter(reservation.getReservationStartTime())
                     || reservationDTO.getReservationStartTime().isEqual(reservation.getReservationStartTime()))
                     && (reservationDTO.getReservationEndTime().isBefore(reservation.getReservationEndTime())

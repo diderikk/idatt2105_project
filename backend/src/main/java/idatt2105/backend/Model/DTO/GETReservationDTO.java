@@ -30,7 +30,7 @@ public class GETReservationDTO {
         this.amountOfPeople = reservation.getAmountOfPeople();
         this.userId = reservation.getUser().getUserId();
         this.sections = reservation.getSections().stream()
-        .map(section -> new GETSectionDTO(section.getSectionId(), section.getRoom().getRoomCode()))
+        .map(section -> new GETSectionDTO(section.getSectionId(), section.getSectionName(), section.getRoom().getRoomCode()))
         .collect(Collectors.toList());
     }
 }
