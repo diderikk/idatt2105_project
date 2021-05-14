@@ -64,6 +64,7 @@ public class RoomService {
         LOGGER.info("getSectionOfRoom(String roomCode, long sectionId) called with roomCode: {}, and sectionId: {}", roomCode, sectionId);
         Optional<Room> roomOptional = roomRepository.findById(roomCode);
         if(roomOptional.isPresent()) {
+            if(roomOptional.get().getSections() == null) return null;
             for(Section section : roomOptional.get().getSections()) {
                 if(section.getSectionId() == sectionId) return new SectionDTO(section);
             }
@@ -80,7 +81,7 @@ public class RoomService {
     {
         LOGGER.info("getSectionsOfRoom(String roomCode) called with roomCode: {}", roomCode);
         Optional<Room> roomOptional = roomRepository.findById(roomCode);
-        if(roomOptional.isPresent()) return roomOptional.get().getSections().stream().map(section -> new SectionDTO(section)).collect(Collectors.toList());
+        if(roomOptional.isPresent() && roomOptional.get().getSections() != null) return roomOptional.get().getSections().stream().map(section -> new SectionDTO(section)).collect(Collectors.toList());
         return new ArrayList<>();
     }
 
@@ -195,4 +196,41 @@ public class RoomService {
         sectionRepository.save(newSection);
         return new RoomDTO(roomRepository.save(room.get()));
     }
+
+    /**
+     * Finds room based on roomCode and deletes it
+     * @param roomCode
+     * @return true if deletion was successful, false otherwise
+     */
+    public boolean deleteRoom(String roomCode)
+    {
+        LOGGER.info("deleteRoom(String roomCode) called with roomCode: {}", roomCode);
+        roomRepository.deleteById(roomCode);
+        return !roomRepository.existsById(roomCode);
+    }
+
+    /**
+     * Finds section based on id and deletes it
+     * @param roomCode
+     * @param sectionId
+     * @return true if deletion was successful, false otherwise
+     */
+    public boolean deleteSectionOfRoom(String roomCode, long sectionId)
+    {
+        LOGGER.info("deleteSectionOfRoom(String roomCode, long sectionId) called with roomCode: {}, and sectionId: {}", roomCode, sectionId);
+        Optional<Section> sectionOptional = sectionRepository.findById(sectionId);
+        Optional<Room> roomOptional = roomRepository.findById(roomCode);
+
+        // Return false if no section or room is present
+        if(!sectionOptional.isPresent()) return false;
+        if(!roomOptional.isPresent()) return false;
+
+        // Delete only if section is of this room
+        if(sectionOptional.get().getRoom() != null && sectionOptional.get().getRoom().getRoomCode().equals(roomCode) && roomOptional.get().getSections().remove(sectionOptional.get())) {
+            sectionRepository.deleteById(sectionId);
+            return !sectionRepository.existsById(sectionId);
+        }
+        return false;
+    }
+
 }

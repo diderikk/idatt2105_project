@@ -15,6 +15,6 @@ public class RoomDTO {
 
     public RoomDTO(Room room) {
         roomCode = room.getRoomCode();
-        sections = room.getSections().stream().map(section -> new SectionDTO(section)).collect(Collectors.toList());
+        if(room.getSections() != null) sections = room.getSections().stream().map(section -> new SectionDTO(section)).collect(Collectors.toList());
     }
 }

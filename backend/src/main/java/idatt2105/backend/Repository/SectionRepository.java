@@ -7,6 +7,5 @@ import idatt2105.backend.Model.Section;
 
 @Repository
 public interface SectionRepository extends JpaRepository<Section, Long> {
-    
 }
 

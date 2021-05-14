@@ -27,7 +27,7 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long sectionId;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "roomCode", referencedColumnName = "roomCode")
     private Room room;
 
