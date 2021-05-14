@@ -17,14 +17,19 @@ const routes: Array<RouteRecordRaw> = [
       import(/* webpackChunkName: "about" */ "../views/About.vue"),
   },
   {
-    path: "/createUser",
+    path: "/create-user",
     name: "CreateUser",
     component: () => import("../views/CreateUser.vue"),
   },
   {
-    path: "/createReservation",
+    path: "/create-reservation",
     name: "CreateReservation",
     component: () => import("../views/CreateReservation.vue"),
+  },
+  {
+    path: "/log-in",
+    name: "LogIn",
+    component: () => import("../views/LogIn.vue"),
   },
 ];
 
