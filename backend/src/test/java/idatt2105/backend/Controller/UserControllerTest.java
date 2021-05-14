@@ -19,12 +19,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import idatt2105.backend.Model.Reservation;
+import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.UserDTO;
 import idatt2105.backend.Repository.ReservationRepository;
+import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import idatt2105.backend.Repository.UserRepository;
 import idatt2105.backend.Service.UserService;
@@ -53,6 +55,9 @@ public class UserControllerTest {
     private ReservationRepository reservationRepository;
 
     @Autowired
+    private RoomRepository roomRepository;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -62,6 +67,7 @@ public class UserControllerTest {
     private Section section;
     private Reservation reservation;
     private UserDTO userDTO;
+    private Room room;
 
     @BeforeEach
     public void setup() {
@@ -76,8 +82,13 @@ public class UserControllerTest {
         user.setReservations(new ArrayList<>());
         user = userRepository.save(user);
 
+        room = new Room();
+        room.setRoomCode("roomCode");
+        room = roomRepository.save(room);
+
         section = new Section();
         section.setSeatAmount(10);
+        section.setRoom(room);
         section = sectionRepository.save(section);
 
         reservation = new Reservation();
@@ -90,6 +101,7 @@ public class UserControllerTest {
         reservation = reservationRepository.save(reservation);
 
         user = userRepository.findById(user.getUserId()).get();
+
 
 
         

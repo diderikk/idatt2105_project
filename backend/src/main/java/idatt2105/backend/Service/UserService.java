@@ -89,18 +89,15 @@ public class UserService implements UserDetailsService {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            return user.getReservations().stream()
-                    .map(reservation -> new GETReservationDTO(reservation.getReservationId(),
-                            reservation.getReservationStartTime(), reservation.getReservationEndTime(),
-                            reservation.getReservationText(), reservation.getAmountOfPeople()))
+            return user.getReservations().stream().map(reservation -> new GETReservationDTO(reservation))
                     .collect(Collectors.toList());
         }
         return List.of();
     }
 
-    public POSTReservationDTO addUserReservation(long userId, POSTReservationDTO dto){
+    public POSTReservationDTO addUserReservation(long userId, POSTReservationDTO dto) {
         Optional<User> optionalUser = userRepository.findById(userId);
-        if(optionalUser.isPresent()){
+        if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             Reservation reservation = new Reservation();
             reservation.setReservationStartTime(dto.getReservationStartTime());
@@ -108,12 +105,12 @@ public class UserService implements UserDetailsService {
             reservation.setReservationText(dto.getReservationText());
             reservation.setAmountOfPeople(dto.getAmountOfPeople());
             List<Section> registerSections = new ArrayList<>();
-            for(POSTSectionDTO section : dto.getSections()){
+            for (POSTSectionDTO section : dto.getSections()) {
                 Optional<Section> optionalSection = sectionRepository.findById(section.getSectionId());
-                if(optionalSection.isPresent() && checkIfNotAlreadyBooked(section, dto)){
+                if (optionalSection.isPresent() && checkIfNotAlreadyBooked(section, dto)) {
                     registerSections.add(optionalSection.get());
-                }
-                else return null;
+                } else
+                    return null;
             }
             reservation.setSections(registerSections);
             reservation.setUser(user);
@@ -123,10 +120,10 @@ public class UserService implements UserDetailsService {
         return null;
     }
 
-    public boolean removeUserReservation(long userId, long reservationId){
+    public boolean removeUserReservation(long userId, long reservationId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
-        if(optionalReservation.isPresent() && optionalUser.isPresent()){
+        if (optionalReservation.isPresent() && optionalUser.isPresent()) {
             Reservation reservation = optionalReservation.get();
             reservation.getSections().clear();
             reservation = reservationRepository.save(reservation);
@@ -166,6 +163,7 @@ public class UserService implements UserDetailsService {
 
     /**
      * Creates a random password
+     * 
      * @return randomly created password
      */
     private String createRandomPassword() {
@@ -177,21 +175,18 @@ public class UserService implements UserDetailsService {
 
     /**
      * n² complexity
+     * Section is already checked if it exists
      * @param sectionDTO
      * @param reservationDTO
      * @return
      */
-    private boolean checkIfNotAlreadyBooked(POSTSectionDTO sectionDTO, POSTReservationDTO reservationDTO){
-        for(Reservation reservation : sectionRepository.findById(sectionDTO.getSectionId()).get().getReservations()){
-            if((
-                reservationDTO.getReservationStartTime().isAfter(reservation.getReservationStartTime()) || 
-                reservationDTO.getReservationStartTime().isEqual(reservation.getReservationStartTime())
-                ) 
-                &&
-                (
-                reservationDTO.getReservationEndTime().isBefore(reservation.getReservationEndTime()) ||
-                reservationDTO.getReservationEndTime().isEqual(reservation.getReservationEndTime())
-            )) return false;
+    private boolean checkIfNotAlreadyBooked(POSTSectionDTO sectionDTO, POSTReservationDTO reservationDTO) {
+        for (Reservation reservation : sectionRepository.findById(sectionDTO.getSectionId()).get().getReservations()) {
+            if ((reservationDTO.getReservationStartTime().isAfter(reservation.getReservationStartTime())
+                    || reservationDTO.getReservationStartTime().isEqual(reservation.getReservationStartTime()))
+                    && (reservationDTO.getReservationEndTime().isBefore(reservation.getReservationEndTime())
+                            || reservationDTO.getReservationEndTime().isEqual(reservation.getReservationEndTime())))
+                return false;
         }
         return true;
     }

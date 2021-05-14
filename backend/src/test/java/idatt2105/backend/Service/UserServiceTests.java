@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import idatt2105.backend.Model.Reservation;
+import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.UserSecurityDetails;
@@ -59,6 +59,8 @@ public class UserServiceTests {
     private ChangePasswordDTO changePasswordDTO;
     private Reservation reservation;
     private Section section;
+    private Room room;
+    
 
     @BeforeEach
     public void setup(){
@@ -76,6 +78,7 @@ public class UserServiceTests {
         reservation.setReservationId(1);
         reservation.setReservationText("reservationText");
         reservation.setAmountOfPeople(1);
+        reservation.setUser(user);
 
         user.setReservations(List.of(reservation));
 
@@ -84,10 +87,15 @@ public class UserServiceTests {
         changePasswordDTO.setNewPassword("test");
         changePasswordDTO.setUserId(1);
 
+        room = new Room();
+        room.setRoomCode("roomCode");
+
         section = new Section();
         section.setSeatAmount(100);
         section.setSectionId(1);
         section.setReservations(List.of());
+        section.setRoom(room);
+        reservation.setSections(List.of(section));
 
         userDTO = new UserDTO(2, "firstName", "lastName", "email", "phoneNumber", null, false);
         Mockito.lenient().when(userRepository.findById(1L))
