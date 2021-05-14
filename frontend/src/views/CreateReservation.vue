@@ -2,45 +2,6 @@
   <div>
     <base-form-field-input
       :config="{
-        title: 'Choose the room name',
-        errorHelperMessage: 'Choose a room',
-        successHelperMessage: 'Valid!',
-        feedbackStatus: roomStatus,
-      }"
-    >
-      <select v-model="roomCode" @change="checkRoomValidity">
-        <option value="" hidden disabled>Select room</option>
-        <option
-          v-for="(room, index) in rooms"
-          :value="room.roomCode"
-          :key="index"
-        >
-          {{ room.roomCode }}
-        </option>
-      </select>
-    </base-form-field-input>
-
-    <base-form-field-input
-      :config="{
-        title: 'Choose the wished sections',
-        errorHelperMessage: 'Choose at least one section',
-        successHelperMessage: 'Valid!',
-        feedbackStatus: roomStatus,
-      }"
-    >
-      <button>Select all</button>
-      <div v-for="(section, index) in availableSections" :key="index">
-        <label>{{ section.name }} is checked {{ section.selected }}</label>
-        <input
-          @change="handleCheckBoxChange(section)"
-          :value="section.selected"
-          type="checkbox"
-        />
-      </div>
-    </base-form-field-input>
-
-    <base-form-field-input
-      :config="{
         title: 'Start date',
         errorHelperMessage: startDateErrorMessage,
         successHelperMessage: 'Valid!',
@@ -51,7 +12,10 @@
         v-model="startDate"
         :min="minDateString"
         :max="maxDateStartDateField"
-        @blur="checkStartDateValidity"
+        @blur="
+          checkStartDateValidity();
+          assignEndDate();
+        "
         type="date"
       />
     </base-form-field-input>
@@ -67,9 +31,10 @@
       <input
         v-model="endDate"
         :min="minDateEndDateField"
-        :max="maxDateString"
+        :max="maxDateEndDateField"
         @blur="checkEndDateValidity"
         type="date"
+        :disabled="disableEndDateField"
       />
     </base-form-field-input>
 
@@ -93,6 +58,73 @@
         :disabled="disableTimePickers"
         type="time"
       />
+    </base-form-field-input>
+    <base-form-field-input
+      :config="{
+        title: 'Choose the room name',
+        errorHelperMessage: 'Choose a room',
+        successHelperMessage: 'Valid!',
+        feedbackStatus: roomStatus,
+      }"
+    >
+      <select
+        v-model="roomCode"
+        @change="checkRoomValidity"
+        :disabled="!isDateAndTimeSelected"
+      >
+        <option value="" hidden disabled>Select room</option>
+        <option
+          v-for="(room, index) in rooms"
+          :value="room.roomCode"
+          :key="index"
+        >
+          {{ room.roomCode }}
+        </option>
+      </select>
+    </base-form-field-input>
+    <p v-if="availableSections.length === 0">
+      No sections available for this room during the selected time.
+    </p>
+    <base-form-field-input
+      v-else
+      :config="{
+        title: 'Choose sections',
+        errorHelperMessage: 'Choose at least one section',
+        successHelperMessage: 'Valid!',
+        feedbackStatus: sectionStatus,
+      }"
+    >
+      <button
+        @click="
+          selectAll();
+          checkSectionValidity();
+        "
+        :disabled="!isDateAndTimeSelected"
+      >
+        Select all
+      </button>
+      <button
+        @click="
+          removeAll();
+          checkSectionValidity();
+        "
+        :disabled="!isDateAndTimeSelected"
+      >
+        Remove all
+      </button>
+      <div v-for="(section, index) in availableSections" :key="index">
+        <label>{{ section.name }}</label>
+        <input
+          @change="
+            handleCheckBoxChange(section);
+            checkSectionValidity();
+          "
+          :value="section.selected"
+          :checked="section.selected"
+          type="checkbox"
+          :disabled="!isDateAndTimeSelected"
+        />
+      </div>
     </base-form-field-input>
     <base-form-field-input
       :config="{
@@ -141,11 +173,12 @@ export default defineComponent({
   name: "CreateReservation",
   components: { BaseFormFieldInput },
   setup() {
+    //Object containing all the information to be used in the form
     const registerInformation = reactive({
       roomCode: "",
       sections: [] as Array<string>,
       description: "",
-      startDate: "",
+      startDate: dateToString(removeTimeFromDate(new Date())),
       startTime: "",
       endDate: "",
       endTime: "",
@@ -154,9 +187,11 @@ export default defineComponent({
 
     //Rooms
     const roomStatus = ref(InputFieldFeedbackStatus.NONE);
+
+    /**
+     * Sets roomStatus to succes if the selected roomCode exists in the the rooms to be selected from, else it sets an ERROR
+     */
     const checkRoomValidity = () => {
-      console.log(registerInformation.roomCode);
-      rooms.value.forEach((room) => console.log(room.roomCode));
       if (
         rooms.value.some(
           (room) => room.roomCode === registerInformation.roomCode
@@ -166,7 +201,7 @@ export default defineComponent({
       } else roomStatus.value = InputFieldFeedbackStatus.ERROR;
     };
 
-    //TODO remove testdata
+    //TODO remove testdata and replace with async call to server
     const rooms: Ref<Array<Room>> = ref([
       {
         roomCode: "Rom 1",
@@ -187,10 +222,52 @@ export default defineComponent({
           },
         ],
       },
+      {
+        roomCode: "A4-121",
+        sections: [
+          {
+            name: "Kalle",
+          },
+          {
+            name: "Hei",
+          },
+        ],
+      },
+      {
+        roomCode: "A4-100",
+        sections: [],
+      },
     ]);
+    //Sorts all alphabeticalle based on the room code
+    rooms.value.sort((a, b) => {
+      if (a.roomCode.toLowerCase() < b.roomCode.toLowerCase()) {
+        return -1;
+      }
+      if (a.roomCode.toLowerCase() > b.roomCode.toLowerCase()) {
+        return 1;
+      }
+      return 0;
+    });
 
+    //Sections
     const availableSections: Ref<SectionForCheckBox[]> = ref([]);
-    //Need watcher instead of computed to not mutate computed
+    const sectionStatus = ref(InputFieldFeedbackStatus.NONE);
+    /**
+     * Checks if at least on section is selected, and sets the section status
+     */
+    const checkSectionValidity = () => {
+      sectionStatus.value =
+        registerInformation.sections.length !== 0
+          ? InputFieldFeedbackStatus.SUCCESS
+          : InputFieldFeedbackStatus.ERROR;
+    };
+
+    /**
+     * When a change in the selected roomCode occurs
+     * Removes all sections from the registerInformation object
+     * Maps all the sections from the selected room to SectionForCheckBox,where the initial selected value is false
+     * Need a watcher since computed object cannot be mutated
+     */
     watch(
       () => registerInformation.roomCode,
       () => {
@@ -206,9 +283,13 @@ export default defineComponent({
       }
     );
 
+    /**
+     * Selects or deselects a section
+     * Adds or removes the section name to/from the registerInformation object (depending on the check value)
+     * @param section The section to be selected or deselected
+     */
     const handleCheckBoxChange = (section: SectionForCheckBox) => {
       section.selected = !section.selected;
-      console.log(section);
       if (section.selected) {
         registerInformation.sections.push(section.name);
       } else {
@@ -217,31 +298,67 @@ export default defineComponent({
           1
         );
       }
-      /*if (registerInformation.sections.some((s) => section.name === s)) {
-        registerInformation.sections.splice(
-          registerInformation.sections.findIndex((s) => s === section.name),
-          1
-        );
-      } else {
-        registerInformation.sections.push(section.name);
-      }*/
+    };
+
+    /**
+     * Selects all of the sections for the current roomCode
+     * Adds all sections belonging to the current roomCode to the registerInformation  object
+     */
+    const selectAll = () => {
+      availableSections.value.forEach((sectionForCheckBox) => {
+        sectionForCheckBox.selected = true;
+        if (
+          !registerInformation.sections.some(
+            (sectionName) => sectionName === sectionForCheckBox.name
+          )
+        )
+          registerInformation.sections.push(sectionForCheckBox.name);
+      });
+    };
+
+    /**
+     * Removes all of the sections for the current roomCode
+     * Removes all sections belonging to the current roomCode of the registerInformation object
+     */
+    const removeAll = () => {
+      availableSections.value.forEach((sectionForCheckBox) => {
+        sectionForCheckBox.selected = false;
+      });
+      registerInformation.sections = [];
     };
 
     const currentDate = new Date();
+    //The minimum allowed date
     const minDate = removeTimeFromDate(currentDate);
-    const longestTimeInFuture = 6;
+    //Not allowed too book reservation more than half a year in advance
+    const longestTimeInFutureAllowedInMonths = 6;
+    //Not allow to reserve a room for more than a week
+    const maxDaysDifferenceBetweenStartAndEndDate = 7;
+
     const maxDate = removeTimeFromDate(currentDate);
-    maxDate.setMonth(minDate.getMonth() + longestTimeInFuture);
+    maxDate.setMonth(minDate.getMonth() + longestTimeInFutureAllowedInMonths);
+
     const minDateString = ref(dateToString(minDate));
     const maxDateString = ref(dateToString(maxDate));
 
+    /**
+     * Returns the startDate from the datePicker as a date, to be ble to do mathematical operations with it
+     */
     const startDateAsDate = computed(
       () => new Date(registerInformation.startDate)
     );
+
+    /**
+     * Returns the endDate from the datePicker as a date, to be ble to do mathematical operations with it
+     */
     const endDateAsDate = computed(() => new Date(registerInformation.endDate));
 
-    //Start date
-    const startDateStatus = ref(InputFieldFeedbackStatus.NONE);
+    //Is success because it starts as filled out
+    const startDateStatus = ref(InputFieldFeedbackStatus.SUCCESS);
+
+    /**
+     * Sets startDateStatus to SUCCESS if its a valid date
+     */
     const checkStartDateValidity = () => {
       startDateStatus.value =
         startDateAsDate.value <= maxDate &&
@@ -252,6 +369,19 @@ export default defineComponent({
           ? InputFieldFeedbackStatus.SUCCESS
           : InputFieldFeedbackStatus.ERROR;
     };
+
+    /**
+     * Assigns end date based on the selected start date
+     * Meaning that when a users selects a date 3 months from now the user does not need to go 3 months in the future when using the end date datpicker
+     */
+    const assignEndDate = () => {
+      if (registerInformation.startDate.trim() !== "")
+        registerInformation.endDate = registerInformation.startDate;
+    };
+
+    /**
+     * Returns the max date for the startDate picker
+     */
     const maxDateStartDateField = computed(() => {
       return registerInformation.endDate.trim() === "" ||
         maxDate < new Date(registerInformation.endDate)
@@ -259,6 +389,9 @@ export default defineComponent({
         : registerInformation.endDate;
     });
 
+    /**
+     * Calculates error message for starDate based on the constraints available
+     */
     const startDateErrorMessage = computed(
       () =>
         `Select a date between ${minDateString.value} and ${maxDateStartDateField.value}`
@@ -267,17 +400,29 @@ export default defineComponent({
     //End date
     const endDateStatus = ref(InputFieldFeedbackStatus.NONE);
 
+    /**
+     * Sets endDateStatus to SUCCESS if endDate is valid, or ERROR if it is not valid
+     */
     const checkEndDateValidity = () => {
       endDateStatus.value =
         endDateAsDate.value <= maxDate &&
         endDateAsDate.value >= minDate &&
-        (endDateAsDate.value >= startDateAsDate.value ||
-          registerInformation.startDate === "") &&
+        endDateAsDate.value >= startDateAsDate.value &&
         registerInformation.endDate !== ""
           ? InputFieldFeedbackStatus.SUCCESS
           : InputFieldFeedbackStatus.ERROR;
     };
 
+    /**
+     * Disabling endDate datePicker if a startDate is not selected
+     */
+    const disableEndDateField = computed(() => {
+      return registerInformation.startDate.trim() === "";
+    });
+
+    /**
+     * Calculates the minimum date allowed for the endDate datePicker
+     */
     const minDateEndDateField = computed(() => {
       return registerInformation.startDate.trim() === "" ||
         minDate > new Date(registerInformation.startDate)
@@ -285,12 +430,32 @@ export default defineComponent({
         : registerInformation.startDate;
     });
 
+    /**
+     * Calculates the max date allowed for the endDate datePicker
+     */
+    const maxDateEndDateField = computed(() => {
+      if (registerInformation.startDate.trim() === "") {
+        return maxDateString.value;
+      }
+      const tempDate = new Date(startDateAsDate.value);
+      tempDate.setDate(
+        startDateAsDate.value.getDate() +
+          maxDaysDifferenceBetweenStartAndEndDate
+      );
+      return maxDate > tempDate ? dateToString(tempDate) : maxDateString.value;
+    });
+
+    /**
+     * Computes error message for the
+     */
     const endDateErrorMessage = computed(
       () =>
-        `Select a date between ${minDateEndDateField.value} and ${maxDateString.value}`
+        `Select a date between ${minDateEndDateField.value} and ${maxDateEndDateField.value}`
     );
 
-    //Start time
+    /**
+     * Adds start date and start time together
+     */
     const startDateAndTime = computed(
       () =>
         new Date(
@@ -301,7 +466,9 @@ export default defineComponent({
         )
     );
 
-    //End time
+    /**
+     * Adds end date and end time together
+     */
     const endDateAndTime = computed(
       () =>
         new Date(
@@ -314,6 +481,9 @@ export default defineComponent({
 
     //Time
     const timeStatus = ref(InputFieldFeedbackStatus.NONE);
+    /**
+     * Sets timeStatus to SUCCESS if the selected times are valid, and ERROR if not
+     */
     const checkTimeValidity = () => {
       timeStatus.value =
         registerInformation.startTime === "" ||
@@ -322,14 +492,34 @@ export default defineComponent({
           ? InputFieldFeedbackStatus.ERROR
           : InputFieldFeedbackStatus.SUCCESS;
     };
+
+    /**
+     * Disables time pickers if the startDate and endDate are not selected
+     */
     const disableTimePickers = computed(
       () =>
         registerInformation.startDate === "" ||
         registerInformation.endDate === ""
     );
 
+    /**
+     * Checks if both start and end date is selected, and start and end time is selected
+     */
+    const isDateAndTimeSelected = computed(() => {
+      return (
+        registerInformation.startDate.trim() !== "" &&
+        registerInformation.endDate.trim() !== "" &&
+        registerInformation.startTime.trim() !== "" &&
+        registerInformation.endTime.trim() !== ""
+      );
+    });
+
     //Number of people
     const limitStatus = ref(InputFieldFeedbackStatus.NONE);
+
+    /**
+     * Sets limitStatus to SUCCESS if between 1 and 100 people have been added, else it is set to ERROR
+     */
     const checkLimitValidity = () => {
       //+ converts string to number or NaN
       const limitValue = +registerInformation.limit;
@@ -343,15 +533,17 @@ export default defineComponent({
       }
     };
 
-    const bookReservation = () => {
+    const bookReservation = async () => {
       //Want to run through every check so that the user gets all errors at once, and does not discover new errors after submitting again
       checkRoomValidity();
+      checkSectionValidity();
       checkStartDateValidity();
       checkEndDateValidity();
       checkTimeValidity();
       checkLimitValidity();
       const checks = [
         roomStatus,
+        sectionStatus,
         startDateStatus,
         endDateStatus,
         timeStatus,
@@ -362,7 +554,18 @@ export default defineComponent({
         if (check.value === InputFieldFeedbackStatus.SUCCESS) passed++;
       });
       if (passed === checks.length) {
-        //TODO make async call
+        const reservation = {
+          roomCode: registerInformation.roomCode,
+          sections: registerInformation.sections,
+          startTime:
+            registerInformation.startDate + " " + registerInformation.startTime,
+          endTime:
+            registerInformation.endDate + " " + registerInformation.endTime,
+          description: registerInformation.description,
+          limit: registerInformation.limit,
+        };
+        //TODO make async call instead of console logging
+        console.log(reservation);
       }
     };
 
@@ -371,22 +574,29 @@ export default defineComponent({
       rooms,
       roomStatus,
       checkRoomValidity,
-      //sectionCheckBoxMap,
       availableSections,
+      selectAll,
+      removeAll,
+      checkSectionValidity,
+      sectionStatus,
       handleCheckBoxChange,
       minDate,
       maxDate,
       maxDateStartDateField,
       minDateEndDateField,
+      maxDateEndDateField,
       minDateString,
       maxDateString,
       endDateStatus,
+      disableEndDateField,
       startDateErrorMessage,
       endDateErrorMessage,
       startDateStatus,
+      assignEndDate,
       checkStartDateValidity,
       checkEndDateValidity,
       checkTimeValidity,
+      isDateAndTimeSelected,
       timeStatus,
       disableTimePickers,
       limitStatus,
