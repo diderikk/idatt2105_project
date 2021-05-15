@@ -38,5 +38,6 @@ jobs:
           echo "$known_hosts" > ~/.ssh/known_hosts
           echo "$private_key" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+      - run: ssh backend@40.87.146.194 rm -rf backend/;
       - run: scp -r backend Makefile backend@40.87.146.194:~/
-      - run: ssh backend@40.87.146.194 docker stop backend
+      - run: ssh backend@40.87.146.194 cp config.properties backend/src/main/resources/ && docker stop backend;
