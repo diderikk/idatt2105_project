@@ -196,7 +196,7 @@ public class RoomService {
         // TODO: add ADMIN verification?
 
         Optional<Room> optionalRoom = roomRepository.findById(sectionDTO.getRoomCode());
-        if(!optionalRoom.isPresent()) return null;
+        if(!optionalRoom.isPresent() || isSectionNameInRoom(optionalRoom.get(), sectionDTO.getSectionName())) return null;
         Room room = optionalRoom.get();
 
         Section newSection = new Section();
@@ -261,6 +261,11 @@ public class RoomService {
             sectionRepository.deleteById(sectionId);
             return !sectionRepository.existsById(sectionId);
         }
+        return false;
+    }
+
+    private boolean isSectionNameInRoom(Room room, String sectionName){
+        for(Section section : room.getSections()) if(section.getSectionName().equals(sectionName)) return true;
         return false;
     }
 }

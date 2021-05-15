@@ -3,6 +3,7 @@ package idatt2105.backend.Model;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -25,6 +26,7 @@ public class User {
     private long userId;
     private String firstName;
     private String lastName;
+    @Column(unique = true)
     private String email;
     private String phoneNumber;
     private String hash;
