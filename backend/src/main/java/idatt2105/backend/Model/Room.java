@@ -3,6 +3,7 @@ package idatt2105.backend.Model;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
@@ -20,6 +21,6 @@ public class Room {
     @Id
     private String roomCode;
 
-    @OneToMany(mappedBy = "room")
+    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER)
     private List<Section> sections;
 }
