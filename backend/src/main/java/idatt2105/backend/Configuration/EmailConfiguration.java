@@ -1,6 +1,7 @@
 package idatt2105.backend.Configuration;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 
 import java.util.Properties;
@@ -14,6 +15,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
  * Configures email settings for EmailComponent
  */
 @Configuration
+@Profile("dev")
 @PropertySource("classpath:config.properties")
 public class EmailConfiguration {
 
