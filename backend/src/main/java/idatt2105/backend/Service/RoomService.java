@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import idatt2105.backend.Exception.NoRoomFoundException;
+import idatt2105.backend.Exception.NoSectionFoundException;
+import idatt2105.backend.Exception.SectionsListOfRoomIsNullException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
@@ -38,13 +41,16 @@ public class RoomService {
      * Returns room based on roomCode stored in the database
      * @param roomCode
      * @return RoomDTO object
+     * @throws NoRoomFoundException
      */
-    public RoomDTO getRoom(String roomCode)
+    public RoomDTO getRoom(String roomCode) throws NoRoomFoundException
     {
         LOGGER.info("getRoom(String roomCode) called with roomCode: {}", roomCode); 
         Optional<Room> room = roomRepository.findById(roomCode);
-        if(room.isPresent()) return new RoomDTO(room.get());
-        return null;
+        if(!room.isPresent()){
+            throw new NoRoomFoundException("No room found with room code: " + roomCode);
+        }
+        return new RoomDTO(room.get());
     }
 
     /**
@@ -63,31 +69,43 @@ public class RoomService {
      * @param roomCode
      * @param sectionId
      * @return SectionDTO, or null if room does not exist or section not found
+     * @throws NoRoomFoundException
+     * @throws NoSectionFoundException
      */
-    public GETSectionDTO getSectionOfRoom(String roomCode, long sectionId)
+    public GETSectionDTO getSectionOfRoom(String roomCode, long sectionId) throws NoRoomFoundException, NoSectionFoundException
     {
         LOGGER.info("getSectionOfRoom(String roomCode, long sectionId) called with roomCode: {}, and sectionId: {}", roomCode, sectionId);
         Optional<Room> roomOptional = roomRepository.findById(roomCode);
-        if(roomOptional.isPresent()) {
-            if(roomOptional.get().getSections() == null) return null;
-            for(Section section : roomOptional.get().getSections()) {
-                if(section.getSectionId() == sectionId) return new GETSectionDTO(section);
-            }
+        if(!roomOptional.isPresent()) {
+            throw new NoRoomFoundException("No room found with room code: " + roomCode);
         }
-        return null;
+        if(roomOptional.get().getSections() == null) {
+            throw new SectionsListOfRoomIsNullException("Sections list of room with code '" + roomCode + "' is null");
+        }
+
+        for(Section section : roomOptional.get().getSections()) {
+            if(section.getSectionId() == sectionId) return new GETSectionDTO(section);
+        }
+        throw new NoSectionFoundException("No section found with id: " + sectionId);
     }
 
     /**
      * Returns all sections of a specific room given by roomCode
      * @param roomCode
      * @return List of sections
+     * @throws NoRoomFoundException
      */
-    public List<GETSectionDTO> getSectionsOfRoom(String roomCode)
+    public List<GETSectionDTO> getSectionsOfRoom(String roomCode) throws NoRoomFoundException
     {
         LOGGER.info("getSectionsOfRoom(String roomCode) called with roomCode: {}", roomCode);
         Optional<Room> roomOptional = roomRepository.findById(roomCode);
-        if(roomOptional.isPresent() && roomOptional.get().getSections() != null) return roomOptional.get().getSections().stream().map(section -> new GETSectionDTO(section)).collect(Collectors.toList());
-        return new ArrayList<>();
+        if(!roomOptional.isPresent()) {
+            throw new NoRoomFoundException("No room found with room code: " + roomCode);
+        }
+        if(roomOptional.get().getSections() == null) {
+            throw new SectionsListOfRoomIsNullException("Sections list of room with code '" + roomCode + "' is null");
+        }
+        return roomOptional.get().getSections().stream().map(section -> new GETSectionDTO(section)).collect(Collectors.toList());
     }
 
     /**
@@ -142,16 +160,18 @@ public class RoomService {
      * Returns list of all resevations of a room, given by roomCode
      * @param roomCode
      * @return List of reservationDTOs
+     * @throws NoRoomFoundException
      */
-    public List<GETReservationDTO> getReservationsOfRoom(String roomCode)
+    public List<GETReservationDTO> getReservationsOfRoom(String roomCode) throws NoRoomFoundException
     {
         LOGGER.info("getReservationsOfRoom(String roomCode) called with roomCode: {}", roomCode);
-        Optional<Room> room = roomRepository.findById(roomCode);
+        Optional<Room> roomOptional = roomRepository.findById(roomCode);
         
-        //Return null if no room is present
-        if(!room.isPresent()) return null;
+        if(!roomOptional.isPresent()) {
+            throw new NoRoomFoundException("No room found with room code: " + roomCode);
+        }
 
-        List<Section> sections = room.get().getSections();
+        List<Section> sections = roomOptional.get().getSections();
         if(sections == null) sections = new ArrayList<>();
         List<Reservation> reservations = new ArrayList<>();
         for(Section section : sections) {
@@ -165,14 +185,16 @@ public class RoomService {
      * @param roomCode
      * @param sectionDTO
      * @return List of reservationDTOs, null if no section or section is not of the specific room
+     * @throws NoSectionFoundException
      */
-    public List<GETReservationDTO> getReservationsOfSection(String roomCode, long sectionId)
+    public List<GETReservationDTO> getReservationsOfSection(String roomCode, long sectionId) throws NoSectionFoundException
     {
         LOGGER.info("getReservationsOfSection(String roomCode, long sectionId) called with roomCode: {}, and sectionID: {}", roomCode, sectionId);
         Optional<Section> sectionOptional = sectionRepository.findById(sectionId);
 
-        //Return null if no section is present
-        if(!sectionOptional.isPresent()) return null;
+        if(!sectionOptional.isPresent()) {
+            throw new NoSectionFoundException("No section found with id: " + sectionId);
+        }
 
         List<GETReservationDTO> reservations = sectionOptional.get().getReservations().stream().map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
 
