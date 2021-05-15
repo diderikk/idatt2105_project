@@ -16,10 +16,10 @@ public class UserSecurityDetails implements UserDetails {
     private String email;
     private long userId;
     private List<? extends GrantedAuthority> grantedAuthorities;
-    private boolean isAccountNonExpired;
-    private boolean isAccountNonLocked;
-    private boolean isCredentialsNonExpired;
-    private boolean isEnabled;
+    private boolean isAccountNonExpired = true;
+    private boolean isAccountNonLocked = true;
+    private boolean isCredentialsNonExpired = true;
+    private boolean isEnabled = true;
     
     
     @Override
