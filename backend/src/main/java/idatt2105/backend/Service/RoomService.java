@@ -193,18 +193,19 @@ public class RoomService {
 
         // TODO: add ADMIN verification?
 
-        Optional<Room> room = roomRepository.findById(sectionDTO.getRoomCode());
-        if(!room.isPresent()) return null;
+        Optional<Room> optionalRoom = roomRepository.findById(sectionDTO.getRoomCode());
+        if(!optionalRoom.isPresent()) return null;
+        Room room = optionalRoom.get();
 
         Section newSection = new Section();
-        newSection.setRoom(room.get());
+        newSection.setRoom(room);
         newSection.setSectionName(sectionDTO.getSectionName());
-        List<Section> sections = room.get().getSections();
+        List<Section> sections = room.getSections();
         if(sections == null) sections = new ArrayList<>();
         sections.add(newSection);
-        room.get().setSections(sections);
+        room.setSections(sections);
         sectionRepository.save(newSection);
-        return new RoomDTO(roomRepository.save(room.get()));
+        return new RoomDTO(room);
     }
 
     /**
