@@ -120,7 +120,11 @@ public class ReservationControllerTest {
         mockMvc.perform(get("/api/v1/reservations")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].reservationId", equalTo((int) reservation.getReservationId())))
                 .andExpect(jsonPath("$.[0].reservationText", equalTo(reservation.getReservationText())))
-                .andExpect(jsonPath("$.[0].amountOfPeople", is(reservation.getAmountOfPeople())));
+                .andExpect(jsonPath("$.[0].amountOfPeople", is(reservation.getAmountOfPeople())))
+                .andExpect(jsonPath("$.[0].user.firstName", is(user.getFirstName())))
+                .andExpect(jsonPath("$.[0].user.lastName", is(user.getLastName())))
+                .andExpect(jsonPath("$.[0].user.email", is(user.getEmail())))
+                .andExpect(jsonPath("$.[0].user.phoneNumber", is(user.getPhoneNumber())));
     }
 
     @Test
@@ -128,7 +132,11 @@ public class ReservationControllerTest {
         mockMvc.perform(get("/api/v1/reservations/" + reservation.getReservationId())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.reservationId", is((int) reservation.getReservationId())))
                 .andExpect(jsonPath("$.reservationText", equalTo(reservation.getReservationText())))
-                .andExpect(jsonPath("$.amountOfPeople", is(reservation.getAmountOfPeople())));
+                .andExpect(jsonPath("$.amountOfPeople", is(reservation.getAmountOfPeople())))
+                .andExpect(jsonPath("$.user.firstName", is(user.getFirstName())))
+                .andExpect(jsonPath("$.user.lastName", is(user.getLastName())))
+                .andExpect(jsonPath("$.user.email", is(user.getEmail())))
+                .andExpect(jsonPath("$.user.phoneNumber", is(user.getPhoneNumber())));
     }
 
     @Test
@@ -140,13 +148,17 @@ public class ReservationControllerTest {
     public void editReservation_CorrectInput_EditsRequest() throws Exception {
         String dtoString = objectMapper.writeValueAsString(postReservationDTO);
         mockMvc.perform(post("/api/v1/reservations/"+ reservation.getReservationId())
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(dtoString))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.reservationId", is((int) reservation.getReservationId())))
-        .andExpect(jsonPath("$.reservationText", equalTo(postReservationDTO.getReservationText())))
-        .andExpect(jsonPath("$.amountOfPeople", is(postReservationDTO.getAmountOfPeople())))
-        .andExpect(jsonPath("$.sections.[0].sectionId", is((int)section.getSectionId())));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(dtoString))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.reservationId", is((int) reservation.getReservationId())))
+                .andExpect(jsonPath("$.reservationText", equalTo(postReservationDTO.getReservationText())))
+                .andExpect(jsonPath("$.amountOfPeople", is(postReservationDTO.getAmountOfPeople())))
+                .andExpect(jsonPath("$.sections.[0].sectionId", is((int)section.getSectionId())))
+                .andExpect(jsonPath("$.user.firstName", is(user.getFirstName())))
+                .andExpect(jsonPath("$.user.lastName", is(user.getLastName())))
+                .andExpect(jsonPath("$.user.email", is(user.getEmail())))
+                .andExpect(jsonPath("$.user.phoneNumber", is(user.getPhoneNumber())));
     }
 
     @Test
