@@ -7,6 +7,7 @@
         <router-link class="navbar-item" to="/create-user"
           >Create new user</router-link
         >
+        <router-link class="navbar-item" to="/edit-user">Edit user</router-link>
         <router-link class="navbar-item" to="/create-reservation"
           >Make reservation</router-link
         >
