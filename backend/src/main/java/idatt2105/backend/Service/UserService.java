@@ -101,8 +101,8 @@ public class UserService implements UserDetailsService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             Reservation reservation = new Reservation();
-            reservation.setReservationStartTime(dto.getReservationStartTime());
-            reservation.setReservationEndTime(dto.getReservationEndTime());
+            reservation.setStartTime(dto.getStartTime());
+            reservation.setEndTime(dto.getEndTime());
             reservation.setReservationText(dto.getReservationText());
             reservation.setAmountOfPeople(dto.getAmountOfPeople());
             List<Section> registerSections = new ArrayList<>();
@@ -190,10 +190,10 @@ public class UserService implements UserDetailsService {
         for (Reservation reservation : sectionRepository
                 .findSectionBySectionNameAndRoomCode(sectionDTO.getSectionName(), sectionDTO.getRoomCode()).get()
                 .getReservations()) {
-            if ((reservationDTO.getReservationStartTime().isAfter(reservation.getReservationStartTime())
-                    || reservationDTO.getReservationStartTime().isEqual(reservation.getReservationStartTime()))
-                    && (reservationDTO.getReservationEndTime().isBefore(reservation.getReservationEndTime())
-                            || reservationDTO.getReservationEndTime().isEqual(reservation.getReservationEndTime())))
+            if ((reservationDTO.getStartTime().isAfter(reservation.getStartTime())
+                    || reservationDTO.getStartTime().isEqual(reservation.getStartTime()))
+                    && (reservationDTO.getEndTime().isBefore(reservation.getEndTime())
+                            || reservationDTO.getEndTime().isEqual(reservation.getEndTime())))
                 return false;
         }
         return true;

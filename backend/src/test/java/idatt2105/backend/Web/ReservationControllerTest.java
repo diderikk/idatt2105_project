@@ -92,8 +92,8 @@ public class ReservationControllerTest {
 
         reservation = new Reservation();
         reservation.setAmountOfPeople(10);
-        reservation.setReservationStartTime(LocalDateTime.now());
-        reservation.setReservationEndTime(LocalDateTime.now().plusHours(2));
+        reservation.setStartTime(LocalDateTime.now());
+        reservation.setEndTime(LocalDateTime.now().plusHours(2));
         ArrayList<Section> sections = new ArrayList<>();
         sections.add(section);
         reservation.setSections(sections);

@@ -13,6 +13,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,8 +30,10 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long reservationId;
 
-    private LocalDateTime reservationStartTime;
-    private LocalDateTime reservationEndTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime endTime;
     private String reservationText;
     private int amountOfPeople;
 

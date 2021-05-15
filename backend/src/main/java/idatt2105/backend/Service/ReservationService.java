@@ -48,8 +48,8 @@ public class ReservationService {
         if(optionalReservation.isPresent()){
             Reservation reservation = optionalReservation.get();
             reservation.setAmountOfPeople(dto.getAmountOfPeople());
-            if(dto.getReservationStartTime() != null) reservation.setReservationStartTime(dto.getReservationStartTime());
-            if(dto.getReservationEndTime() != null) reservation.setReservationEndTime(dto.getReservationEndTime());
+            if(dto.getStartTime() != null) reservation.setStartTime(dto.getStartTime());
+            if(dto.getEndTime() != null) reservation.setEndTime(dto.getEndTime());
             if(dto.getReservationText() != null) reservation.setReservationText(dto.getReservationText());
             if(dto.getSections() != null && !dto.getSections().isEmpty()) {
                 for(POSTSectionDTO sectionDTO : dto.getSections()){
