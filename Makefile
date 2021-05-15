@@ -9,7 +9,7 @@ backend_build:
 	@docker build -t backend-server ./backend
 
 backend_run:
-	@docker run -p 8080:8080 --name backend --rm backend-server
+	@docker run -p 8443:8443 --name backend --rm backend-server
 
 backend_keystore:
 	-mkdir backend/src/main/resources/keystore
