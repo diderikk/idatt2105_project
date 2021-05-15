@@ -265,6 +265,7 @@ public class RoomService {
     }
 
     private boolean isSectionNameInRoom(Room room, String sectionName){
+        if(room.getSections() == null) return false;
         for(Section section : room.getSections()) if(section.getSectionName().equals(sectionName)) return true;
         return false;
     }
