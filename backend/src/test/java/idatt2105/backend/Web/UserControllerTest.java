@@ -103,7 +103,7 @@ public class UserControllerTest {
 
         user = userRepository.findById(user.getUserId()).get();
 
-        userDTO = new UserDTO(-1, "firstName", "lastName", "email", "phoneNumber", null, false);
+        userDTO = new UserDTO(-1, "firstName", "lastName", "email1", "phoneNumber", null, false);
 
     }
 
