@@ -1,30 +1,47 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+  <div>
+    <nav class="navbar is-primary" role="navigation">
+      <div class="navbar-start">
+        <router-link to="/" class="navbar-item">Home</router-link>
+        <router-link to="/about" class="navbar-item">About</router-link>
+        <router-link class="navbar-item" to="/create-user"
+          >Create new user</router-link
+        >
+        <router-link class="navbar-item" to="/create-reservation"
+          >Make reservation</router-link
+        >
+      </div>
+      <div class="navbar-end">
+        <!--Could not wrap the items in a div and use on if-else since it broke Bulma -->
+
+        <router-link class="navbar-item is-white" to="/log-in"
+          >Log In</router-link
+        >
+        <router-link @click="signOut" class="navbar-item" to="/log-in">
+          Sign out
+        </router-link>
+      </div>
+    </nav>
+    <div id="application-wrapper">
+      <router-view />
+    </div>
   </div>
-  <router-view />
 </template>
 
 <style>
+body {
+  margin: 0px;
+}
+
+#application-wrapper {
+  width: 60%;
+  margin: 4vh auto;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
 }
 </style>

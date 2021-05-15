@@ -1,11 +1,10 @@
 <template>
   <div>
-    <h1>Create user</h1>
+    <h1 class="title">Create user</h1>
     <base-form-field-input
       :config="{
         title: 'First name',
         errorHelperMessage: 'Enter a first name',
-        successHelperMessage: 'Valid!',
         feedbackStatus: firstNameStatus,
       }"
       ><input
@@ -13,13 +12,13 @@
         v-model="firstName"
         type="text"
         placeholder="First name"
+        class="input"
     /></base-form-field-input>
 
     <base-form-field-input
       :config="{
         title: 'Last name',
         errorHelperMessage: 'Enter a last name',
-        successHelperMessage: 'Valid!',
         feedbackStatus: lastNameStatus,
       }"
       ><input
@@ -27,13 +26,13 @@
         v-model="lastName"
         type="text"
         placeholder="Last name"
+        class="input"
     /></base-form-field-input>
 
     <base-form-field-input
       :config="{
         title: 'Email',
         errorHelperMessage: 'Enter an email (which includes a @ and a.)',
-        successHelperMessage: 'Valid!',
         feedbackStatus: emailStatus,
       }"
       ><input
@@ -41,34 +40,38 @@
         v-model="email"
         type="email"
         placeholder="example@example.com"
+        class="input"
     /></base-form-field-input>
     <base-form-field-input
       :config="{
         title: 'Phone number',
         errorHelperMessage: 'Enter the users national code and phone number',
-        successHelperMessage: 'Valid!',
         feedbackStatus: phoneNumberStatus,
       }"
     >
-      +<input
+      <span>+</span>
+      <input
         v-model="phoneNationalCode"
         @blur="checkPhoneNumberValidity"
         type="text"
+        placeholder="47"
         id="phoneNationalCode"
+        class="input"
       />
       <input
         v-model="phoneNumber"
         @blur="checkPhoneNumberValidity"
         type="tel"
         placeholder="Example:12345678"
+        id="phoneNumber"
+        class="input"
       />
     </base-form-field-input>
 
     <base-form-field-input
       :config="{
-        title: 'Last name',
+        title: 'Expiration date',
         errorHelperMessage: 'Enter an upcoming date',
-        successHelperMessage: 'Valid!',
         feedbackStatus: expirationDateStatus,
       }"
       ><input
@@ -77,8 +80,11 @@
         :min="tommorrowAsString"
         type="date"
         placeholder="Expiration date"
+        class="input"
     /></base-form-field-input>
-    <button @click="register">Create user</button>
+    <button @click="register" class="button is-link is-primary">
+      Create user
+    </button>
   </div>
 </template>
 
@@ -132,7 +138,9 @@ export default defineComponent({
       phoneNumberStatus.value =
         //Solomon islands have 5 digits, thats the smallest I could find
         registerInformation.phoneNumber.trim().length >= 5 &&
-        registerInformation.phoneNationalCode.trim().length >= 1
+        !isNaN(+registerInformation.phoneNumber.trim()) &&
+        registerInformation.phoneNationalCode.trim().length >= 1 &&
+        !isNaN(+registerInformation.phoneNationalCode.trim())
           ? InputFieldFeedbackStatus.SUCCESS
           : InputFieldFeedbackStatus.ERROR;
     };
@@ -202,6 +210,13 @@ export default defineComponent({
 
 <style scoped>
 #phoneNationalCode {
-  width: 1vw;
+  width: 3vw;
+  display: inline;
+  margin-left: 10px;
+}
+#phoneNumber {
+  display: inline;
+  width: 92.1%;
+  margin-left: 10px;
 }
 </style>

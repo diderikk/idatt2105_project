@@ -1,18 +1,21 @@
 <template>
-  <div>
-    <label>{{ config.title }}</label>
-    <slot id="input"></slot>
-    <p v-if="config.feedbackStatus === SUCCESS">
-      {{ config.successHelperMessage }}
+  <div class="field">
+    <label v-if="'title' in config" class="label">{{ config.title }}</label>
+    <slot></slot>
+    <p v-if="isSuccess" class="help is-success">
+      <span v-if="'successHelperMessage' in config">{{
+        config.successHelperMessage
+      }}</span
+      ><span v-else>&#10003;</span>
     </p>
-    <p v-else-if="config.feedbackStatus === ERROR">
+    <p v-else-if="isError" class="help is-danger">
       {{ config.errorHelperMessage }}
     </p>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { computed, defineComponent, PropType } from "vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import FormFieldInputConfig from "../interfaces/FormFieldInputConfig.interface";
 export default defineComponent({
@@ -23,21 +26,25 @@ export default defineComponent({
       required: true,
     },
   },
-  setup() {
-    //Have to extract from enum to be able to use them
-    const SUCCESS = InputFieldFeedbackStatus.SUCCESS;
-    const ERROR = InputFieldFeedbackStatus.ERROR;
+  setup(props) {
+    const isSuccess = computed(
+      () => props.config.feedbackStatus === InputFieldFeedbackStatus.SUCCESS
+    );
+
+    const isError = computed(
+      () => props.config.feedbackStatus === InputFieldFeedbackStatus.ERROR
+    );
 
     return {
-      SUCCESS,
-      ERROR,
+      isSuccess,
+      isError,
     };
   },
 });
 </script>
 
 <style scoped>
-#input {
-  display: block;
+p {
+  font-size: 15px;
 }
 </style>

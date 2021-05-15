@@ -4,7 +4,6 @@
       :config="{
         title: 'Start date',
         errorHelperMessage: startDateErrorMessage,
-        successHelperMessage: 'Valid!',
         feedbackStatus: startDateStatus,
       }"
     >
@@ -17,6 +16,7 @@
           assignEndDate();
         "
         type="date"
+        class="input"
       />
     </base-form-field-input>
 
@@ -24,7 +24,6 @@
       :config="{
         title: 'End date',
         errorHelperMessage: endDateErrorMessage,
-        successHelperMessage: 'Valid!',
         feedbackStatus: endDateStatus,
       }"
     >
@@ -35,6 +34,7 @@
         @blur="checkEndDateValidity"
         type="date"
         :disabled="disableEndDateField"
+        class="input"
       />
     </base-form-field-input>
 
@@ -42,7 +42,6 @@
       :config="{
         title: 'Start time and end time',
         errorHelperMessage: 'Fill inn a start time and end time ',
-        successHelperMessage: 'Valid!',
         feedbackStatus: timeStatus,
       }"
     >
@@ -51,46 +50,49 @@
         @blur="checkTimeValidity"
         :disabled="disableTimePickers"
         type="time"
+        class="input time"
+        id="left-time-input"
       />
       <input
         v-model="endTime"
         @blur="checkTimeValidity"
         :disabled="disableTimePickers"
         type="time"
+        class="input time"
       />
     </base-form-field-input>
     <base-form-field-input
       :config="{
         title: 'Choose the room name',
         errorHelperMessage: 'Choose a room',
-        successHelperMessage: 'Valid!',
         feedbackStatus: roomStatus,
       }"
     >
-      <select
-        v-model="roomCode"
-        @change="checkRoomValidity"
-        :disabled="!isDateAndTimeSelected"
-      >
-        <option value="" hidden disabled>Select room</option>
-        <option
-          v-for="(room, index) in rooms"
-          :value="room.roomCode"
-          :key="index"
+      <div class="select">
+        <select
+          v-model="roomCode"
+          @change="checkRoomValidity"
+          :disabled="!isDateAndTimeSelected"
         >
-          {{ room.roomCode }}
-        </option>
-      </select>
+          <option value="" hidden disabled>Select room</option>
+          <option
+            v-for="(room, index) in rooms"
+            :value="room.roomCode"
+            :key="index"
+          >
+            {{ room.roomCode }}
+          </option>
+        </select>
+      </div>
     </base-form-field-input>
-    <p v-if="availableSections.length === 0">
+    <label class="label">Choose Sections</label>
+    <p v-if="availableSections.length === 0" class="help is-danger">
       No sections available for this room during the selected time.
     </p>
     <base-form-field-input
       v-else
       :config="{
-        title: 'Choose sections',
         errorHelperMessage: 'Choose at least one section',
-        successHelperMessage: 'Valid!',
         feedbackStatus: sectionStatus,
       }"
     >
@@ -100,6 +102,7 @@
           checkSectionValidity();
         "
         :disabled="!isDateAndTimeSelected"
+        class="button is-primary"
       >
         Select all
       </button>
@@ -109,28 +112,30 @@
           checkSectionValidity();
         "
         :disabled="!isDateAndTimeSelected"
+        class="button"
       >
         Remove all
       </button>
       <div v-for="(section, index) in availableSections" :key="index">
-        <label>{{ section.name }}</label>
-        <input
-          @change="
-            handleCheckBoxChange(section);
-            checkSectionValidity();
-          "
-          :value="section.selected"
-          :checked="section.selected"
-          type="checkbox"
-          :disabled="!isDateAndTimeSelected"
-        />
+        <label class="checkbox">
+          <input
+            @change="
+              handleCheckBoxChange(section);
+              checkSectionValidity();
+            "
+            :value="section.selected"
+            :checked="section.selected"
+            type="checkbox"
+            :disabled="!isDateAndTimeSelected"
+          />
+          {{ section.name }}</label
+        >
       </div>
     </base-form-field-input>
     <base-form-field-input
       :config="{
         title: 'Enter the amount of people to use the room',
         errorHelperMessage: 'The number of people has to be between 1 and 100',
-        successHelperMessage: 'Valid!',
         feedbackStatus: limitStatus,
       }"
     >
@@ -140,16 +145,24 @@
         min="1"
         max="100"
         @blur="checkLimitValidity"
+        class="input"
       />
+      <p v-if="limitStatusIsNone" class="helper">Beetween 1 and 100</p>
     </base-form-field-input>
-    <label>Description of room use</label>
-    <textarea
-      v-model="description"
-      placeholder="Enter description for renting the room"
-      cols="30"
-      rows="10"
-    ></textarea>
-    <button @click="bookReservation">Book reservation</button>
+    <div class="field">
+      <label class="label">Description of room use</label>
+      <textarea
+        v-model="description"
+        placeholder="Enter description for renting the room"
+        cols="30"
+        rows="10"
+        class="textarea"
+      ></textarea>
+    </div>
+
+    <button @click="bookReservation" class="button is-link is-primary">
+      Book reservation
+    </button>
   </div>
 </template>
 
@@ -516,6 +529,9 @@ export default defineComponent({
 
     //Number of people
     const limitStatus = ref(InputFieldFeedbackStatus.NONE);
+    const limitStatusIsNone = computed(
+      () => limitStatus.value === InputFieldFeedbackStatus.NONE
+    );
 
     /**
      * Sets limitStatus to SUCCESS if between 1 and 100 people have been added, else it is set to ERROR
@@ -600,6 +616,7 @@ export default defineComponent({
       timeStatus,
       disableTimePickers,
       limitStatus,
+      limitStatusIsNone,
       checkLimitValidity,
       bookReservation,
     };
@@ -607,4 +624,17 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.time {
+  display: inline;
+  width: 49%;
+}
+
+#left-time-input {
+  margin-right: 2%;
+}
+
+button {
+  margin-right: 5px;
+}
+</style>
