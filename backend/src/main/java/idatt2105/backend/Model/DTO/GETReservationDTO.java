@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GETReservationDTO {
     private long reservationId;
-    private LocalDateTime reservationStartTime;
-    private LocalDateTime reservationEndTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private String reservationText;
     private int amountOfPeople;
     private long userId;
@@ -26,8 +26,8 @@ public class GETReservationDTO {
     public GETReservationDTO(Reservation reservation){
         this.reservationId = reservation.getReservationId();
         this.reservationText = reservation.getReservationText();
-        this.reservationStartTime = reservation.getReservationStartTime();
-        this.reservationEndTime = reservation.getReservationEndTime();
+        this.startTime = reservation.getStartTime();
+        this.endTime = reservation.getEndTime();
         this.amountOfPeople = reservation.getAmountOfPeople();
         if(reservation.getUser() != null) this.userId = reservation.getUser().getUserId();
         if(reservation.getSections() != null) this.sections = reservation.getSections().stream()

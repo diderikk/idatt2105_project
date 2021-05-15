@@ -59,15 +59,15 @@ public class RoomServiceTest {
 
         reservation1 = new Reservation();
         reservation1.setAmountOfPeople(5);
-        reservation1.setReservationStartTime(LocalDateTime.of(2000, 1, 1, 1, 1, 1));
-        reservation1.setReservationEndTime(LocalDateTime.of(2000, 1, 1, 2, 1, 1));
+        reservation1.setStartTime(LocalDateTime.of(2000, 1, 1, 1, 1, 1));
+        reservation1.setEndTime(LocalDateTime.of(2000, 1, 1, 2, 1, 1));
         reservation1.setReservationId(1);
         reservation1.setReservationText("reservation1");
 
         reservation2 = new Reservation();
         reservation2.setAmountOfPeople(10);
-        reservation2.setReservationStartTime(LocalDateTime.of(2000, 2, 2, 2, 2, 2));
-        reservation2.setReservationEndTime(LocalDateTime.of(2000, 2, 2, 3, 2, 2));
+        reservation2.setStartTime(LocalDateTime.of(2000, 2, 2, 2, 2, 2));
+        reservation2.setEndTime(LocalDateTime.of(2000, 2, 2, 3, 2, 2));
         reservation2.setReservationId(2);
         reservation2.setReservationText("reservation2");
 
@@ -232,14 +232,14 @@ public class RoomServiceTest {
         List<GETReservationDTO> reservationDTOs = roomService.getReservationsOfRoom(room1.getRoomCode());
         assertNotNull(reservationDTOs);
         assertThat(reservationDTOs.get(0).getAmountOfPeople()).isEqualTo(reservation1.getAmountOfPeople());
-        assertThat(reservationDTOs.get(0).getReservationStartTime()).isEqualTo(reservation1.getReservationStartTime());
-        assertThat(reservationDTOs.get(0).getReservationEndTime()).isEqualTo(reservation1.getReservationEndTime());
+        assertThat(reservationDTOs.get(0).getStartTime()).isEqualTo(reservation1.getStartTime());
+        assertThat(reservationDTOs.get(0).getEndTime()).isEqualTo(reservation1.getEndTime());
         assertThat(reservationDTOs.get(0).getReservationId()).isEqualTo(reservation1.getReservationId());
         assertThat(reservationDTOs.get(0).getReservationText()).isEqualTo(reservation1.getReservationText());
 
         assertThat(reservationDTOs.get(1).getAmountOfPeople()).isEqualTo(reservation2.getAmountOfPeople());
-        assertThat(reservationDTOs.get(1).getReservationStartTime()).isEqualTo(reservation2.getReservationStartTime());
-        assertThat(reservationDTOs.get(1).getReservationEndTime()).isEqualTo(reservation2.getReservationEndTime());
+        assertThat(reservationDTOs.get(1).getStartTime()).isEqualTo(reservation2.getStartTime());
+        assertThat(reservationDTOs.get(1).getEndTime()).isEqualTo(reservation2.getEndTime());
         assertThat(reservationDTOs.get(1).getReservationId()).isEqualTo(reservation2.getReservationId());
         assertThat(reservationDTOs.get(1).getReservationText()).isEqualTo(reservation2.getReservationText());
     }
@@ -265,14 +265,14 @@ public class RoomServiceTest {
         List<GETReservationDTO> reservationDTOs = roomService.getReservationsOfSection(room1.getRoomCode(), section1.getSectionId());
         assertNotNull(reservationDTOs);
         assertThat(reservationDTOs.get(0).getAmountOfPeople()).isEqualTo(reservation1.getAmountOfPeople());
-        assertThat(reservationDTOs.get(0).getReservationStartTime()).isEqualTo(reservation1.getReservationStartTime());
-        assertThat(reservationDTOs.get(0).getReservationEndTime()).isEqualTo(reservation1.getReservationEndTime());
+        assertThat(reservationDTOs.get(0).getStartTime()).isEqualTo(reservation1.getStartTime());
+        assertThat(reservationDTOs.get(0).getEndTime()).isEqualTo(reservation1.getEndTime());
         assertThat(reservationDTOs.get(0).getReservationId()).isEqualTo(reservation1.getReservationId());
         assertThat(reservationDTOs.get(0).getReservationText()).isEqualTo(reservation1.getReservationText());
 
         assertThat(reservationDTOs.get(1).getAmountOfPeople()).isEqualTo(reservation2.getAmountOfPeople());
-        assertThat(reservationDTOs.get(1).getReservationStartTime()).isEqualTo(reservation2.getReservationStartTime());
-        assertThat(reservationDTOs.get(1).getReservationEndTime()).isEqualTo(reservation2.getReservationEndTime());
+        assertThat(reservationDTOs.get(1).getStartTime()).isEqualTo(reservation2.getStartTime());
+        assertThat(reservationDTOs.get(1).getEndTime()).isEqualTo(reservation2.getEndTime());
         assertThat(reservationDTOs.get(1).getReservationId()).isEqualTo(reservation2.getReservationId());
         assertThat(reservationDTOs.get(1).getReservationText()).isEqualTo(reservation2.getReservationText());
     }

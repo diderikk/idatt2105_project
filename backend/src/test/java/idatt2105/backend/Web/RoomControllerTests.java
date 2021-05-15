@@ -71,14 +71,14 @@ public class RoomControllerTests {
 
         reservation1 = new Reservation();
         reservation1.setAmountOfPeople(5);
-        reservation1.setReservationStartTime(LocalDateTime.of(2000, 1, 1, 1, 1, 1));
-        reservation1.setReservationEndTime(LocalDateTime.of(2000, 1, 1, 2, 1, 1));
+        reservation1.setStartTime(LocalDateTime.of(2000, 1, 1, 1, 1, 1));
+        reservation1.setEndTime(LocalDateTime.of(2000, 1, 1, 2, 1, 1));
         reservation1.setReservationText("reservation1");
 
         reservation2 = new Reservation();
         reservation2.setAmountOfPeople(10);
-        reservation2.setReservationStartTime(LocalDateTime.of(2000, 2, 2, 2, 2, 2));
-        reservation2.setReservationEndTime(LocalDateTime.of(2000, 2, 2, 3, 2, 2));
+        reservation2.setStartTime(LocalDateTime.of(2000, 2, 2, 2, 2, 2));
+        reservation2.setEndTime(LocalDateTime.of(2000, 2, 2, 3, 2, 2));
         reservation2.setReservationText("reservation2");
 
         section1 = new Section();
@@ -149,13 +149,13 @@ public class RoomControllerTests {
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$.[0].reservationId", is((int)(reservation1.getReservationId()))))
                 .andExpect(jsonPath("$.[0].amountOfPeople", is(reservation1.getAmountOfPeople())))
-                .andExpect(jsonPath("$.[0].reservationStartTime", is(reservation1.getReservationStartTime().toString())))
-                .andExpect(jsonPath("$.[0].reservationEndTime", is(reservation1.getReservationEndTime().toString())))
+                .andExpect(jsonPath("$.[0].startTime", is(reservation1.getStartTime().toString())))
+                .andExpect(jsonPath("$.[0].endTime", is(reservation1.getEndTime().toString())))
                 .andExpect(jsonPath("$.[0].reservationText", is(reservation1.getReservationText())))
                 .andExpect(jsonPath("$.[1].reservationId", is((int)(reservation2.getReservationId()))))
                 .andExpect(jsonPath("$.[1].amountOfPeople", is(reservation2.getAmountOfPeople())))
-                .andExpect(jsonPath("$.[1].reservationStartTime", is(reservation2.getReservationStartTime().toString())))
-                .andExpect(jsonPath("$.[1].reservationEndTime", is(reservation2.getReservationEndTime().toString())))
+                .andExpect(jsonPath("$.[1].startTime", is(reservation2.getStartTime().toString())))
+                .andExpect(jsonPath("$.[1].endTime", is(reservation2.getEndTime().toString())))
                 .andExpect(jsonPath("$.[1].reservationText", is(reservation2.getReservationText())))
                 .andReturn();
 
@@ -172,13 +172,13 @@ public class RoomControllerTests {
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$.[0].reservationId", is((int)(reservation1.getReservationId()))))
                 .andExpect(jsonPath("$.[0].amountOfPeople", is(reservation1.getAmountOfPeople())))
-                .andExpect(jsonPath("$.[0].reservationStartTime", is(reservation1.getReservationStartTime().toString())))
-                .andExpect(jsonPath("$.[0].reservationEndTime", is(reservation1.getReservationEndTime().toString())))
+                .andExpect(jsonPath("$.[0].startTime", is(reservation1.getStartTime().toString())))
+                .andExpect(jsonPath("$.[0].endTime", is(reservation1.getEndTime().toString())))
                 .andExpect(jsonPath("$.[0].reservationText", is(reservation1.getReservationText())))
                 .andExpect(jsonPath("$.[1].reservationId", is((int)(reservation2.getReservationId()))))
                 .andExpect(jsonPath("$.[1].amountOfPeople", is(reservation2.getAmountOfPeople())))
-                .andExpect(jsonPath("$.[1].reservationStartTime", is(reservation2.getReservationStartTime().toString())))
-                .andExpect(jsonPath("$.[1].reservationEndTime", is(reservation2.getReservationEndTime().toString())))
+                .andExpect(jsonPath("$.[1].startTime", is(reservation2.getStartTime().toString())))
+                .andExpect(jsonPath("$.[1].endTime", is(reservation2.getEndTime().toString())))
                 .andExpect(jsonPath("$.[1].reservationText", is(reservation2.getReservationText())))
                 .andReturn();
     }
