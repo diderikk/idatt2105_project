@@ -5,7 +5,14 @@
     class="notification is-dark"
   >
     <button @click="close" class="delete"></button>
-    <p :class="{ error: isError, success: isSuccess }">{{ snackbar.title }}</p>
+    <pulse-loader
+      v-if="isLoading"
+      :loading="isLoading"
+      color="white"
+    ></pulse-loader>
+    <p v-else :class="{ error: isError, success: isSuccess }">
+      {{ snackbar.title }}
+    </p>
   </div>
 </template>
 
@@ -14,8 +21,12 @@ import { computed, defineComponent, ref, watch } from "vue";
 //TODO Change useStore import to the one defined in authentication branch
 import { useStore } from "vuex";
 import SnackBarStatus from "../enum/SnackbarStatus.enum";
+import PulseLoader from "vue-spinner/src/PulseLoader.vue";
 export default defineComponent({
   name: "Snackbar",
+  components: {
+    PulseLoader,
+  },
   setup() {
     const store = useStore();
 
@@ -35,8 +46,8 @@ export default defineComponent({
 
     setTimeout(() => {
       store.commit("setSnackbar", {
-        title: "Success",
-        status: SnackBarStatus.SUCCESS,
+        title: "Error",
+        status: SnackBarStatus.ERROR,
       });
     }, 3000);
 
@@ -48,6 +59,10 @@ export default defineComponent({
           visible.value = false;
         }, 7000);
       }
+    );
+
+    const isLoading = computed(
+      () => snackbar.value.status === SnackBarStatus.LOADING
     );
 
     const isError = computed(
@@ -67,6 +82,7 @@ export default defineComponent({
       snackbar,
       isError,
       isSuccess,
+      isLoading,
     };
   },
 });
