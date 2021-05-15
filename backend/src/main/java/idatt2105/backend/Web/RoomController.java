@@ -72,6 +72,10 @@ public class RoomController {
 
     @PostMapping("/{room_code}/sections")
     public ResponseEntity<RoomDTO> addSectionToRoom(@PathVariable("room_code") String roomCode, @RequestBody POSTSectionDTO sectionDTO) {
+        //Return HTTP 400 if roomCode does not match roomCode in sectionDTO
+        if(!roomCode.equals(sectionDTO.getRoomCode())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         RoomDTO roomDTO = roomService.addSectionToRoom(sectionDTO);
         if (roomDTO == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
