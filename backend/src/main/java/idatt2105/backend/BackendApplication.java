@@ -16,13 +16,13 @@ public class BackendApplication {
 		SpringApplication.run(BackendApplication.class, args);
 	}
 
-	@Autowired
-	RoomService roomService;
+	// @Autowired
+	// RoomService roomService;
 
-	@Bean
-	public CommandLineRunner run() {
-		return args -> {
-			roomService.addSectionToRoom(new POSTSectionDTO("Bord 1", "A4-112"));
-		};
-	}
+	// @Bean
+	// public CommandLineRunner run() {
+	// 	return args -> {
+	// 		roomService.addSectionToRoom(new POSTSectionDTO("Bord 1", "A4-112"));
+	// 	};
+	// }
 }
