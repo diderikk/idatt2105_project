@@ -6,32 +6,25 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
+import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.RoomDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
-import idatt2105.backend.Service.RoomService;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -46,9 +39,6 @@ public class RoomControllerTests {
     
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private RoomService roomService;
 
     @Autowired
     private RoomRepository roomRepository;
@@ -153,15 +143,72 @@ public class RoomControllerTests {
     }
 
     @Test
-    public void getReservationsOfRoom_UsingRoomCode_StatusOk() throws Exception {
+    public void getReservationsOfRoom_ReturnsListOfReservationsAndStatus_StatusOk() throws Exception {
         this.mockMvc.perform(get("/api/v1/rooms/" + room1.getRoomCode() + "/reservations"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$.[0].reservationId", is((int)(reservation1.getReservationId()))))
+                .andExpect(jsonPath("$.[0].amountOfPeople", is(reservation1.getAmountOfPeople())))
+                .andExpect(jsonPath("$.[0].reservationStartTime", is(reservation1.getReservationStartTime().toString())))
+                .andExpect(jsonPath("$.[0].reservationEndTime", is(reservation1.getReservationEndTime().toString())))
+                .andExpect(jsonPath("$.[0].reservationText", is(reservation1.getReservationText())))
                 .andExpect(jsonPath("$.[1].reservationId", is((int)(reservation2.getReservationId()))))
+                .andExpect(jsonPath("$.[1].amountOfPeople", is(reservation2.getAmountOfPeople())))
+                .andExpect(jsonPath("$.[1].reservationStartTime", is(reservation2.getReservationStartTime().toString())))
+                .andExpect(jsonPath("$.[1].reservationEndTime", is(reservation2.getReservationEndTime().toString())))
+                .andExpect(jsonPath("$.[1].reservationText", is(reservation2.getReservationText())))
+                .andReturn();
+
+        this.mockMvc.perform(get("/api/v1/rooms/" + room2.getRoomCode() + "/reservations"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)))
                 .andReturn();
     }
 
+    @Test
+    public void getReservationsOfSection_ReturnsListOfReservationsAndStatus_StatusOk() throws Exception {
+        this.mockMvc.perform(get("/api/v1/rooms/" + room1.getRoomCode() + "/sections/" + section1.getSectionId() + "/reservations"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$.[0].reservationId", is((int)(reservation1.getReservationId()))))
+                .andExpect(jsonPath("$.[0].amountOfPeople", is(reservation1.getAmountOfPeople())))
+                .andExpect(jsonPath("$.[0].reservationStartTime", is(reservation1.getReservationStartTime().toString())))
+                .andExpect(jsonPath("$.[0].reservationEndTime", is(reservation1.getReservationEndTime().toString())))
+                .andExpect(jsonPath("$.[0].reservationText", is(reservation1.getReservationText())))
+                .andExpect(jsonPath("$.[1].reservationId", is((int)(reservation2.getReservationId()))))
+                .andExpect(jsonPath("$.[1].amountOfPeople", is(reservation2.getAmountOfPeople())))
+                .andExpect(jsonPath("$.[1].reservationStartTime", is(reservation2.getReservationStartTime().toString())))
+                .andExpect(jsonPath("$.[1].reservationEndTime", is(reservation2.getReservationEndTime().toString())))
+                .andExpect(jsonPath("$.[1].reservationText", is(reservation2.getReservationText())))
+                .andReturn();
+    }
 
+    @Test
+    public void addSectionToRoom_ReturnRoomAndStatus_StatusOk() throws Exception {
+        POSTSectionDTO sectionDTO = new POSTSectionDTO();
+        sectionDTO.setRoomCode(room2.getRoomCode());
+        sectionDTO.setSectionName("sectionName");
+        String sectionJson = objectMapper.writeValueAsString(sectionDTO);
 
+        this.mockMvc.perform(post("/api/v1/rooms/" + room2.getRoomCode() + "/sections")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(sectionJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.roomCode", is(room2.getRoomCode())))
+                .andReturn();
+    }
+
+    @Test
+    public void deleteRoom_ShouldDeleteRoom_StatusOk() throws Exception {
+        this.mockMvc.perform(delete("/api/v1/rooms/" + room2.getRoomCode()))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    public void deleteSectionOfRoom_ShouldDeleteSection_StatusOk() throws Exception {
+        this.mockMvc.perform(delete("/api/v1/rooms/" + room1.getRoomCode() + "/sections/" + section1.getSectionId()))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
 }

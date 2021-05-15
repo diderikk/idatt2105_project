@@ -61,7 +61,7 @@ public class RoomController {
         return new ResponseEntity<>(reservations, HttpStatus.OK);
     }
 
-    @GetMapping("/{room_id}/sections/{section_id}/reservations")
+    @GetMapping("/{room_code}/sections/{section_id}/reservations")
     public ResponseEntity<List<GETReservationDTO>> getReservationsOfSection(@PathVariable("room_code") String roomCode, @PathVariable("section_id") long sectionId) {
         List<GETReservationDTO> reservations = roomService.getReservationsOfSection(roomCode, sectionId);
         if (reservations == null) {
@@ -88,7 +88,7 @@ public class RoomController {
     }
 
     @DeleteMapping("/{room_code}/sections/{section_id}")
-    public ResponseEntity<RoomDTO> deleteRoom(@PathVariable("room_code") String roomCode, @PathVariable("section_id") long sectionId) {
+    public ResponseEntity<RoomDTO> deleteSectionOfRoom(@PathVariable("room_code") String roomCode, @PathVariable("section_id") long sectionId) {
         if (roomService.deleteSectionOfRoom(roomCode, sectionId)) {
             return new ResponseEntity<>(HttpStatus.OK);
         }
