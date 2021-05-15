@@ -103,10 +103,6 @@ public class UserControllerTest {
 
         user = userRepository.findById(user.getUserId()).get();
 
-
-
-        
-
         userDTO = new UserDTO(-1, "firstName", "lastName", "email", "phoneNumber", null, false);
 
     }
@@ -131,7 +127,7 @@ public class UserControllerTest {
 
     @Test
     public void getUser_UserDoesNotExist_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(get("/api/v1/users/0")).andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/v1/users/0")).andExpect(status().isNotFound());
     }
 
     @Test
@@ -151,73 +147,63 @@ public class UserControllerTest {
     }
 
     @Test
-    public void changePassword_CorrectInput_PasswordChanged() throws Exception{
+    public void changePassword_CorrectInput_PasswordChanged() throws Exception {
         ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO();
         changePasswordDTO.setUserId(user.getUserId());
         changePasswordDTO.setOldPassword("hash");
         changePasswordDTO.setNewPassword("newHash");
         String changePasswordDTOString = objectMapper.writeValueAsString(changePasswordDTO);
 
-        mockMvc.perform(put("/api/v1/users/"+ user.getUserId() + "/password")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(changePasswordDTOString))
-        .andExpect(status().isOk());
+        mockMvc.perform(put("/api/v1/users/" + user.getUserId() + "/password").contentType(MediaType.APPLICATION_JSON)
+                .content(changePasswordDTOString)).andExpect(status().isOk());
 
         changePasswordDTO.setOldPassword("newHash");
         changePasswordDTOString = objectMapper.writeValueAsString(changePasswordDTO);
 
-        mockMvc.perform(put("/api/v1/users/"+ user.getUserId() + "/password")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(changePasswordDTOString))
-        .andExpect(status().isOk());
+        mockMvc.perform(put("/api/v1/users/" + user.getUserId() + "/password").contentType(MediaType.APPLICATION_JSON)
+                .content(changePasswordDTOString)).andExpect(status().isOk());
     }
 
     @Test
-    public void changePassword_WrongOldPassword_BadRequest() throws Exception{
+    public void changePassword_WrongOldPassword_BadRequest() throws Exception {
         ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO();
         changePasswordDTO.setUserId(user.getUserId());
         changePasswordDTO.setOldPassword("hash123");
         changePasswordDTO.setNewPassword("newHash");
         String changePasswordDTOString = objectMapper.writeValueAsString(changePasswordDTO);
 
-        mockMvc.perform(put("/api/v1/users/"+ user.getUserId() + "/password")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(changePasswordDTOString))
-        .andExpect(status().isBadRequest());
+        mockMvc.perform(put("/api/v1/users/" + user.getUserId() + "/password").contentType(MediaType.APPLICATION_JSON)
+                .content(changePasswordDTOString)).andExpect(status().isBadRequest());
     }
 
     @Test
-    public void getUserReservations_UserExists_ReturnsListOfOneObject() throws Exception{
-        mockMvc.perform(get("/api/v1/users/"+user.getUserId()+"/reservations"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.[0].reservationId", is((int)reservation.getReservationId())))
-        .andExpect(jsonPath("$.[0].reservationText", equalTo(reservation.getReservationText())))
-        .andExpect(jsonPath("$.[0].amountOfPeople", is(reservation.getAmountOfPeople())));
+    public void getUserReservations_UserExists_ReturnsListOfOneObject() throws Exception {
+        mockMvc.perform(get("/api/v1/users/" + user.getUserId() + "/reservations")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].reservationId", is((int) reservation.getReservationId())))
+                .andExpect(jsonPath("$.[0].reservationText", equalTo(reservation.getReservationText())))
+                .andExpect(jsonPath("$.[0].amountOfPeople", is(reservation.getAmountOfPeople())));
     }
 
     @Test
-    public void addUserReservation_InputCorrect_ReservationAdded() throws Exception{
+    public void addUserReservation_InputCorrect_ReservationAdded() throws Exception {
         POSTReservationDTO dto = new POSTReservationDTO();
         dto.setAmountOfPeople(10);
         dto.setReservationText("test");
         dto.setSections(new ArrayList<>());
         String DTOString = objectMapper.writeValueAsString(dto);
-        mockMvc.perform(post("/api/v1/users/"+user.getUserId()+"/reservations")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(DTOString))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.reservationText", equalTo(dto.getReservationText())))
-        .andExpect(jsonPath("$.amountOfPeople", is(dto.getAmountOfPeople())));
+        mockMvc.perform(post("/api/v1/users/" + user.getUserId() + "/reservations")
+                .contentType(MediaType.APPLICATION_JSON).content(DTOString)).andExpect(status().isCreated())
+                .andExpect(jsonPath("$.reservationText", equalTo(dto.getReservationText())))
+                .andExpect(jsonPath("$.amountOfPeople", is(dto.getAmountOfPeople())));
     }
 
     @Test
-    public void removeUserReservation_ReservationExists_ReservationDeleted() throws Exception{
+    public void removeUserReservation_ReservationExists_ReservationDeleted() throws Exception {
         mockMvc.perform(delete("/api/v1/users/" + user.getUserId() + "/reservations/" + reservation.getReservationId()))
-        .andExpect(status().isOk());
+                .andExpect(status().isOk());
 
-        MvcResult result = mockMvc.perform(get("/api/v1/users/"+user.getUserId()+"/reservations"))
-        .andExpect(status().isOk())
-        .andReturn();
+        MvcResult result = mockMvc.perform(get("/api/v1/users/" + user.getUserId() + "/reservations"))
+                .andExpect(status().isOk()).andReturn();
 
         assertEquals("[]", result.getResponse().getContentAsString());
     }
