@@ -1,4 +1,5 @@
 backend: backend_stop backend_keystore backend_build backend_run
+deploy: backend_stop
 
 backend_stop:
 	-docker stop backend
