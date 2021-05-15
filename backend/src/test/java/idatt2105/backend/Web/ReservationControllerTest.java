@@ -1,4 +1,4 @@
-package idatt2105.backend.Controller;
+package idatt2105.backend.Web;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
