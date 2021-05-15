@@ -63,6 +63,7 @@ public class UserService implements UserDetailsService {
         User createdUser = new User();
         if (inputUser.getEmail() == null || inputUser.getFirstName() == null || inputUser.getLastName() == null)
             return null;
+        if(userRepository.findUserByEmail(createdUser.getEmail()).isPresent()) return null; //EmailAlreadyExists
         createdUser.setFirstName(inputUser.getFirstName());
         createdUser.setLastName(inputUser.getLastName());
         createdUser.setEmail(inputUser.getEmail());

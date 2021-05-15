@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +21,7 @@ import lombok.NoArgsConstructor;
  * with sectionId as primary key
  */
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"sectionName","roomCode"}))
 @NoArgsConstructor
 @Data
 public class Section {
