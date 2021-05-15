@@ -1,6 +1,6 @@
 <template>
   <div>
-    <nav class="navbar is-primary" role="navigation">
+    <nav id="nav" class="navbar is-dark" role="navigation">
       <div class="navbar-start">
         <router-link to="/" class="navbar-item">Home</router-link>
         <router-link to="/about" class="navbar-item">About</router-link>
@@ -25,8 +25,18 @@
     <div id="application-wrapper">
       <router-view />
     </div>
+    <snackbar></snackbar>
   </div>
 </template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+import Snackbar from "./components/Snackbar.vue";
+export default defineComponent({
+  name: "App",
+  components: { Snackbar },
+});
+</script>
 
 <style>
 body {
@@ -36,6 +46,12 @@ body {
 #application-wrapper {
   width: 60%;
   margin: 4vh auto;
+}
+
+#nav {
+  position: fixed;
+  width: 100%;
+  top: 0px;
 }
 
 #app {
