@@ -21,6 +21,6 @@ public class Room {
     @Id
     private String roomCode;
 
-    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "room")
     private List<Section> sections;
 }
