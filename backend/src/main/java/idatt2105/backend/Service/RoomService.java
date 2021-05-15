@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
@@ -187,6 +188,7 @@ public class RoomService {
      * @param sectionDTO
      * @return RoomDTO object
      */
+    @Transactional
     public RoomDTO addSectionToRoom(POSTSectionDTO sectionDTO)
     {
         LOGGER.info("addSectionToRoom(SectionDTO sectionDTO) called with roomCode: {}", sectionDTO.getRoomCode());
