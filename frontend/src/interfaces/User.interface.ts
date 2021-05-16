@@ -1,6 +1,6 @@
-export default interface User {
-  email: String;
-  firstname: String;
-  lastname: String;
-  isAdmin: Boolean;
+import CreateUser from "./CreateUser.interface";
+
+export default interface User extends CreateUser {
+  id: number;
+  isAdmin: boolean;
 }

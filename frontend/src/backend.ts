@@ -2,11 +2,10 @@ import axios from "axios";
 import router from "./router";
 import { useStore } from "./store";
 
-const isTesting = true;
-
+const isTesting = false;
 const backend = axios.create({
   baseURL: isTesting
-    ? "http://localhost:8080/api/v1"
+    ? "https://localhost:8443/api/v1"
     : "https://40.87.146.194:8443/api/v1",
 });
 

@@ -1,27 +1,39 @@
 <template>
   <div>
     <nav id="nav" class="navbar is-dark" role="navigation">
+      <!--Could not wrap the items in a span and use if-else on the isLoggedIn property since it broke Bulma -->
       <div class="navbar-start">
         <router-link to="/" class="navbar-item">Home</router-link>
         <router-link to="/about" class="navbar-item">About</router-link>
-        <router-link class="navbar-item" to="/create-user"
-          >Create new user</router-link
-        >
-        <router-link class="navbar-item" to="/edit-user">Edit user</router-link>
         <router-link class="navbar-item" to="/create-reservation"
           >Make reservation</router-link
         >
         <router-link class="navbar-item" to="/edit-reservation"
           >Edit reservation</router-link
         >
+        <router-link v-if="isAdmin" class="navbar-item" to="/create-user"
+          >Create new user</router-link
+        >
+        <router-link v-if="isAdmin" class="navbar-item" to="/edit-user"
+          >Edit user</router-link
+        >
       </div>
       <div class="navbar-end">
-        <!--Could not wrap the items in a div and use on if-else since it broke Bulma -->
-
-        <router-link class="navbar-item is-white" to="/log-in"
+        <router-link
+          v-if="!isLoggedIn"
+          class="navbar-item is-white"
+          to="/log-in"
           >Log In</router-link
         >
-        <router-link @click="logout" class="navbar-item" to="/log-in">
+        <router-link v-if="isLoggedIn" class="navbar-item" to="/users">
+          Profile
+        </router-link>
+        <router-link
+          v-if="isLoggedIn"
+          @click="logout"
+          class="navbar-item"
+          to="/log-in"
+        >
           Log out
         </router-link>
       </div>
@@ -34,7 +46,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
 import { useRouter } from "vue-router";
 import Snackbar from "./components/Snackbar.vue";
 import { useStore } from "./store";
@@ -45,6 +57,9 @@ export default defineComponent({
     const router = useRouter();
     const store = useStore();
 
+    const isLoggedIn = computed(() => store.getters.isUserLoggedIn);
+    const isAdmin = computed(() => store.getters.getUser.admin);
+
     const logout = () => {
       store.dispatch("logout");
       router.replace("/log-in");
@@ -52,6 +67,8 @@ export default defineComponent({
 
     return {
       logout,
+      isAdmin,
+      isLoggedIn,
     };
   },
 });
