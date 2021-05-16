@@ -1,4 +1,5 @@
-backend: backend_stop backend_keystore backend_build backend_run
+dev: backend_stop backend_keystore backend_build backend_run
+prod: backend_stop backend_build backend_run
 deploy: backend_stop
 
 backend_stop:
@@ -14,4 +15,4 @@ backend_run:
 backend_keystore:
 	-mkdir backend/src/main/resources/keystore
 	-rm backend/src/main/resources/keystore/*
-	keytool -genkeypair -dname "cn=, ou=, o=, c=NO" -alias fullstack -storepass password -keypass password -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore backend/src/main/resources/keystore/mykeystore.p12 -validity 3650
+	keytool -genkeypair -dname "cn=, ou=, o=, c=NO" -alias fullstack -storepass password -keypass password -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore backend/src/main/resources/keystore/cert_key.p12 -validity 3650
