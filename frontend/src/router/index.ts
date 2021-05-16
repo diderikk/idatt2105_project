@@ -22,9 +22,19 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/CreateUser.vue"),
   },
   {
+    path: "/edit-user",
+    name: "EditUser",
+    component: () => import("../views/EditUser.vue"),
+  },
+  {
     path: "/create-reservation",
     name: "CreateReservation",
     component: () => import("../views/CreateReservation.vue"),
+  },
+  {
+    path: "/edit-reservation",
+    name: "EditReservation",
+    component: () => import("../views/EditReservation.vue"),
   },
   {
     path: "/log-in",

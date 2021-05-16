@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
+import idatt2105.backend.Model.DTO.SortingDTO;
 import idatt2105.backend.Service.ReservationService;
 import javassist.NotFoundException;
 
@@ -39,6 +40,11 @@ public class ReservationController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping("/sort")
+    public ResponseEntity<List<GETReservationDTO>> getSortedAndFilteredReservations(@RequestBody SortingDTO dto){
+        return new ResponseEntity<>(reservationService.getSortedAndFilteredReservations(dto), HttpStatus.OK);
     }
 
     @PostMapping("/{reservation_id}")

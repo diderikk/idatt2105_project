@@ -3,6 +3,7 @@ package idatt2105.backend.Service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,8 @@ import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
+import idatt2105.backend.Model.DTO.SortingDTO;
+import idatt2105.backend.Model.Enum.SortingTypeEnum;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import javassist.NotFoundException;
@@ -107,6 +110,10 @@ public class ReservationServiceTest {
         Mockito.lenient()
         .when(sectionRepository.findSectionBySectionNameAndRoomCode("sectionName", "roomCode"))
         .thenReturn(Optional.of(section));
+
+        Mockito.lenient()
+        .when(reservationRepository.getFutureReservationsSortedByDate(anyString(), anyString()))
+        .thenReturn(List.of(reservation));
     }
 
     @Test
@@ -127,6 +134,14 @@ public class ReservationServiceTest {
     @Test
     public void getReservation_ReservationDoesNotExist_ReturnsNull() throws NotFoundException{
         assertThrows(NotFoundException.class, () -> reservationService.getReservation(reservation.getReservationId()+2));
+    }
+
+    @Test
+    public void getSortedAndFilteredReservations_CorrectInput_ReturnsListOfOneObject(){
+        SortingDTO sortingDTO = new SortingDTO(SortingTypeEnum.DATE, "", "");
+        List<GETReservationDTO> resultReservations = reservationService.getSortedAndFilteredReservations(sortingDTO);
+
+        assertEquals(1, resultReservations.size());
     }
 
     @Test
