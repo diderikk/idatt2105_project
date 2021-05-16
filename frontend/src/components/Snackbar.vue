@@ -43,7 +43,7 @@ export default defineComponent({
     });
 
     /**
-     * Watches the snackbar status, if it is chaned to anything other than none, it displays the snackbar, and removes it after seven seconds
+     * Watches the snackbar status, if it is changed to anything other than none, it displays the snackbar, and removes it after seven seconds, if it is changed to NONE its closed immediately
      */
     watch(
       () => snackbar.value.status,
@@ -53,6 +53,8 @@ export default defineComponent({
           setTimeout(() => {
             visible.value = false;
           }, 7000);
+        } else {
+          visible.value = false;
         }
       }
     );
