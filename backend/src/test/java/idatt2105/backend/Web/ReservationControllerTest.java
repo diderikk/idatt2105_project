@@ -23,6 +23,8 @@ import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
+import idatt2105.backend.Model.DTO.SortingDTO;
+import idatt2105.backend.Model.Enum.SortingTypeEnum;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -92,7 +94,7 @@ public class ReservationControllerTest {
 
         reservation = new Reservation();
         reservation.setAmountOfPeople(10);
-        reservation.setStartTime(LocalDateTime.now());
+        reservation.setStartTime(LocalDateTime.now().plusHours(1));
         reservation.setEndTime(LocalDateTime.now().plusHours(2));
         ArrayList<Section> sections = new ArrayList<>();
         sections.add(section);
@@ -142,6 +144,28 @@ public class ReservationControllerTest {
     @Test
     public void getReservation_ReservationDoesNotExists_ReturnsNotFound() throws Exception {
         mockMvc.perform(get("/api/v1/reservations/" + 0)).andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void getSortedAndFilteredReservations_CorrectInput_ReturnsListOfOneObject() throws Exception {
+        SortingDTO sortingDTO = new SortingDTO(SortingTypeEnum.DATE, user.getFirstName(), section.getRoom().getRoomCode());
+        String dtoString = objectMapper.writeValueAsString(sortingDTO);
+        mockMvc.perform(post("/api/v1/reservations/sort")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(dtoString))
+        .andExpect(jsonPath("$", hasSize(1)))
+        .andExpect(jsonPath("$.[0].reservationId", is((int)reservation.getReservationId())));
+
+    }
+
+    @Test
+    public void getSortedAndFilteredReservations_CorrectInput_ReturnsEmptyList() throws Exception {
+        SortingDTO sortingDTO = new SortingDTO(SortingTypeEnum.DATE, user.getFirstName(), section.getRoom().getRoomCode()+"fake");
+        String dtoString = objectMapper.writeValueAsString(sortingDTO);
+        mockMvc.perform(post("/api/v1/reservations/sort")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(dtoString))
+        .andExpect(jsonPath("$", hasSize(0)));
     }
 
     @Test
