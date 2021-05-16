@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
+import idatt2105.backend.Model.DTO.SortingDTO;
 import idatt2105.backend.Service.ReservationService;
 
 @RestController
@@ -36,6 +37,11 @@ public class ReservationController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(reservation, HttpStatus.OK);
+    }
+
+    @PostMapping("/sort")
+    public ResponseEntity<List<GETReservationDTO>> getSortedAndFilteredReservations(@RequestBody SortingDTO dto){
+        return new ResponseEntity<>(reservationService.getSortedAndFilteredReservations(dto), HttpStatus.OK);
     }
 
     @PostMapping("/{reservation_id}")

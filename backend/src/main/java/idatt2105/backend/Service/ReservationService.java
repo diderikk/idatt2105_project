@@ -14,6 +14,8 @@ import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
+import idatt2105.backend.Model.DTO.SortingDTO;
+import idatt2105.backend.Model.Enum.SortingTypeEnum;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.SectionRepository;
 
@@ -40,6 +42,24 @@ public class ReservationService {
             return new GETReservationDTO(optionalReservation.get());
         }
         return null;
+    }
+
+    /**
+     * Gets sorted and filtered reservation list from database throught queries and returns result
+     * @param dto 
+     * @return result reservations
+     */
+    public List<GETReservationDTO> getSortedAndFilteredReservations(SortingDTO dto){
+        List<Reservation> reservations;
+        String nameQuery = dto.getNameQuery() + "%";
+        String roomQuery = "%" + dto.getRoomQuery() + "%";
+
+        if(dto.getSortType() == SortingTypeEnum.AMOUNT_OF_PEOPLE) 
+            reservations = reservationRepository.getFutureReservationSortedByPeople(nameQuery,roomQuery);
+        else
+            reservations = reservationRepository.getFutureReservationsSortedByDate(nameQuery,roomQuery);
+        
+        return reservations.stream().map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
     }
 
     public GETReservationDTO editReservation(long reservationId, POSTReservationDTO dto){
