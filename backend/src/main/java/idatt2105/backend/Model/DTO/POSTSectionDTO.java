@@ -5,6 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO class for section. 
+ * Used for receiving information from frontend
+ * using POST request.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

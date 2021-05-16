@@ -31,11 +31,21 @@ public class ReservationService {
     @Autowired
     private SectionRepository sectionRepository;
 
+    /**
+     * Returns all reserations in the database
+     * @return List of GETReservationDTOs
+     */
     public List<GETReservationDTO> getReservations(){
         LOGGER.info("getReservations() called");
         return reservationRepository.findAll().stream().map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
     }
 
+    /**
+     * Returns a reservation from database based on reservationId
+     * @param reservationId
+     * @return GETReservationDTO
+     * @throws NotFoundException if reservation not found
+     */
     public GETReservationDTO getReservation(long reservationId) throws NotFoundException{
         LOGGER.info("getReservation(long reservationId) called with reservationId: {}", reservationId);
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
@@ -46,9 +56,9 @@ public class ReservationService {
     }
 
     /**
-     * Gets sorted and filtered reservation list from database throught queries and returns result
+     * Gets sorted and filtered reservation list from database through queries and returns a list
      * @param dto 
-     * @return result reservations
+     * @return List of GETReservationDTOs
      */
     public List<GETReservationDTO> getSortedAndFilteredReservations(SortingDTO dto){
         List<Reservation> reservations;
@@ -63,6 +73,14 @@ public class ReservationService {
         return reservations.stream().map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
     }
 
+    /**
+     * Edits a reservation specified by reservationId, using information
+     * from given POSTReservationDTO object. Returns edited reservation.
+     * @param reservationId
+     * @param dto
+     * @return GETReservationDTO
+     * @throws NotFoundException if no reservation or specified section found
+     */
     public GETReservationDTO editReservation(long reservationId, POSTReservationDTO dto) throws NotFoundException {
         LOGGER.info("editReservation(long reservationId) called with reservationId: {}", reservationId);
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
@@ -87,10 +105,15 @@ public class ReservationService {
                 }
             }
         }
-        LOGGER.info("ER VI HER?");
         return new GETReservationDTO(reservation);
     }
 
+    /**
+     * Deletes a reservation specified by reservationId
+     * @param reservationId
+     * @return true if reservation was deleted and no longer exist in the database
+     * @throws NotFoundException if no reservation found
+     */
     public boolean deleteReservation(long reservationId) throws NotFoundException{
         LOGGER.info("deleteReservation(long reservationId) called with reservationId: {}", reservationId);
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);

@@ -9,6 +9,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Implementation of UserDetails class used for user authorities.
+ * Class also sets user email as username.
+ */
 @NoArgsConstructor
 @Data
 public class UserSecurityDetails implements UserDetails {

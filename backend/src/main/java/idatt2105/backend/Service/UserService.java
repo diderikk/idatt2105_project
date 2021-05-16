@@ -53,6 +53,12 @@ public class UserService implements UserDetailsService {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    /**
+     * Returns user from database based on given userId
+     * @param userId
+     * @return UserDTO
+     * @throws NotFoundException if iser not found
+     */
     public UserDTO getUser(long userId) throws NotFoundException {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (!optionalUser.isPresent()) {
@@ -63,6 +69,15 @@ public class UserService implements UserDetailsService {
                 user.getExpirationDate(), user.isAdmin());
     }
 
+    /**
+     * Creates user based on given information from UserDTO and stores it in database.
+     * Also checks if email, first name and last name fields in given DTO are not null.
+     * Also checks if email is already existant. Emails have to be unique for every user.
+     * @param inputUser
+     * @return UserDTO that was created
+     * @throws NullPointerException if some of the fields in dto are null
+     * @throws EmailAlreadyExistsException if user with this email already exists
+     */
     public UserDTO createUser(UserDTO inputUser) throws EmailAlreadyExistsException, NullPointerException {
         if (inputUser.getEmail() == null || inputUser.getFirstName() == null || inputUser.getLastName() == null) {
             throw new NullPointerException("InputUserDTO object has some fields that are null");
@@ -84,6 +99,13 @@ public class UserService implements UserDetailsService {
         return inputUser;
     }
 
+    /**
+     * Changes password of a user, given by userId in the ChangePasswordDTO parameter.
+     * @param dto
+     * @return true if user changed password successfully
+     * @throws NotFoundException if user not found
+     * @throws ValidationException if old password didn't match
+     */
     public boolean changePassword(ChangePasswordDTO dto) throws ValidationException, NotFoundException {
         Optional<User> optionalUser = userRepository.findById(dto.getUserId());
         if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + dto.getUserId());
@@ -96,6 +118,12 @@ public class UserService implements UserDetailsService {
         return true;
     }
 
+    /**
+     * Finds and returns all reservations that this user has made
+     * @param userId
+     * @return List of GETReservationDTOs
+     * @throws NotFoundException if user not found
+     */
     public List<GETReservationDTO> getUserReservations(long userId) throws NotFoundException {
         Optional<User> optionalUser = userRepository.findById(userId);
         if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + userId);
@@ -104,6 +132,14 @@ public class UserService implements UserDetailsService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Creates a new reservation based on the information 
+     * in given POSTReservationDTO, and adds it to the user.
+     * @param userId
+     * @param dto
+     * @return POSTReservationDTO of the reservation that was added
+     * @throws NotFoundException if user not found
+     */
     public POSTReservationDTO addUserReservation(long userId, POSTReservationDTO dto) throws NotFoundException, SectionAlreadyBookedException {
         Optional<User> optionalUser = userRepository.findById(userId);
         if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + userId);
@@ -129,6 +165,14 @@ public class UserService implements UserDetailsService {
         return dto;
     }
 
+    /**
+     * Removes an existing reservation from the user and the database.
+     * Reservation specified bu reservationId.
+     * @param userId
+     * @param reservationId
+     * @return POSTReservationDTO of the reservation that was added
+     * @throws NotFoundException if user not found
+     */
     public boolean removeUserReservation(long userId, long reservationId) throws NotFoundException {
         Optional<User> optionalUser = userRepository.findById(userId);
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
@@ -142,11 +186,10 @@ public class UserService implements UserDetailsService {
     }
 
     /**
-     * Gets user from Database with email and compares input password with hased
-     * password
-     * 
+     * Gets user from Database with email and compares input password 
+     * with hashed password
      * @param email username/email for the user trying to log in
-     * @throws NotFoundException
+     * @return UserDetails
      */
     @Override
     public UserDetails loadUserByUsername(String email) {
@@ -173,7 +216,6 @@ public class UserService implements UserDetailsService {
 
     /**
      * Creates a random password
-     * 
      * @return randomly created password
      */
     private String createRandomPassword() {
@@ -184,11 +226,11 @@ public class UserService implements UserDetailsService {
     }
 
     /**
-     * Checks if section is already reserved
-     * n² complexity
+     * Checks if section is already reserved.
+     * n² complexity.
      * @param sectionDTO
      * @param reservationDTO
-     * @return
+     * @return true if reservation already exists during specified times
      * @throws NotFoundException
      */
     private boolean checkIfSectionIsBooked(POSTSectionDTO sectionDTO, POSTReservationDTO reservationDTO) throws NotFoundException {

@@ -6,6 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO class for section. 
+ * Used for sending information to frontend
+ * using GET request.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

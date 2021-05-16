@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Entity class for storing information about a room
- * with roomId as primary key
+ * with roomCode as primary key
  */
 @Entity
 @NoArgsConstructor

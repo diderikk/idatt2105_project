@@ -14,7 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * User class for storing information about a room
+ * Entity class for storing information about a user
  * with userId as primary key
  */
 @Entity
