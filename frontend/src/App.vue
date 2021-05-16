@@ -45,10 +45,12 @@ body {
 
 #application-wrapper {
   width: 60%;
-  margin: 4vh auto;
+  margin: auto;
+  margin-top: 80px;
 }
 
 #nav {
+  /*Wanted to use position sticky but many browsers does not support that*/
   position: fixed;
   width: 100%;
   top: 0px;

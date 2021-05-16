@@ -29,8 +29,11 @@ export default defineComponent({
   },
   setup() {
     const store = useStore();
+    const visible = ref(false);
 
-    const visible = ref(true);
+    /**
+     * Computes the css value to be added to the css visibility attribute
+     */
     const isVisible = computed(() => {
       return visible.value ? "visible" : "hidden";
     });
@@ -39,40 +42,45 @@ export default defineComponent({
       return store.getters.getSnackbar;
     });
 
-    store.commit("setSnackbar", {
-      title: "Loading",
-      status: SnackBarStatus.LOADING,
-    });
-
-    setTimeout(() => {
-      store.commit("setSnackbar", {
-        title: "Error",
-        status: SnackBarStatus.ERROR,
-      });
-    }, 3000);
-
+    /**
+     * Watches the snackbar status, if it is chaned to anything other than none, it displays the snackbar, and removes it after seven seconds
+     */
     watch(
       () => snackbar.value.status,
       () => {
-        visible.value = true;
-        setTimeout(() => {
-          visible.value = false;
-        }, 7000);
+        if (snackbar.value.status != SnackBarStatus.NONE) {
+          visible.value = true;
+          setTimeout(() => {
+            visible.value = false;
+          }, 7000);
+        }
       }
     );
 
+    /**
+     * Checks if the snackbar status is loading
+     */
     const isLoading = computed(
       () => snackbar.value.status === SnackBarStatus.LOADING
     );
 
+    /**
+     * Checks if the snackbar status is error
+     */
     const isError = computed(
       () => snackbar.value.status === SnackBarStatus.ERROR
     );
 
+    /**
+     * Checks if the snackbar status is success
+     */
     const isSuccess = computed(
       () => snackbar.value.status === SnackBarStatus.SUCCESS
     );
 
+    /**
+     * Closes the snackbar
+     */
     const close = () => {
       visible.value = false;
     };
@@ -103,5 +111,9 @@ export default defineComponent({
 
 .error {
   color: hsl(348, 100%, 61%);
+}
+
+p {
+  font-size: 17.5px;
 }
 </style>
