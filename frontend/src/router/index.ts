@@ -26,11 +26,6 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/About.vue"),
   },
   {
-    path: "/:catchAll(.*)",
-    name: "NotFound",
-    component: () => import("../views/PageNotFound.vue"),
-  },
-  {
     path: "/create-user",
     name: "CreateUser",
     component: () => import("../views/CreateUser.vue"),
@@ -54,6 +49,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/log-in",
     name: "LogIn",
     component: () => import("../views/LogIn.vue"),
+  },
+  {
+    path: "/:catchAll(.*)",
+    name: "NotFound",
+    component: () => import("../views/PageNotFound.vue"),
   },
 ];
 

@@ -19,7 +19,7 @@
 <script lang="ts">
 import { computed, defineComponent, ref, watch } from "vue";
 //TODO Change useStore import to the one defined in authentication branch
-import { useStore } from "vuex";
+import { useStore } from "../store";
 import SnackBarStatus from "../enum/SnackbarStatus.enum";
 import PulseLoader from "vue-spinner/src/PulseLoader.vue";
 export default defineComponent({
@@ -48,13 +48,15 @@ export default defineComponent({
     watch(
       () => snackbar.value.status,
       () => {
-        if (snackbar.value.status != SnackBarStatus.NONE) {
+        if (snackbar.value.staus === SnackBarStatus.NONE) {
+          visible.value = false;
+        } else if (snackbar.value.status === SnackBarStatus.LOADING) {
+          visible.value = true;
+        } else {
           visible.value = true;
           setTimeout(() => {
             visible.value = false;
           }, 7000);
-        } else {
-          visible.value = false;
         }
       }
     );

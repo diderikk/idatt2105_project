@@ -2,14 +2,15 @@ import User from "@/interfaces/User.interface";
 import { InjectionKey } from "vue";
 import { createStore, Store, useStore as vuexUseStore } from "vuex";
 import SnackBarStatus from "../enum/SnackbarStatus.enum";
+import backend from "../backend";
 
 export interface State {
   user: string;
   token: string;
   snackbar: {
-    content: string,
-    status: SnackBarStatus
-  }
+    content: string;
+    status: SnackBarStatus;
+  };
 }
 
 export const key: InjectionKey<Store<State>> = Symbol();
@@ -35,6 +36,9 @@ export const store = createStore<State>({
     setSnackbar(state, snackbar) {
       state.snackbar = snackbar;
     },
+    setSnackbarStatus(state, status: SnackBarStatus) {
+      state.snackbar.status = status;
+    },
   },
   getters: {
     getUser: (state): User | Record<string, unknown> =>
@@ -48,9 +52,20 @@ export const store = createStore<State>({
       if (!getters.getUser.isAdmin) return false;
       return true;
     },
-    async login() {
-      //TODO change
-      return true;
+    async login({ commit }, user: { email: string; password: string }) {
+      commit("setSnackbarStatus", SnackBarStatus.LOADING);
+      try {
+        await backend.post("/login", user);
+        commit("setSnackbarStatus", SnackBarStatus.NONE);
+        return true;
+      } catch (error) {
+        console.log(error);
+        commit("setSnackbar", {
+          title: "Error could not log in",
+          status: SnackBarStatus.ERROR,
+        });
+        return false;
+      }
     },
     async deleteUser({ commit, getters }, user): Promise<boolean> {
       //Not letting users that aren't admins delete other users
@@ -63,20 +78,7 @@ export const store = createStore<State>({
       commit("setToken", "");
       commit("setUser", "");
     },
-import { createStore } from "vuex";
-
-
-export default createStore({
-  state: {
-    
   },
-  mutations: {
-    
-  },
-  actions: {},
-  getters: {
-  },
-  modules: {},
 });
 
 export function useStore() {

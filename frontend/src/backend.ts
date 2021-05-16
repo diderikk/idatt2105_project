@@ -5,7 +5,9 @@ import { useStore } from "./store";
 const isTesting = true;
 
 const backend = axios.create({
-  baseURL: isTesting ? "http://localhost:8080" : "https://13.69.249.213",
+  baseURL: isTesting
+    ? "http://localhost:8080/api/v1"
+    : "https://40.87.146.194:8443/api/v1",
 });
 
 backend.defaults.headers.common["Authorization"] =
@@ -27,3 +29,5 @@ backend.interceptors.response.use(undefined, (error) => {
     throw error;
   }
 });
+
+export default backend;

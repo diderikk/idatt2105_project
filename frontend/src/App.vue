@@ -21,8 +21,8 @@
         <router-link class="navbar-item is-white" to="/log-in"
           >Log In</router-link
         >
-        <router-link @click="signOut" class="navbar-item" to="/log-in">
-          Sign out
+        <router-link @click="logout" class="navbar-item" to="/log-in">
+          Log out
         </router-link>
       </div>
     </nav>
@@ -35,10 +35,25 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { useRouter } from "vue-router";
 import Snackbar from "./components/Snackbar.vue";
+import { useStore } from "./store";
 export default defineComponent({
   name: "App",
   components: { Snackbar },
+  setup() {
+    const router = useRouter();
+    const store = useStore();
+
+    const logout = () => {
+      store.dispatch("logout");
+      router.replace("/log-in");
+    };
+
+    return {
+      logout,
+    };
+  },
 });
 </script>
 
