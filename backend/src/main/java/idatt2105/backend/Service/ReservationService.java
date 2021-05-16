@@ -87,6 +87,7 @@ public class ReservationService {
                 }
             }
         }
+        LOGGER.info("ER VI HER?");
         return new GETReservationDTO(reservation);
     }
 

@@ -29,7 +29,6 @@ import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import idatt2105.backend.Repository.UserRepository;
-import idatt2105.backend.Service.UserService;
 import javassist.NotFoundException;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -58,9 +57,6 @@ public class UserControllerTest {
 
     @Autowired
     private RoomRepository roomRepository;
-
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -111,7 +107,6 @@ public class UserControllerTest {
 
     @AfterEach
     public void tearDown() throws NotFoundException {
-        userService.removeUserReservation(user.getUserId(), reservation.getReservationId());
         reservationRepository.deleteAll();
         sectionRepository.deleteAll();
         userRepository.deleteAll();

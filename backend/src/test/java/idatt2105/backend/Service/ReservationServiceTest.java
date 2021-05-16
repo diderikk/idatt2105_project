@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import idatt2105.backend.Model.Reservation;
@@ -32,6 +33,7 @@ import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import javassist.NotFoundException;
 
+@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
 public class ReservationServiceTest {

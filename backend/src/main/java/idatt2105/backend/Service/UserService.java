@@ -63,7 +63,7 @@ public class UserService implements UserDetailsService {
                 user.getExpirationDate(), user.isAdmin());
     }
 
-    public UserDTO createUser(UserDTO inputUser) throws EmailAlreadyExistsException {
+    public UserDTO createUser(UserDTO inputUser) throws EmailAlreadyExistsException, NullPointerException {
         if (inputUser.getEmail() == null || inputUser.getFirstName() == null || inputUser.getLastName() == null) {
             throw new NullPointerException("InputUserDTO object has some fields that are null");
         }

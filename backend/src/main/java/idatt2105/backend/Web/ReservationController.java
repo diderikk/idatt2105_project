@@ -54,7 +54,7 @@ public class ReservationController {
             return new ResponseEntity<>(reservation, HttpStatus.OK);
         } catch (NotFoundException e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
