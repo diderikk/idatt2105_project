@@ -11,6 +11,9 @@
         <router-link class="navbar-item" to="/create-reservation"
           >Make reservation</router-link
         >
+        <router-link class="navbar-item" to="/edit-reservation"
+          >Edit reservation</router-link
+        >
       </div>
       <div class="navbar-end">
         <!--Could not wrap the items in a div and use on if-else since it broke Bulma -->

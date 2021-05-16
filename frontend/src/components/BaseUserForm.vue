@@ -106,14 +106,14 @@ import { computed, defineComponent, reactive, ref, toRefs } from "vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import BaseFormFieldInput from "../components/BaseFormFieldInput.vue";
 import { dateToString, removeTimeFromDate } from "../utils/date";
-import BaseUserFormConfig from "../interfaces/config/BaseUserFormConfig.interface";
+import BaseFormConfig from "../interfaces/config/BaseFormConfig.interface";
 import CreateUser from "../interfaces/CreateUser.interface";
 export default defineComponent({
   name: "CreateUser",
   props: {
     config: {
       required: true,
-      type: Object as () => BaseUserFormConfig,
+      type: Object as () => BaseFormConfig,
     },
     baseUser: {
       required: false,
