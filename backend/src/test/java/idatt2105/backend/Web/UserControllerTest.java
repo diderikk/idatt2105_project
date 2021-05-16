@@ -123,8 +123,8 @@ public class UserControllerTest {
     }
 
     @Test
-    public void getUser_UserDoesNotExist_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(get("/api/v1/users/0")).andExpect(status().isInternalServerError());
+    public void getUser_UserDoesNotExist_ReturnsNotFound() throws Exception {
+        mockMvc.perform(get("/api/v1/users/0")).andExpect(status().isNotFound());
     }
 
     @Test
@@ -170,7 +170,7 @@ public class UserControllerTest {
         String changePasswordDTOString = objectMapper.writeValueAsString(changePasswordDTO);
 
         mockMvc.perform(put("/api/v1/users/" + user.getUserId() + "/password").contentType(MediaType.APPLICATION_JSON)
-                .content(changePasswordDTOString)).andExpect(status().isInternalServerError());
+                .content(changePasswordDTOString)).andExpect(status().isBadRequest());
     }
 
     @Test

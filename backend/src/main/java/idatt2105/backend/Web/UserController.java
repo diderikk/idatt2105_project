@@ -41,7 +41,7 @@ public class UserController {
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (NotFoundException e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -50,10 +50,7 @@ public class UserController {
         try {
             UserDTO createdUser = userService.createUser(inputUser);
             return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
-        } catch (EmailAlreadyExistsException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (NullPointerException e) {
+        } catch (EmailAlreadyExistsException | NullPointerException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -65,9 +62,12 @@ public class UserController {
             boolean successful = userService.changePassword(dto);
             if(successful) return new ResponseEntity<>(HttpStatus.OK);
             else return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (ValidationException | NotFoundException e) {
+        } catch (NotFoundException e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (ValidationException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -77,7 +77,7 @@ public class UserController {
             return new ResponseEntity<>(userService.getUserReservations(userId), HttpStatus.OK);
         } catch (NotFoundException e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -88,7 +88,7 @@ public class UserController {
             return new ResponseEntity<>(newDto, HttpStatus.CREATED);
         } catch (NotFoundException e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (SectionAlreadyBookedException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -103,7 +103,7 @@ public class UserController {
             else return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (NotFoundException e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

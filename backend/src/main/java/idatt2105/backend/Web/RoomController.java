@@ -73,9 +73,12 @@ public class RoomController {
         try {
             List<GETReservationDTO> reservations = roomService.getReservationsOfSection(roomCode, sectionId);
             return new ResponseEntity<>(reservations, HttpStatus.OK);
-        } catch (NotFoundException | SectionNotOfThisRoomException e) {
+        } catch (NotFoundException e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (SectionNotOfThisRoomException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -89,9 +92,12 @@ public class RoomController {
         try {
             RoomDTO roomDTO = roomService.addSectionToRoom(sectionDTO);
             return new ResponseEntity<>(roomDTO, HttpStatus.OK);
-        } catch (NotFoundException | SectionNameInRoomAlreadyExistsException e) {
+        } catch (NotFoundException e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (SectionNameInRoomAlreadyExistsException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -105,7 +111,7 @@ public class RoomController {
             }
         } catch (NotFoundException e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -119,7 +125,7 @@ public class RoomController {
             }
         } catch (NotFoundException e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (SectionNotOfThisRoomException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
