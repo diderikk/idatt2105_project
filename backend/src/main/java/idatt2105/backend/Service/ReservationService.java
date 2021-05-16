@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import idatt2105.backend.Exception.NoReservationFoundException;
-import idatt2105.backend.Exception.NoSectionFoundException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
@@ -18,6 +16,7 @@ import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.SectionRepository;
+import javassist.NotFoundException;
 
 @Service
 public class ReservationService {
@@ -35,20 +34,20 @@ public class ReservationService {
         return reservationRepository.findAll().stream().map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
     }
 
-    public GETReservationDTO getReservation(long reservationId) throws NoReservationFoundException{
+    public GETReservationDTO getReservation(long reservationId) throws NotFoundException{
         LOGGER.info("getReservation(long reservationId) called with reservationId: {}", reservationId);
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
         if(!optionalReservation.isPresent()){
-            throw new NoReservationFoundException("No reservation found with id: " + reservationId);
+            throw new NotFoundException("No reservation found with id: " + reservationId);
         }
         return new GETReservationDTO(optionalReservation.get());
     }
 
-    public GETReservationDTO editReservation(long reservationId, POSTReservationDTO dto) throws NoReservationFoundException, NoSectionFoundException{
+    public GETReservationDTO editReservation(long reservationId, POSTReservationDTO dto) throws NotFoundException {
         LOGGER.info("editReservation(long reservationId) called with reservationId: {}", reservationId);
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
         if(!optionalReservation.isPresent()){
-            throw new NoReservationFoundException("No reservation found with id: " + reservationId);
+            throw new NotFoundException("No reservation found with id: " + reservationId);
         }
         Reservation reservation = optionalReservation.get();
         reservation.setAmountOfPeople(dto.getAmountOfPeople());
@@ -62,7 +61,7 @@ public class ReservationService {
                     reservation.getSections().add(optionalSection.get());
                 }
                 else {
-                    throw new NoSectionFoundException("No section found with sectionName: " 
+                    throw new NotFoundException("No section found with sectionName: " 
                         + sectionDTO.getSectionName() + ", and roomCode: " 
                         + sectionDTO.getRoomCode());
                 }
@@ -71,11 +70,11 @@ public class ReservationService {
         return new GETReservationDTO(reservation);
     }
 
-    public boolean deleteReservation(long reservationId) throws NoReservationFoundException{
+    public boolean deleteReservation(long reservationId) throws NotFoundException{
         LOGGER.info("deleteReservation(long reservationId) called with reservationId: {}", reservationId);
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
         if(!optionalReservation.isPresent()){
-            throw new NoReservationFoundException("No reservation found with id: " + reservationId);
+            throw new NotFoundException("No reservation found with id: " + reservationId);
         }
         Reservation reservation = optionalReservation.get();
         reservation.getSections().clear();

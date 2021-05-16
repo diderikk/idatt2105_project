@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Service.ReservationService;
+import javassist.NotFoundException;
 
 @RestController
 @RequestMapping("/api/v1/reservations")
@@ -31,28 +32,35 @@ public class ReservationController {
 
     @GetMapping("/{reservation_id}")
     public ResponseEntity<GETReservationDTO> getReservation(@PathVariable("reservation_id") long reservationId){
-        GETReservationDTO reservation = reservationService.getReservation(reservationId);
-        if(reservation == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            GETReservationDTO reservation = reservationService.getReservation(reservationId);
+            return new ResponseEntity<>(reservation, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(reservation, HttpStatus.OK);
     }
 
     @PostMapping("/{reservation_id}")
     public ResponseEntity<GETReservationDTO> editReservation(@PathVariable("reservation_id") long reservationId, @RequestBody POSTReservationDTO dto){
-        GETReservationDTO reservation = reservationService.editReservation(reservationId, dto);
-        if(reservation == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        try {
+            GETReservationDTO reservation = reservationService.editReservation(reservationId, dto);
+            return new ResponseEntity<>(reservation, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(reservation, HttpStatus.OK);
     }
 
     @DeleteMapping("/{reservation_id}")
     public ResponseEntity<Boolean> deleteReservation(@PathVariable("reservation_id") long reservationId){
-        boolean successful = reservationService.deleteReservation(reservationId);
-        if(!successful){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            boolean successful = reservationService.deleteReservation(reservationId);
+            if(successful) return new ResponseEntity<>(HttpStatus.OK);
+            else return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

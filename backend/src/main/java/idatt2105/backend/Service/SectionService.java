@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Repository.SectionRepository;
+import javassist.NotFoundException;
 
 @Service
 public class SectionService {
@@ -25,13 +26,15 @@ public class SectionService {
      * Returns list of all resevations of a section, given by sectionId
      * @param sectionId
      * @return List of reservationDTOs
+     * @throws NoSectionFoundException
+     * @throws NotFoundException
      */
-    public List<GETReservationDTO> getReservationsOfSection(long sectionId)
+    public List<GETReservationDTO> getReservationsOfSection(long sectionId) throws NotFoundException
     {
         LOGGER.info("getReservationsOfSection(long sectionId) called with sectionId: {}", sectionId);
         Optional<Section> sectionOptional = sectionRepository.findById(sectionId);
         //Return null if no section is present
-        if(!sectionOptional.isPresent()) return null;
+        if(!sectionOptional.isPresent()) throw new NotFoundException("No section found with id " + sectionId);
         return sectionOptional.get().getReservations().stream().map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
     }
 }

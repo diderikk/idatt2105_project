@@ -1,7 +1,7 @@
 package idatt2105.backend.Service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 
 import java.util.ArrayList;
@@ -27,6 +27,7 @@ import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.SectionRepository;
+import javassist.NotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
@@ -116,7 +117,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void getReservation_ReservationExists_ReturnsReservation(){
+    public void getReservation_ReservationExists_ReturnsReservation() throws NotFoundException{
         GETReservationDTO tempReservation = reservationService.getReservation(reservation.getReservationId());
         assertEquals(reservation.getReservationId(), tempReservation.getReservationId());
         assertEquals(reservation.getAmountOfPeople(), tempReservation.getAmountOfPeople());
@@ -124,13 +125,12 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void getReservation_ReservationDoesNotExist_ReturnsNull(){
-        GETReservationDTO tempReservation = reservationService.getReservation(reservation.getReservationId()+2);
-        assertNull(tempReservation);
+    public void getReservation_ReservationDoesNotExist_ReturnsNull() throws NotFoundException{
+        assertThrows(NotFoundException.class, () -> reservationService.getReservation(reservation.getReservationId()+2));
     }
 
     @Test
-    public void editReservation_CorrectInput_ReturnsEditedReservation(){
+    public void editReservation_CorrectInput_ReturnsEditedReservation() throws NotFoundException{
         reservation.setSections(new ArrayList<>());
         GETReservationDTO returnDto = reservationService.editReservation(reservation.getReservationId(),postReservationDTO);
 
@@ -141,20 +141,18 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void editReservation_UsedDoesNotExist_ReturnsNUll(){
-        GETReservationDTO returnDto = reservationService.editReservation(-1,postReservationDTO);    
-        assertNull(returnDto);
+    public void editReservation_UsedDoesNotExist_ReturnsNUll() throws NotFoundException{  
+        assertThrows(NotFoundException.class, () -> reservationService.editReservation(-1,postReservationDTO));
     }
 
     @Test
-    public void deleteReservation_CorrectInput_DeletesReservation(){
+    public void deleteReservation_CorrectInput_DeletesReservation() throws NotFoundException{
         boolean successful = reservationService.deleteReservation(reservation.getReservationId());
         assertEquals(true, successful);
     }
 
     @Test
-    public void deleteReservation_WrongInput_DoesNotDeleteReservation(){
-        boolean successful = reservationService.deleteReservation(reservation.getReservationId()+1);
-        assertEquals(false, successful);
+    public void deleteReservation_WrongInput_DoesNotDeleteReservation() throws NotFoundException{
+        assertThrows(NotFoundException.class, () -> reservationService.deleteReservation(reservation.getReservationId()+1));
     }
 }

@@ -28,6 +28,7 @@ import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import idatt2105.backend.Repository.UserRepository;
 import idatt2105.backend.Service.UserService;
+import javassist.NotFoundException;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -108,7 +109,7 @@ public class ReservationControllerTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    public void tearDown() throws NotFoundException {
         userService.removeUserReservation(user.getUserId(), reservation.getReservationId());
         reservationRepository.deleteAll();
         sectionRepository.deleteAll();
