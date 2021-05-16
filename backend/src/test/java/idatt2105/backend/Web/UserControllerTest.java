@@ -1,4 +1,4 @@
-package idatt2105.backend.Controller;
+package idatt2105.backend.Web;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -94,8 +94,8 @@ public class UserControllerTest {
 
         reservation = new Reservation();
         reservation.setAmountOfPeople(10);
-        reservation.setReservationStartTime(LocalDateTime.now());
-        reservation.setReservationEndTime(LocalDateTime.now().plusHours(2));
+        reservation.setStartTime(LocalDateTime.now());
+        reservation.setEndTime(LocalDateTime.now().plusHours(2));
         reservation.setSections(List.of(section));
         reservation.setReservationText("reservationText");
         reservation.setUser(user);
@@ -103,7 +103,7 @@ public class UserControllerTest {
 
         user = userRepository.findById(user.getUserId()).get();
 
-        userDTO = new UserDTO(-1, "firstName", "lastName", "email", "phoneNumber", null, false);
+        userDTO = new UserDTO(-1, "firstName", "lastName", "email1", "phoneNumber", null, false);
 
     }
 

@@ -1,6 +1,7 @@
 package idatt2105.backend.Service;
 
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,6 +63,7 @@ public class UserService implements UserDetailsService {
         User createdUser = new User();
         if (inputUser.getEmail() == null || inputUser.getFirstName() == null || inputUser.getLastName() == null)
             return null;
+        if(userRepository.findUserByEmail(createdUser.getEmail()).isPresent()) return null; //EmailAlreadyExists
         createdUser.setFirstName(inputUser.getFirstName());
         createdUser.setLastName(inputUser.getLastName());
         createdUser.setEmail(inputUser.getEmail());
@@ -100,8 +102,8 @@ public class UserService implements UserDetailsService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             Reservation reservation = new Reservation();
-            reservation.setReservationStartTime(dto.getReservationStartTime());
-            reservation.setReservationEndTime(dto.getReservationEndTime());
+            reservation.setStartTime(dto.getStartTime());
+            reservation.setEndTime(dto.getEndTime());
             reservation.setReservationText(dto.getReservationText());
             reservation.setAmountOfPeople(dto.getAmountOfPeople());
             List<Section> registerSections = new ArrayList<>();
@@ -154,6 +156,10 @@ public class UserService implements UserDetailsService {
             userSecurityDetails.setPassword(user.getHash());
             userSecurityDetails.setGrantedAuthorities(grantedAuthorities);
             userSecurityDetails.setUserId(user.getUserId());
+            if(user.getExpirationDate() != null){
+                boolean expired = user.getExpirationDate().isAfter(LocalDate.now());
+                userSecurityDetails.setAccountNonExpired(!expired);
+            }
             return userSecurityDetails;
         } else {
             LOGGER.warn("Could not find user with email: {}. Throwing exception", email);
@@ -185,10 +191,10 @@ public class UserService implements UserDetailsService {
         for (Reservation reservation : sectionRepository
                 .findSectionBySectionNameAndRoomCode(sectionDTO.getSectionName(), sectionDTO.getRoomCode()).get()
                 .getReservations()) {
-            if ((reservationDTO.getReservationStartTime().isAfter(reservation.getReservationStartTime())
-                    || reservationDTO.getReservationStartTime().isEqual(reservation.getReservationStartTime()))
-                    && (reservationDTO.getReservationEndTime().isBefore(reservation.getReservationEndTime())
-                            || reservationDTO.getReservationEndTime().isEqual(reservation.getReservationEndTime())))
+            if ((reservationDTO.getStartTime().isAfter(reservation.getStartTime())
+                    || reservationDTO.getStartTime().isEqual(reservation.getStartTime()))
+                    && (reservationDTO.getEndTime().isBefore(reservation.getEndTime())
+                            || reservationDTO.getEndTime().isEqual(reservation.getEndTime())))
                 return false;
         }
         return true;

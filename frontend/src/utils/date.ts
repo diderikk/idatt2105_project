@@ -1,4 +1,4 @@
-export const dateToString = (date: Date) => {
+export const dateToString = (date: Date): string => {
   //Need to trick compilator
   let string = "" + date.getFullYear();
   const month = date.getMonth() + 1;

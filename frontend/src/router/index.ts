@@ -31,14 +31,29 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/PageNotFound.vue"),
   },
   {
-    path: "/createUser",
+    path: "/create-user",
     name: "CreateUser",
     component: () => import("../views/CreateUser.vue"),
   },
   {
-    path: "/createReservation",
+    path: "/edit-user",
+    name: "EditUser",
+    component: () => import("../views/EditUser.vue"),
+  },
+  {
+    path: "/create-reservation",
     name: "CreateReservation",
     component: () => import("../views/CreateReservation.vue"),
+  },
+  {
+    path: "/edit-reservation",
+    name: "EditReservation",
+    component: () => import("../views/EditReservation.vue"),
+  },
+  {
+    path: "/log-in",
+    name: "LogIn",
+    component: () => import("../views/LogIn.vue"),
   },
 ];
 
