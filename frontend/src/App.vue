@@ -5,7 +5,10 @@
       <div class="navbar-start">
         <router-link to="/" class="navbar-item">Home</router-link>
         <router-link to="/about" class="navbar-item">About</router-link>
-        <router-link class="navbar-item" to="/create-reservation"
+        <router-link
+          v-if="isLoggedIn"
+          class="navbar-item"
+          to="/create-reservation"
           >Make reservation</router-link
         >
         <router-link class="navbar-item" to="/edit-reservation"

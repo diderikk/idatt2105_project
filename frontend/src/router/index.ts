@@ -31,9 +31,10 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/CreateUser.vue"),
   },
   {
-    path: "/edit-user",
+    path: "/edit-user/:id",
     name: "EditUser",
     component: () => import("../views/EditUser.vue"),
+    props: true,
   },
   {
     path: "/create-reservation",
@@ -41,9 +42,10 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/CreateReservation.vue"),
   },
   {
-    path: "/edit-reservation",
+    path: "/edit-reservation/:id",
     name: "EditReservation",
     component: () => import("../views/EditReservation.vue"),
+    props: true,
   },
   {
     path: "/log-in",

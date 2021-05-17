@@ -1,6 +1,12 @@
 <template>
   <div>
     <base-user-form-config
+      v-if="isDoneLoading"
+      :baseUser="user"
+      :config="config"
+    ></base-user-form-config>
+    <base-user-form-config
+      v-else
       :baseUser="user"
       :config="config"
     ></base-user-form-config>
@@ -8,31 +14,51 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, Ref } from "vue";
+import { defineComponent, onBeforeMount, reactive, ref, Ref } from "vue";
 import BaseUserFormConfig from "../components/BaseUserForm.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
-import CreateUser from "../interfaces/CreateUser.interface";
+import POSTUser from "../interfaces/User/User.interface";
+import UserForm from "../interfaces/User/UserForm.interface";
+import { store } from "../store";
 import checksBeforeAsyncCall from "../utils/checksBeforeAsyncCall";
+import { UserToUserForm } from "../utils/userUtils";
 export default defineComponent({
   name: "EditUser",
   components: {
     BaseUserFormConfig,
   },
-  setup() {
+  props: {
+    id: {
+      required: true,
+      type: String,
+    },
+  },
+  setup(props) {
     //TODO remove testdata and do async call for actual user
-    const user: CreateUser = reactive({
-      firstName: "Kalle",
-      lastName: "Kaviar",
-      email: "kalle.kaviar@kaviar.com",
-      phoneNationalCode: "47",
-      phoneNumber: "12345678",
-      expirationDate: "2022-02-03",
+    const user: Ref<UserForm> = ref({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNationalCode: "",
+      phoneNumber: "",
+      expirationDate: "",
+    });
+    const isDoneLoading = ref(false);
+
+    onBeforeMount(async () => {
+      const response = await store.dispatch("getUser", props.id);
+      console.log(response);
+      if (response !== null) {
+        user.value = UserToUserForm(response.data);
+        isDoneLoading.value = true;
+      }
     });
 
     const editProfile = (
       checks: Array<() => void>,
       statuses: Array<Ref<InputFieldFeedbackStatus>>,
-      registerInformation: CreateUser
+      registerInformation: UserForm,
+      userId: number
     ) => {
       console.log(checks);
       console.log(statuses);
@@ -43,8 +69,9 @@ export default defineComponent({
       }
     };
 
-    const deleteProfile = (registerInformation: CreateUser) => {
+    const deleteProfile = (registerInformation: UserForm, userId: number) => {
       if (window.confirm("Are you sure you want do delete the user?")) {
+        store.dispatch("deleteUser");
         //TODO Add async call
         console.log("User deleted: REMOVE ME");
         console.log(registerInformation);
@@ -57,14 +84,14 @@ export default defineComponent({
         {
           title: "Confirm edit",
           class: "button is-link is-primary",
-          action: { function: editProfile, numberOfArgs: 3 },
+          action: { function: editProfile, numberOfArgs: 4 },
         },
         {
           title: "Delete user",
           class: "button is-danger",
           action: {
             function: deleteProfile,
-            numberOfArgs: 1,
+            numberOfArgs: 2,
           },
         },
       ],
@@ -75,6 +102,7 @@ export default defineComponent({
       config,
       editProfile,
       deleteProfile,
+      isDoneLoading,
     };
   },
 });

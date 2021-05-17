@@ -1,12 +1,12 @@
-import User from "@/interfaces/User.interface";
+import User from "@/interfaces/User/User.interface";
 import { InjectionKey } from "vue";
 import { createStore, Store, useStore as vuexUseStore } from "vuex";
 import SnackbarStatus from "../enum/SnackbarStatus.enum";
 import backend from "../backend";
-import CreateUser from "@/interfaces/CreateUser.interface";
-import CreateReservation from "@/interfaces/CreateReservation.interface";
-import Reservation from "@/interfaces/Reservation.interface";
-import ReservationSorting from "@/interfaces/ReservationSorting.interface";
+import CreateUser from "@/interfaces/User/User.interface";
+import POSTReservation from "@/interfaces/Reservation/POSTReservation.interface";
+import Reservation from "@/interfaces/Reservation/Reservation.interface";
+import ReservationSorting from "@/interfaces/Reservation/ReservationSorting.interface";
 
 export interface State {
   user: string;
@@ -97,6 +97,7 @@ export const store = createStore<State>({
         const userResponse = await backend.get(
           `/users/${response.data.userId}`
         );
+        console.log(userResponse.data);
         commit("setUser", userResponse.data);
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return true;
@@ -145,39 +146,63 @@ export const store = createStore<State>({
       commit("setToken", "");
       commit("setUser", "");
     },
-    async createReservation(
-      { commit, getters },
-      reservation: CreateReservation
-    ) {
+    async getUser({ commit, getters }, userId: number) {
+      const currentUser = getters.getUser;
+      console.log(currentUser.isAdmin);
+      //Not letting users that aren't admins delete other users
+      if (!currentUser.isAdmin && currentUser.userId !== userId) {
+        console.log("Halla");
+        commit("setSnackbar", {
+          title: "Not access to get user",
+          status: SnackbarStatus.ERROR,
+        });
+        return null;
+      }
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        const response = await backend.get(`/users/${userId}`);
+        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        return response.data;
+      } catch (error) {
+        commit("setSnackbar", {
+          title: "Could not get user",
+          status: SnackbarStatus.ERROR,
+        });
+        return null;
+      }
+    },
+    async createReservation({ commit, getters }, reservation: POSTReservation) {
       try {
         commit("setSnackbarStatus", SnackbarStatus.LOADING);
-        await backend.post(`/users/${getters.getUser.id}/reservations`);
+        await backend.post(
+          `/users/${getters.getUser.userId}/reservations`,
+          reservation
+        );
         commit("setSnackbar", {
           title: "Reservation created",
           status: SnackbarStatus.SUCCESS,
         });
         return true;
       } catch (error) {
-        commit("setSnackbar", {
-          title: "Could not create reservation",
-          status: SnackbarStatus.ERROR,
-        });
+        console.log(error);
+        if (error.response.status === 400) {
+          commit("setSnackbar", {
+            title: "Already occupied",
+            status: SnackbarStatus.ERROR,
+          });
+        } else {
+          commit("setSnackbar", {
+            title: "Could not create reservation",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return false;
       }
     },
     async editReservation({ commit }, reservation: Reservation) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        const sections = reservation.sections.map((s: string) => {
-          return { sectionName: s, roomCode: reservation.roomCode };
-        });
-        await backend.post(`/reservations/${reservation.id}`, {
-          amountOfPeople: reservation.limit,
-          startTime: reservation.startDate + " " + reservation.startTime,
-          endTime: reservation.endDate + " " + reservation.endTime,
-          reservationText: reservation.description,
-          sections: sections,
-        });
+        await backend.post(`/reservations/${reservation.id}`, reservation);
         commit("setSnackbar", {
           title: "Reservation edited",
           status: SnackbarStatus.SUCCESS,
@@ -208,18 +233,35 @@ export const store = createStore<State>({
         return false;
       }
     },
+    async getReservation({ commit }, reservationId: number) {
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        const response = await backend.get(`/reservations/${reservationId}`);
+        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        return response.data;
+      } catch (error) {
+        commit("setSnackbar", {
+          title: "Could not find a reservation",
+          status: SnackbarStatus.ERROR,
+        });
+        return null;
+      }
+    },
     async getReservations({ commit }, sortingConfig: ReservationSorting) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        await backend.post("/reservatios/sort", sortingConfig);
+        const response = await backend.post(
+          "/reservations/sort",
+          sortingConfig
+        );
         commit("setSnackbarStatus", SnackbarStatus.NONE);
-        return true;
+        return response.data;
       } catch (error) {
         commit("setSnackbar", {
           title: "Could not find any reservations",
           status: SnackbarStatus.ERROR,
         });
-        return false;
+        return null;
       }
     },
   },

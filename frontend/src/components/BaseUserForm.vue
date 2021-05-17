@@ -84,6 +84,15 @@
     /></base-form-field-input>
     <span v-for="(button, index) in config.buttons" :key="index">
       <button
+        v-if="button.action.numberOfArgs === 4"
+        :class="button.class"
+        @click="
+          button.action.function(checks, statuses, registerInformation, userId)
+        "
+      >
+        {{ button.title }}
+      </button>
+      <button
         v-if="button.action.numberOfArgs === 3"
         :class="button.class"
         @click="button.action.function(checks, statuses, registerInformation)"
@@ -91,9 +100,9 @@
         {{ button.title }}
       </button>
       <button
-        v-else-if="button.action.numberOfArgs === 1"
+        v-else-if="button.action.numberOfArgs === 2"
         :class="button.class"
-        @click="button.action.function(registerInformation)"
+        @click="button.action.function(registerInformation, userId)"
       >
         {{ button.title }}
       </button>
@@ -107,9 +116,9 @@ import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import BaseFormFieldInput from "../components/BaseFormFieldInput.vue";
 import { dateToString, removeTimeFromDate } from "../utils/date";
 import BaseFormConfig from "../interfaces/config/BaseFormConfig.interface";
-import CreateUser from "../interfaces/CreateUser.interface";
+import UserForm from "../interfaces/User/UserForm.interface";
 export default defineComponent({
-  name: "CreateUser",
+  name: "BaseUserForm",
   props: {
     config: {
       required: true,
@@ -117,7 +126,11 @@ export default defineComponent({
     },
     baseUser: {
       required: false,
-      type: Object as () => CreateUser,
+      type: Object as () => UserForm,
+    },
+    userId: {
+      required: false,
+      type: Number,
     },
   },
   components: {
