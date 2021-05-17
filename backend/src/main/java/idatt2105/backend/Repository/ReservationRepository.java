@@ -31,4 +31,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     "ON (reservation.reservation_id = reservation_section.reservation_id) JOIN section "+
     "ON (reservation_section.section_id = section.section_id AND section.room_code LIKE ?2) WHERE start_time > NOW() ORDER BY amount_of_people DESC", nativeQuery = true)
     List<Reservation> getFutureReservationSortedByPeople(String nameQuery, String roomQuery);
+
+    @Query(value = "SELECT SUM(DATEDIFF(MINUTE, start_time, end_time)) FROM reservation WHERE reservation.reservation_id = ?1")
+    float sumOfReservation(long reservationId);
 }

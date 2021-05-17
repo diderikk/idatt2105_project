@@ -126,4 +126,13 @@ public class ReservationService {
         reservationRepository.delete(reservation);
         return !reservationRepository.existsById(reservationId);
     }
+
+    public float somOfReservation(long reservationId) throws NotFoundException {
+        LOGGER.info("deleteReservation(long reservationId) called with reservationId: {}", reservationId);
+        Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
+        if(!optionalReservation.isPresent()){
+            throw new NotFoundException("No reservation found with id: " + reservationId);
+        }
+        return reservationRepository.sumOfReservation(reservationId);
+    }
 }
