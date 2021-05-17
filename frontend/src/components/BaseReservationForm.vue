@@ -251,10 +251,10 @@ export default defineComponent({
         roomCode: "Rom 1",
         sections: [
           {
-            name: "1",
+            sectionName: "1",
           },
           {
-            name: "2",
+            sectionName: "2",
           },
         ],
       },
@@ -262,7 +262,7 @@ export default defineComponent({
         roomCode: "Rom 2",
         sections: [
           {
-            name: "3",
+            sectionName: "3",
           },
         ],
       },
@@ -270,10 +270,10 @@ export default defineComponent({
         roomCode: "A4-121",
         sections: [
           {
-            name: "Kalle",
+            sectionName: "Kalle",
           },
           {
-            name: "Hei",
+            sectionName: "Hei",
           },
         ],
       },
@@ -341,7 +341,7 @@ export default defineComponent({
       if (registerInformation.sections.length !== 0) {
         availableSections.value.forEach((section) => {
           const index = registerInformation.sections.findIndex(
-            (s) => s === section.name
+            (s) => s === section.sectionName
           );
           if (index >= 0) {
             availableSections.value[index].selected = true;
@@ -358,10 +358,10 @@ export default defineComponent({
     const handleCheckBoxChange = (section: SectionForCheckBox) => {
       section.selected = !section.selected;
       if (section.selected) {
-        registerInformation.sections.push(section.name);
+        registerInformation.sections.push(section.sectionName);
       } else {
         registerInformation.sections.splice(
-          registerInformation.sections.findIndex((s) => s === section.name),
+          registerInformation.sections.findIndex((s) => s === section.sectionName),
           1
         );
       }
@@ -376,10 +376,10 @@ export default defineComponent({
         sectionForCheckBox.selected = true;
         if (
           !registerInformation.sections.some(
-            (sectionName) => sectionName === sectionForCheckBox.name
+            (sectionName) => sectionName === sectionForCheckBox.sectionName
           )
         )
-          registerInformation.sections.push(sectionForCheckBox.name);
+          registerInformation.sections.push(sectionForCheckBox.sectionName);
       });
     };
 

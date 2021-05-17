@@ -1,3 +1,4 @@
+import POSTSection from "./Sections/POSTSection.interface";
 import Section from "./Sections/Section.interface";
 import SectionForCheckBox from "./Sections/SectionForCheckBox.interface";
 

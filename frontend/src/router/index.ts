@@ -37,6 +37,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/EditReservation.vue"),
   },
   {
+    path: "/create-room",
+    name: "CreateRoom",
+    component: () => import("../views/CreateRoom.vue"),
+  },
+  {
     path: "/log-in",
     name: "LogIn",
     component: () => import("../views/LogIn.vue"),
