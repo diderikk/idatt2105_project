@@ -41,7 +41,7 @@ public class JwtTokenFilter extends OncePerRequestFilter{
         }
 
         JwtComponent.verifyToken(token);
-            // Sends the request to the next filter, which will be exception-handler and then the controller
+        // Sends the request to the next filter, which will be exception-handler and then the controller
         filterChain.doFilter(request, response);
 
     }

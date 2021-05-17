@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO class for sorting queries
+ * passed from user
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
