@@ -271,10 +271,25 @@ public class UserService implements UserDetailsService {
      * @return randomly created password
      */
     private String createRandomPassword() {
-        byte[] bytes = new byte[30];
-        SecureRandom secureRandom = new SecureRandom();
-        secureRandom.nextBytes(bytes);
-        return String.valueOf(bytes);
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < 30; i++) {
+            int randNum = (int)Math.floor(Math.random()*3 + 1);
+            switch (randNum) {
+                case 1:
+                    sb.append((char)Math.floor(Math.random()*57 + 48));
+                    break;
+                case 2:
+                    sb.append((char)Math.floor(Math.random()*90 + 65));
+                    break;
+                case 3:
+                    sb.append((char)Math.floor(Math.random()*122 + 97));
+                    break;
+                default:
+                    sb.append((char)Math.floor(Math.random()*122 + 97));
+                    break;
+            }
+        }
+        return sb.toString();
     }
 
     /**
