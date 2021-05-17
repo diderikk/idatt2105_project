@@ -129,7 +129,7 @@
             type="checkbox"
             :disabled="!isDateAndTimeSelected"
           />
-          {{ section.name }}</label
+          {{ section.sectionName }}</label
         >
       </div>
     </base-form-field-input>
@@ -137,23 +137,23 @@
       :config="{
         title: 'Enter the amount of people to use the room',
         errorHelperMessage: 'The number of people has to be between 1 and 100',
-        feedbackStatus: limitStatus,
+        feedbackStatus: amountOfPeopleStatus,
       }"
     >
       <input
-        v-model="limit"
+        v-model="amountOfPeople"
         type="number"
         min="1"
         max="100"
-        @blur="checkLimitValidity"
+        @blur="checkAmountOfPeopleValidity"
         class="input"
       />
-      <p v-if="limitStatusIsNone" class="helper">Beetween 1 and 100</p>
+      <p v-if="amountOfPeopleStatusIsNone" class="helper">Beetween 1 and 100</p>
     </base-form-field-input>
     <div class="field">
       <label class="label">Description of room use</label>
       <textarea
-        v-model="description"
+        v-model="reservationText"
         placeholder="Enter description for renting the room"
         cols="30"
         rows="10"
@@ -161,6 +161,20 @@
       ></textarea>
     </div>
     <span v-for="(button, index) in config.buttons" :key="index">
+      <button
+        v-if="button.action.numberOfArgs === 4"
+        :class="button.class"
+        @click="
+          button.action.function(
+            checks,
+            statuses,
+            registerInformation,
+            reservationId
+          )
+        "
+      >
+        {{ button.title }}
+      </button>
       <button
         v-if="button.action.numberOfArgs === 3"
         :class="button.class"
@@ -171,7 +185,7 @@
       <button
         v-else-if="button.action.numberOfArgs === 1"
         :class="button.class"
-        @click="button.action.function(registerInformation)"
+        @click="button.action.function(reservationId)"
       >
         {{ button.title }}
       </button>
@@ -193,13 +207,13 @@ import {
 import BaseFormFieldInput from "../components/BaseFormFieldInput.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import { dateToString, removeTimeFromDate } from "../utils/date";
-import SectionForCheckBox from "../interfaces/Sections/SectionForCheckBox.interface";
+import SectionForCheckBox from "../interfaces/Section/SectionForCheckBox.interface";
 import Room from "../interfaces/Room.interface";
 import BaseFormConfig from "../interfaces/config/BaseFormConfig.interface";
-import Section from "../interfaces/Sections/Section.interface";
-import CreateReservation from "../interfaces/CreateReservation.interface";
+import Section from "../interfaces/Section/Section.interface";
+import ReservationForm from "../interfaces/Reservation/ReservationForm.interface";
 export default defineComponent({
-  name: "CreateReservation",
+  name: "BaseReservationForm",
   components: { BaseFormFieldInput },
   props: {
     config: {
@@ -208,23 +222,27 @@ export default defineComponent({
     },
     baseReservation: {
       required: false,
-      type: Object as () => CreateReservation,
+      type: Object as () => ReservationForm,
+    },
+    reservationId: {
+      required: false,
+      type: Number,
     },
   },
   setup(props) {
     //Object containing all the information to be used in the form
-    const registerInformation = reactive(
+    const registerInformation: ReservationForm = reactive(
       Object.assign(
         {},
         props.baseReservation ?? {
           roomCode: "",
           sections: [] as Array<string>,
-          description: "",
+          reservationText: "",
           startDate: dateToString(removeTimeFromDate(new Date())),
           startTime: "",
           endDate: "",
           endTime: "",
-          limit: "",
+          amountOfPeople: "",
         }
       )
     );
@@ -248,13 +266,10 @@ export default defineComponent({
     //TODO remove testdata and replace with async call to server
     const rooms: Ref<Array<Room>> = ref([
       {
-        roomCode: "Rom 1",
+        roomCode: "A4-112",
         sections: [
           {
-            name: "1",
-          },
-          {
-            name: "2",
+            sectionName: "Bord 1",
           },
         ],
       },
@@ -262,7 +277,7 @@ export default defineComponent({
         roomCode: "Rom 2",
         sections: [
           {
-            name: "3",
+            sectionName: "3",
           },
         ],
       },
@@ -270,10 +285,10 @@ export default defineComponent({
         roomCode: "A4-121",
         sections: [
           {
-            name: "Kalle",
+            sectionName: "Kalle",
           },
           {
-            name: "Hei",
+            sectionName: "Hei",
           },
         ],
       },
@@ -341,7 +356,7 @@ export default defineComponent({
       if (registerInformation.sections.length !== 0) {
         availableSections.value.forEach((section) => {
           const index = registerInformation.sections.findIndex(
-            (s) => s === section.name
+            (s) => s === section.sectionName
           );
           if (index >= 0) {
             availableSections.value[index].selected = true;
@@ -358,10 +373,12 @@ export default defineComponent({
     const handleCheckBoxChange = (section: SectionForCheckBox) => {
       section.selected = !section.selected;
       if (section.selected) {
-        registerInformation.sections.push(section.name);
+        registerInformation.sections.push(section.sectionName);
       } else {
         registerInformation.sections.splice(
-          registerInformation.sections.findIndex((s) => s === section.name),
+          registerInformation.sections.findIndex(
+            (s) => s === section.sectionName
+          ),
           1
         );
       }
@@ -376,10 +393,10 @@ export default defineComponent({
         sectionForCheckBox.selected = true;
         if (
           !registerInformation.sections.some(
-            (sectionName) => sectionName === sectionForCheckBox.name
+            (sectionName) => sectionName === sectionForCheckBox.sectionName
           )
         )
-          registerInformation.sections.push(sectionForCheckBox.name);
+          registerInformation.sections.push(sectionForCheckBox.sectionName);
       });
     };
 
@@ -420,8 +437,12 @@ export default defineComponent({
      */
     const endDateAsDate = computed(() => new Date(registerInformation.endDate));
 
-    //Is success because it starts as filled out
-    const startDateStatus = ref(InputFieldFeedbackStatus.SUCCESS);
+    //Is NONE when an empty start time is passed, or Success when a startime is passed
+    const startDateStatus = ref(
+      registerInformation.startTime === ""
+        ? InputFieldFeedbackStatus.NONE
+        : InputFieldFeedbackStatus.SUCCESS
+    );
 
     /**
      * Sets startDateStatus to SUCCESS if its a valid date
@@ -582,22 +603,25 @@ export default defineComponent({
     });
 
     //Number of people
-    const limitStatus = ref(InputFieldFeedbackStatus.NONE);
-    const limitStatusIsNone = computed(
-      () => limitStatus.value === InputFieldFeedbackStatus.NONE
+    const amountOfPeopleStatus = ref(InputFieldFeedbackStatus.NONE);
+    const amountOfPeopleStatusIsNone = computed(
+      () => amountOfPeopleStatus.value === InputFieldFeedbackStatus.NONE
     );
 
     /**
-     * Sets limitStatus to SUCCESS if between 1 and 100 people have been added, else it is set to ERROR
+     * Sets amountOfPeopleStatus to SUCCESS if between 1 and 100 people have been added, else it is set to ERROR
      */
-    const checkLimitValidity = () => {
+    const checkAmountOfPeopleValidity = () => {
       //+ converts string to number or NaN
-      const limitValue = +registerInformation.limit;
-      if (isNaN(limitValue) || limitValue - Math.floor(limitValue) !== 0) {
-        limitStatus.value = InputFieldFeedbackStatus.ERROR;
+      const amountOfPeopleValue = +registerInformation.amountOfPeople;
+      if (
+        isNaN(amountOfPeopleValue) ||
+        amountOfPeopleValue - Math.floor(amountOfPeopleValue) !== 0
+      ) {
+        amountOfPeopleStatus.value = InputFieldFeedbackStatus.ERROR;
       } else {
-        limitStatus.value =
-          limitValue >= 1 && limitValue <= 100
+        amountOfPeopleStatus.value =
+          amountOfPeopleValue >= 1 && amountOfPeopleValue <= 100
             ? InputFieldFeedbackStatus.SUCCESS
             : InputFieldFeedbackStatus.ERROR;
       }
@@ -609,7 +633,7 @@ export default defineComponent({
       checkStartDateValidity,
       checkEndDateValidity,
       checkTimeValidity,
-      checkLimitValidity,
+      checkAmountOfPeopleValidity,
     ]);
 
     const statuses = ref([
@@ -618,7 +642,7 @@ export default defineComponent({
       startDateStatus,
       endDateStatus,
       timeStatus,
-      limitStatus,
+      amountOfPeopleStatus,
     ]);
     return {
       //Also need the basic registerInformation object to be able to call it from @click which is not possible when using ...toRefs()
@@ -652,9 +676,9 @@ export default defineComponent({
       isDateAndTimeSelected,
       timeStatus,
       disableTimePickers,
-      limitStatus,
-      limitStatusIsNone,
-      checkLimitValidity,
+      amountOfPeopleStatus,
+      amountOfPeopleStatusIsNone,
+      checkAmountOfPeopleValidity,
       checks,
       statuses,
     };

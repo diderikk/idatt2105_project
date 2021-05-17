@@ -1,5 +1,4 @@
-import Section from "./Sections/Section.interface";
-import SectionForCheckBox from "./Sections/SectionForCheckBox.interface";
+import Section from "./Section/Section.interface";
 
 export default interface Room {
   roomCode: string;
