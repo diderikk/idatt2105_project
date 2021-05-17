@@ -303,6 +303,10 @@ public class RoomService {
         return !sectionRepository.existsById(sectionId);
     }
 
+    public List<Room> getTopRooms() {
+        
+    }
+
     /**
      * Private method used to check if section with specified name exists in room
      * @param room

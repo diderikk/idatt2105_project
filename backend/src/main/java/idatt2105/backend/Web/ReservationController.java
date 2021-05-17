@@ -69,15 +69,4 @@ public class ReservationController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @GetMapping("/{reservation_id}/time")
-    public ResponseEntity<Float> getTime(@PathVariable("reservation_id") long reservationId){
-        try {
-            float sum = reservationService.somOfReservation(reservationId);
-            return new ResponseEntity<>(sum, HttpStatus.OK);
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 }

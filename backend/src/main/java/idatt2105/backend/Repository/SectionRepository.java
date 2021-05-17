@@ -22,12 +22,12 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
     @Query(value = "SELECT section.* FROM section " +
     "LEFT JOIN reservation_section ON reservation_section.section_id = section.section_id " +
     "GROUP BY section.section_id ORDER BY COUNT(section.section_id) DESC LIMIT 5", nativeQuery = true)
-    List<Section> getTopSections();
+    Optional<List<Section>> getTopSections();
 
     // Find total time this section was booked in the past
     @Query(value = "SELECT SUM(TIMESTAMPDIFF(HOUR, reservation.start_time, reservation.end_time)) AS SumTime FROM reservation " +
     "JOIN reservation_section ON reservation_section.reservation_id = reservation.reservation_id " +
     "WHERE reservation_section.section_id = ?1 AND reservation.end_time <= NOW()", nativeQuery = true)
-    Float getTotalHoursBooked(long sectionId);
+    Optional<Float> getTotalHoursBooked(long sectionId);
 }
 
