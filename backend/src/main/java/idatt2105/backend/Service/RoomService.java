@@ -68,7 +68,7 @@ public class RoomService {
      * Returns a specific section of a specific room given by roomCode and sectionID
      * @param roomCode
      * @param sectionId
-     * @return SectionDTO, or null if room does not exist or section not found
+     * @return SectionDTO
      * @throws NotFoundException
      * @throws NullPointerException
      */
@@ -157,7 +157,7 @@ public class RoomService {
     /**
      * Returns list of all resevations of a room, given by roomCode
      * @param roomCode
-     * @return List of reservationDTOs
+     * @return List of GETReservationDTOs
      * @throws NotFoundException
      */
     public List<GETReservationDTO> getReservationsOfRoom(String roomCode) throws NotFoundException
@@ -182,7 +182,7 @@ public class RoomService {
      * Returns list of all resevations of a specific rooms section, given by roomCode and sectionId
      * @param roomCode
      * @param sectionDTO
-     * @return List of reservationDTOs, null if no section or section is not of the specific room
+     * @return List of GETReservationDTOs
      * @throws NotFoundException
      * @throws NullPointerException
      * @throws SectionNotOfThisRoomException

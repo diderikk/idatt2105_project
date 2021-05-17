@@ -17,7 +17,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Section class for storing information about a section
+ * Entity class for storing information about a section
  * with sectionId as primary key
  */
 @Entity
