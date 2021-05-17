@@ -106,4 +106,15 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @GetMapping("/{user_id}/time")
+    public ResponseEntity<Float> getUserSumReservationTime(@PathVariable("user_id") long userId){
+        try {
+            float sum = userService.getSumTimeInMinutesOfAllUserReservations(userId);
+            return new ResponseEntity<>(sum, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }

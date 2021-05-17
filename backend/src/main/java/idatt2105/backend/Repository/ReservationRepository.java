@@ -32,6 +32,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     "ON (reservation_section.section_id = section.section_id AND section.room_code LIKE ?2) WHERE start_time > NOW() ORDER BY amount_of_people DESC", nativeQuery = true)
     List<Reservation> getFutureReservationSortedByPeople(String nameQuery, String roomQuery);
 
-    @Query(value = "SELECT SUM(DATEDIFF(MINUTE, start_time, end_time)) FROM reservation WHERE reservation.reservation_id = ?1")
-    float sumOfReservation(long reservationId);
+    // Find total time of all reservations user has had in the past
+    @Query(value = "SELECT SUM(TIMESTAMPDIFF(MINUTE, reservation.start_time, reservation.end_time)) AS SumTime FROM reservation WHERE reservation.user_id = ?1 AND reservation.end_time <= NOW()", nativeQuery = true)
+    Float getSumTimeInMinutesOfAllUserReservations(long userId);
+
+    // Find total reservations done by a user
+    @Query(value = "SELECT COUNT(*) FROM reservation WHERE reservation.user_id = ?1", nativeQuery = true)
+    Integer getResevationCountOfUser(long userId);
 }

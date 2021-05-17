@@ -215,6 +215,22 @@ public class UserService implements UserDetailsService {
     }
 
     /**
+     * Gets sum of all reservations user has done in the past.
+     * @param userId
+     * @return
+     * @throws NotFoundException
+     */
+    public Float getSumTimeInMinutesOfAllUserReservations(long userId) throws NotFoundException {
+        if(!userRepository.findById(userId).isPresent()) {
+            LOGGER.warn("Could not find user with id: {}. Throwing exception", userId);
+            throw new NotFoundException("No user found with id: " + userId);
+        }
+        Float sum = userRepository.getSumTimeInMinutesOfAllUserReservations(userId);
+        if(sum != null) return sum;
+        return 0f;
+    }
+
+    /**
      * Creates a random password
      * @return randomly created password
      */
