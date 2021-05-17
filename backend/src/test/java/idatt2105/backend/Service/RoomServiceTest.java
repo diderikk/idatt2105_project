@@ -13,6 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import idatt2105.backend.Exception.SectionNameInRoomAlreadyExistsException;
+import idatt2105.backend.Exception.SectionNotOfThisRoomException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
@@ -22,11 +24,12 @@ import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
+import javassist.NotFoundException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
@@ -109,7 +112,7 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void getRoom_IdExists_RoomIsCorrect()
+    public void getRoom_IdExists_RoomIsCorrect() throws NotFoundException
     {
         RoomDTO roomDTO = roomService.getRoom(room1.getRoomCode());
         assertNotNull(roomDTO);
@@ -119,10 +122,9 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void getRoom_IdDoesNotExists_ReturnsNull()
+    public void getRoom_IdDoesNotExists_ReturnsNull() throws NotFoundException
     {
-        RoomDTO roomDTO = roomService.getRoom("-1");
-        assertNull(roomDTO);
+        assertThrows(NotFoundException.class, () -> roomService.getRoom("-1"));
     }
 
     @Test
@@ -137,7 +139,7 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void getSectionOfRoom_SectionExists_ReturnsSection()
+    public void getSectionOfRoom_SectionExists_ReturnsSection() throws NotFoundException
     {
         GETSectionDTO section = roomService.getSectionOfRoom(room1.getRoomCode(), section1.getSectionId());
         assertNotNull(section);
@@ -146,28 +148,25 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void getSectionOfRoom_RoomNotExist_ReturnsNull()
+    public void getSectionOfRoom_RoomNotExist_ReturnsNull() throws NotFoundException
     {
-        GETSectionDTO section = roomService.getSectionOfRoom("-1", section1.getSectionId());
-        assertNull(section);
+        assertThrows(NotFoundException.class, () -> roomService.getSectionOfRoom("-1", section1.getSectionId()));
     }
 
     @Test
-    public void getSectionOfRoom_SectionNotExist_ReturnsNull()
+    public void getSectionOfRoom_SectionNotExist_ReturnsNull() throws NotFoundException
     {
-        GETSectionDTO section = roomService.getSectionOfRoom(room1.getRoomCode(), -1);
-        assertNull(section);
+        assertThrows(NotFoundException.class, () -> roomService.getSectionOfRoom(room1.getRoomCode(), -1));
     }
 
     @Test
-    public void getSectionOfRoom_SectionNotInRightRoom_ReturnsNull()
+    public void getSectionOfRoom_SectionNotInRightRoom_ReturnsNull() throws NotFoundException
     {
-        GETSectionDTO section = roomService.getSectionOfRoom(room2.getRoomCode(), section1.getSectionId());
-        assertNull(section);
+        assertThrows(NullPointerException.class, () -> roomService.getSectionOfRoom(room2.getRoomCode(), section1.getSectionId()));
     }
 
     @Test
-    public void getSectionsOfRoom_RoomExists_ReturnsSections()
+    public void getSectionsOfRoom_RoomExists_ReturnsSections() throws NotFoundException
     {
         List<GETSectionDTO> sections = roomService.getSectionsOfRoom(room1.getRoomCode());
         assertNotNull(sections);
@@ -178,17 +177,15 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void getSectionsOfRoom_RoomNotExist_ReturnsEmptyList()
+    public void getSectionsOfRoom_RoomNotExist_ReturnsEmptyList() throws NotFoundException
     {
-        List<GETSectionDTO> sections = roomService.getSectionsOfRoom("-1");
-        assertTrue(sections.isEmpty());
+        assertThrows(NotFoundException.class, () -> roomService.getSectionsOfRoom("-1"));
     }
 
     @Test
-    public void getSectionsOfRoom_RoomHasNoSections_ReturnsEmptyList()
+    public void getSectionsOfRoom_RoomHasNoSections_ReturnsEmptyList() throws NotFoundException
     {
-        List<GETSectionDTO> sections = roomService.getSectionsOfRoom(room2.getRoomCode());
-        assertTrue(sections.isEmpty());
+        assertThrows(NullPointerException.class, () -> roomService.getSectionsOfRoom(room2.getRoomCode()));
     }
 
     @Test
@@ -227,7 +224,7 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void getReservationsOfRoom_RoomExists_ReturnsListOfReservations()
+    public void getReservationsOfRoom_RoomExists_ReturnsListOfReservations() throws NotFoundException
     {
         List<GETReservationDTO> reservationDTOs = roomService.getReservationsOfRoom(room1.getRoomCode());
         assertNotNull(reservationDTOs);
@@ -245,14 +242,13 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void getReservationsOfRoom_RoomDoesNotExists_ReturnsNull()
+    public void getReservationsOfRoom_RoomDoesNotExists_ReturnsNull() throws NotFoundException
     {
-        List<GETReservationDTO> reservationDTOs = roomService.getReservationsOfRoom("-1");
-        assertNull(reservationDTOs);
+        assertThrows(NotFoundException.class, () -> roomService.getReservationsOfRoom("-1"));
     }
 
     @Test
-    public void getReservationsOfRoom_RoomExistsButNoSections_ReturnsEmptyList()
+    public void getReservationsOfRoom_RoomExistsButNoSections_ReturnsEmptyList() throws NotFoundException
     {
         List<GETReservationDTO> reservationDTOs = roomService.getReservationsOfRoom(room2.getRoomCode());
         assertNotNull(reservationDTOs);
@@ -260,7 +256,7 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void getReservationsOfSection_SectionExists_ReturnsListOfReservations()
+    public void getReservationsOfSection_SectionExists_ReturnsListOfReservations() throws NotFoundException, SectionNotOfThisRoomException
     {
         List<GETReservationDTO> reservationDTOs = roomService.getReservationsOfSection(room1.getRoomCode(), section1.getSectionId());
         assertNotNull(reservationDTOs);
@@ -278,21 +274,19 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void getReservationsOfSection_SectionDoesNotExists_ReturnsNull()
+    public void getReservationsOfSection_SectionDoesNotExists_ReturnsNull() throws NotFoundException, SectionNotOfThisRoomException
     {
-        List<GETReservationDTO> reservationDTOs = roomService.getReservationsOfSection(room1.getRoomCode(), -1);
-        assertNull(reservationDTOs);
+        assertThrows(NotFoundException.class, () -> roomService.getReservationsOfSection(room1.getRoomCode(), -1));
     }
 
     @Test
-    public void getReservationsOfSection_SectionIsNotOfThisRoom_ReturnsNull()
+    public void getReservationsOfSection_SectionIsNotOfThisRoom_ReturnsNull() throws NotFoundException, SectionNotOfThisRoomException
     {
-        List<GETReservationDTO> reservationDTOs = roomService.getReservationsOfSection(room2.getRoomCode(), section1.getSectionId());
-        assertNull(reservationDTOs);
+        assertThrows(SectionNotOfThisRoomException.class, () -> roomService.getReservationsOfSection(room2.getRoomCode(), section1.getSectionId()));
     }
 
     @Test
-    public void addSectionToRoom_RoomExists_ReturnsRoom()
+    public void addSectionToRoom_RoomExists_ReturnsRoom() throws NotFoundException, SectionNameInRoomAlreadyExistsException
     {
         POSTSectionDTO sectionDTO = new POSTSectionDTO();
         sectionDTO.setRoomCode(room2.getRoomCode());
@@ -304,47 +298,43 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void addSectionToRoom_RoomDoeNotExist_ReturnsNull()
+    public void addSectionToRoom_RoomDoeNotExist_ReturnsNull() throws NotFoundException, SectionNameInRoomAlreadyExistsException
     {
         POSTSectionDTO sectionDTO = new POSTSectionDTO();
         sectionDTO.setRoomCode("-1");
         sectionDTO.setSectionName("Section");
-        RoomDTO room = roomService.addSectionToRoom(sectionDTO);
-        assertNull(room);
+        assertThrows(NotFoundException.class, () -> roomService.addSectionToRoom(sectionDTO));
     }
 
     @Test
-    public void deleteRoom_RoomIsDeleted_ReturnsTrue()
+    public void deleteRoom_RoomIsDeleted_ReturnsTrue() throws NotFoundException
     {
         boolean isDeleted = roomService.deleteRoom(room2.getRoomCode());
         assertTrue(isDeleted);
     }
 
     @Test
-    public void deleteSectionOfRoom_SectionIsDeleted_ReturnsTrue()
+    public void deleteSectionOfRoom_SectionIsDeleted_ReturnsTrue() throws NotFoundException, SectionNotOfThisRoomException
     {
         boolean isDeleted = roomService.deleteSectionOfRoom(room1.getRoomCode(), section2.getSectionId());
         assertTrue(isDeleted);
     }
 
     @Test
-    public void deleteSectionOfRoom_SectionDoesNotExist_ReturnsFalse()
+    public void deleteSectionOfRoom_SectionDoesNotExist_ReturnsFalse() throws NotFoundException, SectionNotOfThisRoomException
     {
-        boolean isDeleted = roomService.deleteSectionOfRoom(room1.getRoomCode(), -1);
-        assertFalse(isDeleted);
+        assertThrows(NotFoundException.class, () -> roomService.deleteSectionOfRoom(room1.getRoomCode(), -1));
     }
 
     @Test
-    public void deleteSectionOfRoom_RoomDoesNotExist_ReturnsFalse()
+    public void deleteSectionOfRoom_RoomDoesNotExist_ReturnsFalse() throws NotFoundException, SectionNotOfThisRoomException
     {
-        boolean isDeleted = roomService.deleteSectionOfRoom("-1", section2.getSectionId());
-        assertFalse(isDeleted);
+        assertThrows(NotFoundException.class, () -> roomService.deleteSectionOfRoom("-1", section2.getSectionId()));
     }
 
     @Test
-    public void deleteSectionOfRoom_SectionIsNotOfThisRoom_ReturnsFalse()
+    public void deleteSectionOfRoom_SectionIsNotOfThisRoom_ReturnsFalse() throws NotFoundException, SectionNotOfThisRoomException
     {
-        boolean isDeleted = roomService.deleteSectionOfRoom(room2.getRoomCode(), section2.getSectionId());
-        assertFalse(isDeleted);
+        assertThrows(SectionNotOfThisRoomException.class, () -> roomService.deleteSectionOfRoom(room2.getRoomCode(), section2.getSectionId()));
     }
 }

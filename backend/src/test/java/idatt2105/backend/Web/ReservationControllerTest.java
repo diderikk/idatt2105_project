@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +31,7 @@ import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import idatt2105.backend.Repository.UserRepository;
-import idatt2105.backend.Service.UserService;
+import javassist.NotFoundException;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -37,6 +39,7 @@ import static org.hamcrest.Matchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
 public class ReservationControllerTest {
     @Autowired
@@ -58,9 +61,6 @@ public class ReservationControllerTest {
     private RoomRepository roomRepository;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     private User user;
@@ -74,7 +74,7 @@ public class ReservationControllerTest {
         user = new User();
         user.setFirstName("firstName");
         user.setLastName("lastName");
-        user.setEmail("email");
+        user.setEmail("thisIsUniqueEmail");
         user.setExpirationDate(null);
         user.setHash(passwordEncoder.encode("hash"));
         user.setPhoneNumber("12345678");
@@ -110,8 +110,7 @@ public class ReservationControllerTest {
     }
 
     @AfterEach
-    public void tearDown() {
-        userService.removeUserReservation(user.getUserId(), reservation.getReservationId());
+    public void tearDown() throws NotFoundException {
         reservationRepository.deleteAll();
         sectionRepository.deleteAll();
         userRepository.deleteAll();
@@ -143,7 +142,7 @@ public class ReservationControllerTest {
 
     @Test
     public void getReservation_ReservationDoesNotExists_ReturnsNotFound() throws Exception {
-        mockMvc.perform(get("/api/v1/reservations/" + 0)).andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/v1/reservations/" + 0)).andExpect(status().isInternalServerError());
     }
 
     @Test
@@ -212,12 +211,12 @@ public class ReservationControllerTest {
         .andExpect(status().isOk());
 
         mockMvc.perform(get("/api/v1/reservations/" + reservation.getReservationId()))
-        .andExpect(status().isNotFound());
+        .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void deleteReservation_ReservationDoesNotExist_ReturnsNotFound() throws Exception{
         mockMvc.perform(delete("/api/v1/reservations/" + 0))
-        .andExpect(status().isNotFound());
+        .andExpect(status().isInternalServerError());
     }
 }

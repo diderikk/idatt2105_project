@@ -9,7 +9,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+
+import javax.xml.bind.ValidationException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,10 +21,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
+import idatt2105.backend.Exception.EmailAlreadyExistsException;
+import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
@@ -35,7 +40,9 @@ import idatt2105.backend.Model.DTO.UserDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import idatt2105.backend.Repository.UserRepository;
+import javassist.NotFoundException;
 
+@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
 public class UserServiceTests {
@@ -63,7 +70,8 @@ public class UserServiceTests {
     
 
     @BeforeEach
-    public void setup(){
+    public void setup()
+    {
         user = new User();
         user.setAdmin(false);
         user.setEmail("test@test.com");
@@ -127,7 +135,8 @@ public class UserServiceTests {
     }
 
     @Test
-    public void getUser_IdExists_UserIsCorrect(){
+    public void getUser_IdExists_UserIsCorrect() throws NotFoundException
+    {
         UserDTO userDTO = userService.getUser(1L);
         assertNotNull(userDTO);
         assertEquals(user.getFirstName(), userDTO.getFirstName());
@@ -138,13 +147,15 @@ public class UserServiceTests {
     }
     
     @Test
-    public void getUser_IdDoesNotExist_UserIsNull(){
-        UserDTO temp = userService.getUser(0L);
-        assertNull(temp);
+    public void getUser_IdDoesNotExist_UserIsNull() throws NotFoundException
+    {
+        assertThrows(NotFoundException.class, () -> userService.getUser(0L));
     }
 
     @Test
-    public void createUser_InputIsCorrect_UserCreated(){
+    public void createUser_InputIsCorrect_UserCreated() throws EmailAlreadyExistsException
+    {
+        userDTO.setEmail("email1234");
         UserDTO temp = userService.createUser(userDTO);
         assertNotNull(temp);
         assertEquals(user.getUserId(), temp.getUserId());
@@ -156,14 +167,17 @@ public class UserServiceTests {
     }
 
     @Test
-    public void createUser_InputIsWrong_UserNotCreated(){
-        userDTO.setFirstName(null);
-        UserDTO temp = userService.createUser(userDTO);
-        assertNull(temp);
+    public void createUser_InputIsWrong_UserNotCreated() throws EmailAlreadyExistsException
+    {
+        UserDTO testDTO = new UserDTO(this.user);
+        Mockito.lenient().when(userRepository.findUserByEmail(testDTO.getEmail()))
+        .thenReturn(Optional.of(this.user));
+        assertThrows(EmailAlreadyExistsException.class, () -> userService.createUser(testDTO));
     }
 
     @Test
-    public void changePassword_PasswordIsCorrect_PasswordChanged(){
+    public void changePassword_PasswordIsCorrect_PasswordChanged() throws ValidationException, NotFoundException
+    {
         Mockito.lenient().when(passwordEncoder.matches(any(), any()))
         .thenReturn(true);
         boolean successful = userService.changePassword(changePasswordDTO);
@@ -171,28 +185,30 @@ public class UserServiceTests {
     }
 
     @Test
-    public void changePassword_OldPasswordIsWrong_PasswordNotChanged(){
+    public void changePassword_OldPasswordIsWrong_PasswordNotChanged() throws ValidationException, NotFoundException
+    {
         Mockito.lenient().when(passwordEncoder.matches(any(), any()))
         .thenReturn(false);
-        boolean successful = userService.changePassword(changePasswordDTO);
-        assertEquals(false, successful);
+        assertThrows(ValidationException.class, () -> userService.changePassword(changePasswordDTO));
     }
 
     @Test
-    public void getUserReservations_CorrectId_ReturnsListOfOneObject(){
+    public void getUserReservations_CorrectId_ReturnsListOfOneObject() throws NotFoundException
+    {
         List<GETReservationDTO> userReservations = userService.getUserReservations(1);
         assertEquals(user.getReservations().size(), userReservations.size());
         assertEquals(reservation.getReservationText(), userReservations.get(0).getReservationText());
     }
 
     @Test
-    public void getUserReservations_WrongId_ReturnsEmptyList(){
-        List<GETReservationDTO> userReservations = userService.getUserReservations(0);
-        assertEquals(0, userReservations.size());
+    public void getUserReservations_WrongId_ReturnsEmptyList() throws NotFoundException
+    {
+        assertThrows(NotFoundException.class, () -> userService.getUserReservations(0));
     }
 
     @Test
-    public void addUserReservation_CorrectInput_ReservationAdded(){
+    public void addUserReservation_CorrectInput_ReservationAdded() throws NotFoundException, SectionAlreadyBookedException
+    {
         user.setReservations(new ArrayList<>());
         List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO(section.getSectionName(),room.getRoomCode()));
         POSTReservationDTO dto = new POSTReservationDTO(null, null, "reservationText", 100, tempSections);
@@ -202,33 +218,34 @@ public class UserServiceTests {
     }
 
     @Test
-    public void addUserReservation_WrongSectionId_ReservationNotAdded(){
+    public void addUserReservation_WrongSectionId_ReservationNotAdded() throws NotFoundException, SectionAlreadyBookedException
+    {
         user.setReservations(new ArrayList<>());
         List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO("fake", room.getRoomCode()));
         POSTReservationDTO dto = new POSTReservationDTO(null, null, "reservationText", 100, tempSections);
-        dto = userService.addUserReservation(1, dto);
 
-        assertNull(dto);
+        assertThrows(NotFoundException.class, () -> userService.addUserReservation(1, dto));
     }
 
     @Test
-    public void addUserReservation_WrongUserId_ReservationNotAdded(){
+    public void addUserReservation_WrongUserId_ReservationNotAdded() throws NotFoundException, SectionAlreadyBookedException
+    {
         user.setReservations(new ArrayList<>());
         List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO("sectionName", room.getRoomCode()));
         POSTReservationDTO dto = new POSTReservationDTO(null, null, "reservationText", 100, tempSections);
-        dto = userService.addUserReservation(2, dto);
 
-        assertNull(dto);
+        assertThrows(NotFoundException.class, () -> userService.addUserReservation(2, dto));
     }
 
     @Test
-    public void removeUserReservation_WrongUserId_ReturnsFalse(){
-        boolean successful = userService.removeUserReservation(0, 1);
-        assertEquals(false, successful);
+    public void removeUserReservation_WrongUserId_ReturnsFalse() throws NotFoundException
+    {
+        assertThrows(NotFoundException.class, () -> userService.removeUserReservation(0, 1));
     }
 
     @Test
-    public void loadUserByEmail_CorrectInput_ReturnsObject(){
+    public void loadUserByEmail_CorrectInput_ReturnsObject()
+    {
         UserSecurityDetails userSecurityDetails = (UserSecurityDetails) userService.loadUserByUsername("email");
         assertNotNull(userSecurityDetails);
         assertEquals(user.getEmail(), userSecurityDetails.getEmail());
@@ -238,10 +255,8 @@ public class UserServiceTests {
     }
 
     @Test
-    public void loadUserByUsername_WrongUserId_ExceptionsThrown(){
-        assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername("email1"));
+    public void loadUserByUsername_WrongUserId_ExceptionsThrown()
+    {
+        assertThrows(NoSuchElementException.class, () -> userService.loadUserByUsername("email1"));
     }
-
-
-
 }

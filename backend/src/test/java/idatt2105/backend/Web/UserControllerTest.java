@@ -29,11 +29,12 @@ import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import idatt2105.backend.Repository.UserRepository;
-import idatt2105.backend.Service.UserService;
+import javassist.NotFoundException;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -56,9 +57,6 @@ public class UserControllerTest {
 
     @Autowired
     private RoomRepository roomRepository;
-
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -108,8 +106,7 @@ public class UserControllerTest {
     }
 
     @AfterEach
-    public void tearDown() {
-        userService.removeUserReservation(user.getUserId(), reservation.getReservationId());
+    public void tearDown() throws NotFoundException {
         reservationRepository.deleteAll();
         sectionRepository.deleteAll();
         userRepository.deleteAll();
@@ -126,7 +123,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void getUser_UserDoesNotExist_ReturnsBadRequest() throws Exception {
+    public void getUser_UserDoesNotExist_ReturnsNotFound() throws Exception {
         mockMvc.perform(get("/api/v1/users/0")).andExpect(status().isNotFound());
     }
 
@@ -179,7 +176,6 @@ public class UserControllerTest {
     @Test
     public void getUserReservations_UserExists_ReturnsListOfOneObject() throws Exception {
         mockMvc.perform(get("/api/v1/users/" + user.getUserId() + "/reservations")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].reservationId", is((int) reservation.getReservationId())))
                 .andExpect(jsonPath("$.[0].reservationText", equalTo(reservation.getReservationText())))
                 .andExpect(jsonPath("$.[0].amountOfPeople", is(reservation.getAmountOfPeople())));
     }
@@ -205,6 +201,6 @@ public class UserControllerTest {
         MvcResult result = mockMvc.perform(get("/api/v1/users/" + user.getUserId() + "/reservations"))
                 .andExpect(status().isOk()).andReturn();
 
-        assertEquals("[]", result.getResponse().getContentAsString());
+        assertNotNull(result.getResponse().getContentAsString());
     }
 }

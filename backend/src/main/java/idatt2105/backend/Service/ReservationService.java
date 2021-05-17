@@ -18,6 +18,7 @@ import idatt2105.backend.Model.DTO.SortingDTO;
 import idatt2105.backend.Model.Enum.SortingTypeEnum;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.SectionRepository;
+import javassist.NotFoundException;
 
 @Service
 public class ReservationService {
@@ -35,13 +36,13 @@ public class ReservationService {
         return reservationRepository.findAll().stream().map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
     }
 
-    public GETReservationDTO getReservation(long reservationId){
+    public GETReservationDTO getReservation(long reservationId) throws NotFoundException{
         LOGGER.info("getReservation(long reservationId) called with reservationId: {}", reservationId);
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
-        if(optionalReservation.isPresent()){
-            return new GETReservationDTO(optionalReservation.get());
+        if(!optionalReservation.isPresent()){
+            throw new NotFoundException("No reservation found with id: " + reservationId);
         }
-        return null;
+        return new GETReservationDTO(optionalReservation.get());
     }
 
     /**
@@ -62,39 +63,44 @@ public class ReservationService {
         return reservations.stream().map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
     }
 
-    public GETReservationDTO editReservation(long reservationId, POSTReservationDTO dto){
+    public GETReservationDTO editReservation(long reservationId, POSTReservationDTO dto) throws NotFoundException {
         LOGGER.info("editReservation(long reservationId) called with reservationId: {}", reservationId);
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
-        if(optionalReservation.isPresent()){
-            Reservation reservation = optionalReservation.get();
-            reservation.setAmountOfPeople(dto.getAmountOfPeople());
-            if(dto.getStartTime() != null) reservation.setStartTime(dto.getStartTime());
-            if(dto.getEndTime() != null) reservation.setEndTime(dto.getEndTime());
-            if(dto.getReservationText() != null) reservation.setReservationText(dto.getReservationText());
-            if(dto.getSections() != null && !dto.getSections().isEmpty()) {
-                for(POSTSectionDTO sectionDTO : dto.getSections()){
-                    Optional<Section> optionalSection = sectionRepository.findSectionBySectionNameAndRoomCode(sectionDTO.getSectionName(), sectionDTO.getRoomCode());
-                    if(optionalSection.isPresent()){
-                        reservation.getSections().add(optionalSection.get());
-                    }
-                    else return null;
+        if(!optionalReservation.isPresent()){
+            throw new NotFoundException("No reservation found with id: " + reservationId);
+        }
+        Reservation reservation = optionalReservation.get();
+        reservation.setAmountOfPeople(dto.getAmountOfPeople());
+        if(dto.getStartTime() != null) reservation.setStartTime(dto.getStartTime());
+        if(dto.getEndTime() != null) reservation.setEndTime(dto.getEndTime());
+        if(dto.getReservationText() != null) reservation.setReservationText(dto.getReservationText());
+        if(dto.getSections() != null && !dto.getSections().isEmpty()) {
+            for(POSTSectionDTO sectionDTO : dto.getSections()){
+                Optional<Section> optionalSection = sectionRepository.findSectionBySectionNameAndRoomCode(sectionDTO.getSectionName(), sectionDTO.getRoomCode());
+                if(optionalSection.isPresent()){
+                    reservation.getSections().add(optionalSection.get());
+                }
+                else {
+                    throw new NotFoundException("No section found with sectionName: " 
+                        + sectionDTO.getSectionName() + ", and roomCode: " 
+                        + sectionDTO.getRoomCode());
                 }
             }
-            return new GETReservationDTO(reservation);
         }
-        return null;
+        LOGGER.info("ER VI HER?");
+        return new GETReservationDTO(reservation);
     }
 
-    public boolean deleteReservation(long reservationId){
+    public boolean deleteReservation(long reservationId) throws NotFoundException{
         LOGGER.info("deleteReservation(long reservationId) called with reservationId: {}", reservationId);
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
-        if(optionalReservation.isPresent()){
-            Reservation reservation = optionalReservation.get();
-            reservation.getSections().clear();
-            reservation = reservationRepository.save(reservation);
-            reservationRepository.delete(reservation);
-            return true;
+        if(!optionalReservation.isPresent()){
+            throw new NotFoundException("No reservation found with id: " + reservationId);
         }
-        return false;
+        Reservation reservation = optionalReservation.get();
+        reservation.getSections().clear();
+        reservation = reservationRepository.save(reservation);
+        reservationRepository.delete(reservation);
+        return !reservationRepository.existsById(reservationId);
     }
 }
