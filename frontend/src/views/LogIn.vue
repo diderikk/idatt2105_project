@@ -16,6 +16,8 @@
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from "vue";
+import { useRouter } from "vue-router";
+import { useStore } from "../store";
 export default defineComponent({
   name: "LogIn",
   setup() {
@@ -24,9 +26,12 @@ export default defineComponent({
       password: "",
     });
 
-    const logIn = () => {
-      //TODO remove console log and add axios call
-      console.log(userInfo);
+    const store = useStore();
+    const router = useRouter();
+
+    const logIn = async () => {
+      //TODO route to reservation feed
+      if (await store.dispatch("login", userInfo)) router.push("/");
     };
 
     return {

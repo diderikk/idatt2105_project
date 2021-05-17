@@ -7,34 +7,30 @@
 <script lang="ts">
 import { defineComponent, Ref } from "vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
-import CreateReservation from "../interfaces/CreateReservation.interface";
+import ReservationForm from "../interfaces/Reservation/ReservationForm.interface";
 import checksBeforeAsyncCall from "../utils/checksBeforeAsyncCall";
 import BaseReservationForm from "../components/BaseReservationForm.vue";
+import { useStore } from "../store";
+import { reservationFormToPOSTReservtion } from "../utils/reservationUtils";
 
 export default defineComponent({
-  name: "",
+  name: "CreateReservation",
   components: {
     BaseReservationForm,
   },
   setup() {
+    const store = useStore();
+
     const bookReservation = async (
       checks: Array<() => void>,
       statuses: Array<Ref<InputFieldFeedbackStatus>>,
-      registerInformation: CreateReservation
+      registerInformation: ReservationForm
     ) => {
       if (checksBeforeAsyncCall(checks, statuses)) {
-        const reservation = {
-          roomCode: registerInformation.roomCode,
-          sections: registerInformation.sections,
-          startTime:
-            registerInformation.startDate + " " + registerInformation.startTime,
-          endTime:
-            registerInformation.endDate + " " + registerInformation.endTime,
-          description: registerInformation.description,
-          limit: registerInformation.limit,
-        };
-        //TODO make async call instead of console logging
-        console.log(reservation);
+        store.dispatch(
+          "createReservation",
+          reservationFormToPOSTReservtion(registerInformation)
+        );
       }
     };
 
@@ -42,7 +38,7 @@ export default defineComponent({
       title: "Create reservation",
       buttons: [
         {
-          title: "Create user",
+          title: "Create reservation",
           class: "button is-link is-primary",
           action: { function: bookReservation, numberOfArgs: 3 },
         },

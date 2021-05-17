@@ -1,9 +1,7 @@
 package idatt2105.backend.Service;
 
-import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import idatt2105.backend.Component.EmailComponent;
 import idatt2105.backend.Exception.EmailAlreadyExistsException;
 import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.Reservation;
@@ -28,9 +27,10 @@ import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.UserSecurityDetails;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
+import idatt2105.backend.Model.DTO.GETUserDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
-import idatt2105.backend.Model.DTO.UserDTO;
+import idatt2105.backend.Model.DTO.POSTUserDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import idatt2105.backend.Repository.UserRepository;
@@ -53,20 +53,22 @@ public class UserService implements UserDetailsService {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired(required = false)
+    private EmailComponent emailComponent;
+
     /**
      * Returns user from database based on given userId
      * @param userId
      * @return UserDTO
      * @throws NotFoundException if iser not found
      */
-    public UserDTO getUser(long userId) throws NotFoundException {
+    public GETUserDTO getUser(long userId) throws NotFoundException {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (!optionalUser.isPresent()) {
             throw new NotFoundException("No user found with id: " + userId);
         }
         User user = optionalUser.get();
-        return new UserDTO(userId, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhoneNumber(),
-                user.getExpirationDate(), user.isAdmin());
+        return new GETUserDTO(user);
     }
 
     /**
@@ -78,7 +80,7 @@ public class UserService implements UserDetailsService {
      * @throws NullPointerException if some of the fields in dto are null
      * @throws EmailAlreadyExistsException if user with this email already exists
      */
-    public UserDTO createUser(UserDTO inputUser) throws EmailAlreadyExistsException, NullPointerException {
+    public GETUserDTO createUser(POSTUserDTO inputUser) throws EmailAlreadyExistsException, NullPointerException {
         if (inputUser.getEmail() == null || inputUser.getFirstName() == null || inputUser.getLastName() == null) {
             throw new NullPointerException("InputUserDTO object has some fields that are null");
         }
@@ -86,18 +88,47 @@ public class UserService implements UserDetailsService {
         if(userRepository.findUserByEmail(inputUser.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("Email " + inputUser.getEmail() + " already exists");
         }
+        String randomPassword = createRandomPassword();
         User createdUser = new User();
         createdUser.setFirstName(inputUser.getFirstName());
         createdUser.setLastName(inputUser.getLastName());
         createdUser.setEmail(inputUser.getEmail());
         createdUser.setExpirationDate(inputUser.getExpirationDate());
         createdUser.setAdmin(inputUser.isAdmin());
-        createdUser.setHash(passwordEncoder.encode(createRandomPassword()));
+        createdUser.setHash(passwordEncoder.encode(randomPassword));
         createdUser = userRepository.save(createdUser);
 
-        inputUser.setUserId(createdUser.getUserId());
-        return inputUser;
+        if(emailComponent != null) emailComponent.sendPassword(createdUser.getEmail(), randomPassword);
+
+        return new GETUserDTO(createdUser);
     }
+
+    /**
+     * Edits a given user if fields are not null.
+     * Checks if email already exists before allowing the edit user;
+     * @param userId
+     * @param inputUser
+     * @return
+     * @throws NotFoundException
+     * @throws EmailAlreadyExistsException
+     */
+    public GETUserDTO editUser(long userId, POSTUserDTO inputUser) throws NotFoundException, EmailAlreadyExistsException{
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if(userRepository.findUserByEmail(inputUser.getEmail()).isPresent()) 
+            throw new EmailAlreadyExistsException("Email " + inputUser.getEmail() + " already exists");
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
+            if(inputUser.getEmail() != null) user.setEmail(inputUser.getEmail());
+            if(inputUser.getFirstName() != null) user.setFirstName(inputUser.getFirstName());
+            if(inputUser.getLastName() != null) user.setLastName(inputUser.getLastName());
+            if(inputUser.getExpirationDate() != null) user.setExpirationDate(inputUser.getExpirationDate());
+            if(inputUser.getPhoneNumber() != null) user.setPhoneNumber(inputUser.getPhoneNumber());
+            user = userRepository.save(user);
+            
+            return new GETUserDTO(user);
+        }
+        throw new NotFoundException("No user found with id: " + userId);
+    } 
 
     /**
      * Changes password of a user, given by userId in the ChangePasswordDTO parameter.
@@ -186,6 +217,25 @@ public class UserService implements UserDetailsService {
     }
 
     /**
+     * Deletes the user from the database and all their reservations
+     * @param userId
+     * @return true if deleted or throws exception otherwise
+     * @throws NotFoundException
+     */
+    public boolean deleteUser(long userId) throws NotFoundException{
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + userId);
+        User user = optionalUser.get();
+        user.getReservations().stream().forEach(reservation -> reservation.getSections().clear());
+        reservationRepository.saveAll(user.getReservations());
+        reservationRepository.deleteAll(user.getReservations());
+        user.getReservations().clear();
+        user = userRepository.save(user);
+        userRepository.delete(user);
+        return true;
+    }
+
+    /**
      * Gets user from Database with email and compares input password 
      * with hashed password
      * @param email username/email for the user trying to log in
@@ -208,7 +258,7 @@ public class UserService implements UserDetailsService {
         userSecurityDetails.setGrantedAuthorities(grantedAuthorities);
         userSecurityDetails.setUserId(user.getUserId());
         if(user.getExpirationDate() != null){
-            boolean expired = user.getExpirationDate().isAfter(LocalDate.now());
+            boolean expired = user.getExpirationDate().isBefore(LocalDate.now());
             userSecurityDetails.setAccountNonExpired(!expired);
         }
         return userSecurityDetails;
@@ -219,10 +269,25 @@ public class UserService implements UserDetailsService {
      * @return randomly created password
      */
     private String createRandomPassword() {
-        byte[] bytes = new byte[30];
-        SecureRandom secureRandom = new SecureRandom();
-        secureRandom.nextBytes(bytes);
-        return Arrays.toString(bytes);
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < 30; i++) {
+            int randNum = (int)Math.floor(Math.random()*3 + 1);
+            switch (randNum) {
+                case 1:
+                    sb.append(Character.toString((char)Math.floor(Math.random()*(57-48+1) + 48)));
+                    break;
+                case 2:
+                    sb.append(Character.toString((char)Math.floor(Math.random()*(90-65+1) + 65)));
+                    break;
+                case 3:
+                    sb.append(Character.toString((char)Math.floor(Math.random()*(122-97+1) + 97)));
+                    break;
+                default:
+                    sb.append(Character.toString((char)Math.floor(Math.random()*(122-97+1) + 97)));
+                    break;
+            }
+        }
+        return sb.toString();
     }
 
     /**

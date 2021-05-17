@@ -2,6 +2,8 @@ package idatt2105.backend.Model.DTO;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import idatt2105.backend.Model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,18 +13,19 @@ import lombok.NoArgsConstructor;
  * DTO class for user
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
+@AllArgsConstructor
+public class GETUserDTO {
     private long userId;
     private String firstName;
     private String lastName;
     private String email;
     private String phoneNumber;
     private LocalDate expirationDate;
+    @JsonProperty("isAdmin")
     private boolean isAdmin;
 
-    public UserDTO(User user) {
+    public GETUserDTO(User user) {
         this.userId = user.getUserId();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
