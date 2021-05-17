@@ -20,7 +20,8 @@ import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
-import idatt2105.backend.Model.DTO.UserDTO;
+import idatt2105.backend.Model.DTO.POSTUserDTO;
+import idatt2105.backend.Model.DTO.GETUserDTO;
 import idatt2105.backend.Service.UserService;
 import javassist.NotFoundException;
 
@@ -35,9 +36,9 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/{user_id}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable("user_id") long userId){
+    public ResponseEntity<GETUserDTO> getUser(@PathVariable("user_id") long userId){
         try {
-            UserDTO user = userService.getUser(userId);
+            GETUserDTO user = userService.getUser(userId);
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (NotFoundException e) {
             e.printStackTrace();
@@ -46,11 +47,22 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO inputUser){
+    public ResponseEntity<GETUserDTO> createUser(@RequestBody POSTUserDTO inputUser){
         try {
-            UserDTO createdUser = userService.createUser(inputUser);
+            GETUserDTO createdUser = userService.createUser(inputUser);
             return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
         } catch (EmailAlreadyExistsException | NullPointerException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/{user_id}")
+    public ResponseEntity<GETUserDTO> editUser(@PathVariable("user_id") long userId, @RequestBody POSTUserDTO inputUser){
+        try {
+            GETUserDTO createdUser = userService.editUser(userId, inputUser);
+            return new ResponseEntity<>(createdUser, HttpStatus.OK);
+        } catch (EmailAlreadyExistsException | NotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -107,14 +119,15 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{user_id}/time")
-    public ResponseEntity<Float> getUserSumReservationTime(@PathVariable("user_id") long userId){
-        try {
-            float sum = userService.getSumTimeInMinutesOfAllUserReservations(userId);
-            return new ResponseEntity<>(sum, HttpStatus.OK);
+    @DeleteMapping("/{user_id}")
+    public ResponseEntity<String> deleteUser(@PathVariable("user_id") long userId){
+        try{
+            boolean successful = userService.deleteUser(userId);
+            if(successful) return new ResponseEntity<>(HttpStatus.OK);
+            else return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (NotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        } 
     }
 }

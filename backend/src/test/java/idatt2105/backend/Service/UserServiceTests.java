@@ -2,7 +2,6 @@ package idatt2105.backend.Service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -36,7 +35,8 @@ import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
-import idatt2105.backend.Model.DTO.UserDTO;
+import idatt2105.backend.Model.DTO.POSTUserDTO;
+import idatt2105.backend.Model.DTO.GETUserDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import idatt2105.backend.Repository.UserRepository;
@@ -62,7 +62,7 @@ public class UserServiceTests {
     private PasswordEncoder passwordEncoder;
 
     private User user;
-    private UserDTO userDTO;
+    private POSTUserDTO userDTO;
     private ChangePasswordDTO changePasswordDTO;
     private Reservation reservation;
     private Section section;
@@ -87,8 +87,9 @@ public class UserServiceTests {
         reservation.setReservationText("reservationText");
         reservation.setAmountOfPeople(1);
         reservation.setUser(user);
-
-        user.setReservations(List.of(reservation));
+        ArrayList<Reservation> reservations = new ArrayList<>();
+        reservations.add(reservation);
+        user.setReservations(reservations);
 
         changePasswordDTO = new ChangePasswordDTO();
         changePasswordDTO.setOldPassword("test");
@@ -104,9 +105,11 @@ public class UserServiceTests {
         section.setReservations(List.of());
         section.setRoom(room);
         section.setSectionName("sectionName");
-        reservation.setSections(List.of(section));
+        ArrayList<Section> sections = new ArrayList<>();
+        sections.add(section);
+        reservation.setSections(sections);
 
-        userDTO = new UserDTO(2, "firstName", "lastName", "email", "phoneNumber", null, false);
+        userDTO = new POSTUserDTO("firstName", "lastName", "email", "phoneNumber", null, false);
         Mockito.lenient().when(userRepository.findById(1L))
         .thenReturn(Optional.of(user));
 
@@ -137,7 +140,7 @@ public class UserServiceTests {
     @Test
     public void getUser_IdExists_UserIsCorrect() throws NotFoundException
     {
-        UserDTO userDTO = userService.getUser(1L);
+        GETUserDTO userDTO = userService.getUser(1L);
         assertNotNull(userDTO);
         assertEquals(user.getFirstName(), userDTO.getFirstName());
         assertEquals(user.getLastName(), userDTO.getLastName());
@@ -155,24 +158,39 @@ public class UserServiceTests {
     @Test
     public void createUser_InputIsCorrect_UserCreated() throws EmailAlreadyExistsException
     {
-        userDTO.setEmail("email1234");
-        UserDTO temp = userService.createUser(userDTO);
+        userDTO.setEmail("email123");
+        GETUserDTO temp = userService.createUser(userDTO);
         assertNotNull(temp);
         assertEquals(user.getUserId(), temp.getUserId());
-        assertEquals(userDTO.getFirstName(), temp.getFirstName());
-        assertEquals(userDTO.getLastName(), temp.getLastName());
-        assertEquals(userDTO.getEmail(), temp.getEmail());
-        assertEquals(userDTO.getPhoneNumber(), temp.getPhoneNumber());
-        assertEquals(userDTO.getExpirationDate(), temp.getExpirationDate());
+        assertEquals(user.getFirstName(), temp.getFirstName());
+        assertEquals(user.getLastName(), temp.getLastName());
+        assertEquals(user.getEmail(), temp.getEmail());
+        assertEquals(user.getPhoneNumber(), temp.getPhoneNumber());
+        assertEquals(user.getExpirationDate(), temp.getExpirationDate());
     }
 
     @Test
     public void createUser_InputIsWrong_UserNotCreated() throws EmailAlreadyExistsException
     {
-        UserDTO testDTO = new UserDTO(this.user);
-        Mockito.lenient().when(userRepository.findUserByEmail(testDTO.getEmail()))
+        POSTUserDTO temp = new POSTUserDTO("firstName", "lastName", "email", "phoneNumber", null, false);
+        Mockito.lenient().when(userRepository.findUserByEmail(temp.getEmail()))
         .thenReturn(Optional.of(this.user));
-        assertThrows(EmailAlreadyExistsException.class, () -> userService.createUser(testDTO));
+        assertThrows(EmailAlreadyExistsException.class, () -> userService.createUser(userDTO));
+    }
+
+    @Test
+    public void editUser_InputIsCorrect_UserEdited() throws NotFoundException, EmailAlreadyExistsException{
+        POSTUserDTO temp = new POSTUserDTO("firstNameEdited", "lastNameEdited", "emailEdited", "phoneNumberEdited", null, false);
+        user.setFirstName(temp.getFirstName());
+        user.setLastName(temp.getLastName());
+        user.setEmail(temp.getEmail());
+        user.setPhoneNumber(temp.getPhoneNumber());
+        GETUserDTO result = userService.editUser(user.getUserId(), temp);
+
+        assertEquals(temp.getFirstName(), result.getFirstName());
+        assertEquals(temp.getLastName(), result.getLastName());
+        assertEquals(temp.getEmail(), result.getEmail());
+        assertEquals(temp.getPhoneNumber(), result.getPhoneNumber());
     }
 
     @Test
@@ -258,5 +276,16 @@ public class UserServiceTests {
     public void loadUserByUsername_WrongUserId_ExceptionsThrown()
     {
         assertThrows(NoSuchElementException.class, () -> userService.loadUserByUsername("email1"));
+    }
+
+    @Test
+    public void deleteUser_CorrectId_UserDeleted() throws NotFoundException{
+        boolean successful = userService.deleteUser(user.getUserId());
+        assertEquals(true, successful);
+    }
+
+    @Test
+    public void deleteUser_WrongId_ExceptionThrown() throws NotFoundException{
+        assertThrows(NotFoundException.class, () -> userService.deleteUser(0));
     }
 }
