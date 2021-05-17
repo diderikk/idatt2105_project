@@ -16,6 +16,31 @@ const routes: Array<RouteRecordRaw> = [
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/About.vue"),
   },
+  {
+    path: "/create-user",
+    name: "CreateUser",
+    component: () => import("../views/CreateUser.vue"),
+  },
+  {
+    path: "/edit-user",
+    name: "EditUser",
+    component: () => import("../views/EditUser.vue"),
+  },
+  {
+    path: "/create-reservation",
+    name: "CreateReservation",
+    component: () => import("../views/CreateReservation.vue"),
+  },
+  {
+    path: "/edit-reservation",
+    name: "EditReservation",
+    component: () => import("../views/EditReservation.vue"),
+  },
+  {
+    path: "/log-in",
+    name: "LogIn",
+    component: () => import("../views/LogIn.vue"),
+  },
 ];
 
 const router = createRouter({
