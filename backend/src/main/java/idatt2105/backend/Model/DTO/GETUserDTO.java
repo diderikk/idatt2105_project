@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
  * DTO class for user
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
+@AllArgsConstructor
+public class GETUserDTO {
     private long userId;
     private String firstName;
     private String lastName;
@@ -22,7 +22,7 @@ public class UserDTO {
     private LocalDate expirationDate;
     private boolean isAdmin;
 
-    public UserDTO(User user) {
+    public GETUserDTO(User user) {
         this.userId = user.getUserId();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();

@@ -36,21 +36,21 @@ public class RootUserConfiguration {
      * Adds a root user if does not exist
      * @return
      */
-    // @Bean
-    // public CommandLineRunner run(){
-    //     return args -> {
-    //         Optional<User> optionalUser = userRepository.findUserByEmail(email);
-    //         if(!optionalUser.isPresent()){
-    //             User user = new User();
-    //             user.setAdmin(true);
-    //             user.setEmail(email);
-    //             user.setExpirationDate(null);
-    //             user.setFirstName("firstName");
-    //             user.setLastName("lastName");
-    //             user.setPhoneNumber("12345678");
-    //             user.setHash(passwordEncoder.encode(password));
-    //             userRepository.save(user);
-    //         }
-    //     };
-    // }
+    @Bean
+    public CommandLineRunner run(){
+        return args -> {
+            Optional<User> optionalUser = userRepository.findUserByEmail(email);
+            if(!optionalUser.isPresent()){
+                User user = new User();
+                user.setAdmin(true);
+                user.setEmail(email);
+                user.setExpirationDate(null);
+                user.setFirstName("firstName");
+                user.setLastName("lastName");
+                user.setPhoneNumber("12345678");
+                user.setHash(passwordEncoder.encode(password));
+                userRepository.save(user);
+            }
+        };
+    }
 }

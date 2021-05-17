@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
+import idatt2105.backend.Model.DTO.POSTUserDTO;
 import idatt2105.backend.Service.RoomService;
 import idatt2105.backend.Service.UserService;
 
@@ -17,13 +18,14 @@ public class BackendApplication {
 		SpringApplication.run(BackendApplication.class, args);
 	}
 
-	@Autowired
-	UserService userService;
+	// @Autowired
+	// UserService userService;
 
-	@Bean
-	public CommandLineRunner run() {
-		return args -> {
-			POSTUser
-		};
-	}
+	// @Bean
+	// public CommandLineRunner run() {
+	// 	return args -> {
+	// 		POSTUserDTO dto = new POSTUserDTO("did", "Kra", "diderikk@stud.ntnu.no", "phoneNumber", null, false);
+	// 		userService.createUser(dto);
+	// 	};
+	// }
 }
