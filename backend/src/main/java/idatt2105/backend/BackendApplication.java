@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Service.RoomService;
+import idatt2105.backend.Service.UserService;
 
 @SpringBootApplication
 public class BackendApplication {
@@ -16,13 +17,13 @@ public class BackendApplication {
 		SpringApplication.run(BackendApplication.class, args);
 	}
 
-	// @Autowired
-	// RoomService roomService;
+	@Autowired
+	UserService userService;
 
-	// @Bean
-	// public CommandLineRunner run() {
-	// 	return args -> {
-	// 		roomService.addSectionToRoom(new POSTSectionDTO("Bord 1", "A4-112"));
-	// 	};
-	// }
+	@Bean
+	public CommandLineRunner run() {
+		return args -> {
+			POSTUser
+		};
+	}
 }

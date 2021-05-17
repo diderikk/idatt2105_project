@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import idatt2105.backend.Component.EmailComponent;
 import idatt2105.backend.Exception.EmailAlreadyExistsException;
 import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.Reservation;
@@ -52,6 +53,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired(required = false)
+    private EmailComponent emailComponent;
 
     /**
      * Returns user from database based on given userId
@@ -86,14 +90,17 @@ public class UserService implements UserDetailsService {
         if(userRepository.findUserByEmail(inputUser.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("Email " + inputUser.getEmail() + " already exists");
         }
+        String randomPassword = createRandomPassword();
         User createdUser = new User();
         createdUser.setFirstName(inputUser.getFirstName());
         createdUser.setLastName(inputUser.getLastName());
         createdUser.setEmail(inputUser.getEmail());
         createdUser.setExpirationDate(inputUser.getExpirationDate());
         createdUser.setAdmin(inputUser.isAdmin());
-        createdUser.setHash(passwordEncoder.encode(createRandomPassword()));
+        createdUser.setHash(passwordEncoder.encode(randomPassword));
         createdUser = userRepository.save(createdUser);
+
+        if(emailComponent != null) emailComponent.sendPassword(createdUser.getEmail(), randomPassword);
 
         inputUser.setUserId(createdUser.getUserId());
         return inputUser;
