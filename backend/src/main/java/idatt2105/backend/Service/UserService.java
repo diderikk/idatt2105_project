@@ -276,16 +276,16 @@ public class UserService implements UserDetailsService {
             int randNum = (int)Math.floor(Math.random()*3 + 1);
             switch (randNum) {
                 case 1:
-                    sb.append((char)Math.floor(Math.random()*57 + 48));
+                    sb.append(Character.toString((char)Math.floor(Math.random()*(57-48+1) + 48)));
                     break;
                 case 2:
-                    sb.append((char)Math.floor(Math.random()*90 + 65));
+                    sb.append(Character.toString((char)Math.floor(Math.random()*(90-65+1) + 65)));
                     break;
                 case 3:
-                    sb.append((char)Math.floor(Math.random()*122 + 97));
+                    sb.append(Character.toString((char)Math.floor(Math.random()*(122-97+1) + 97)));
                     break;
                 default:
-                    sb.append((char)Math.floor(Math.random()*122 + 97));
+                    sb.append(Character.toString((char)Math.floor(Math.random()*(122-97+1) + 97)));
                     break;
             }
         }
