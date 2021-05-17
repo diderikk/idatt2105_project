@@ -3,7 +3,6 @@ package idatt2105.backend.Service;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -272,13 +271,14 @@ public class UserService implements UserDetailsService {
      * @return Float of hours
      * @throws NotFoundException
      */
-    public Float getSumTimeInMinutesOfAllUserReservations(long userId) throws NotFoundException {
+    public Float getSumTimeInHoursOfAllUserReservations(long userId) throws NotFoundException {
         if(!userRepository.findById(userId).isPresent()) {
             LOGGER.warn("Could not find user with id: {}. Throwing exception", userId);
             throw new NotFoundException("No user found with id: " + userId);
         }
-        Float sum = userRepository.getSumTimeInHoursOfAllUserReservations(userId);
-        if(sum != null && sum > 0) return sum;
+        Optional<Float> sum = userRepository.getSumTimeInHoursOfAllUserReservations(userId);
+        if(!sum.isPresent()) throw new NotFoundException("Sum of all reservations couldn't be found. User might not have any reservations");
+        if(sum.get() > 0f) return sum.get();
         return 0f;
     }
 
