@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import idatt2105.backend.Component.EmailComponent;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
@@ -30,6 +31,9 @@ public class ReservationService {
 
     @Autowired
     private SectionRepository sectionRepository;
+
+    @Autowired(required = false)
+    private EmailComponent emailComponent;
 
     /**
      * Returns all reserations in the database
@@ -105,7 +109,7 @@ public class ReservationService {
                 }
             }
         }
-        return new GETReservationDTO(reservation);
+        return new GETReservationDTO(reservationRepository.save(reservation));
     }
 
     /**
@@ -124,6 +128,9 @@ public class ReservationService {
         reservation.getSections().clear();
         reservation = reservationRepository.save(reservation);
         reservationRepository.delete(reservation);
+
+        if(emailComponent != null) emailComponent.sendReservationDeleted(reservation, reservation.getUser().getEmail());
+
         return !reservationRepository.existsById(reservationId);
     }
 }
