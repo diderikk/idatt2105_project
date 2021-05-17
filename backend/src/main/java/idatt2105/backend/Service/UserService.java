@@ -1,9 +1,7 @@
 package idatt2105.backend.Service;
 
-import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -260,7 +258,7 @@ public class UserService implements UserDetailsService {
         userSecurityDetails.setGrantedAuthorities(grantedAuthorities);
         userSecurityDetails.setUserId(user.getUserId());
         if(user.getExpirationDate() != null){
-            boolean expired = user.getExpirationDate().isAfter(LocalDate.now());
+            boolean expired = user.getExpirationDate().isBefore(LocalDate.now());
             userSecurityDetails.setAccountNonExpired(!expired);
         }
         return userSecurityDetails;
