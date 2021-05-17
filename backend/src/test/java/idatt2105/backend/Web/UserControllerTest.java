@@ -24,7 +24,7 @@ import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
-import idatt2105.backend.Model.DTO.UserDTO;
+import idatt2105.backend.Model.DTO.GETUserDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -64,7 +64,7 @@ public class UserControllerTest {
     private User user;
     private Section section;
     private Reservation reservation;
-    private UserDTO userDTO;
+    private GETUserDTO userDTO;
     private Room room;
 
     @BeforeEach
@@ -101,7 +101,7 @@ public class UserControllerTest {
 
         user = userRepository.findById(user.getUserId()).get();
 
-        userDTO = new UserDTO(-1, "firstName", "lastName", "email1", "phoneNumber", null, false);
+        userDTO = new GETUserDTO(-1, "firstName", "lastName", "email1", "phoneNumber", null, false);
 
     }
 
@@ -141,6 +141,21 @@ public class UserControllerTest {
         String userDTOString = objectMapper.writeValueAsString(userDTO);
         mockMvc.perform(post("/api/v1/users").contentType(MediaType.APPLICATION_JSON).content(userDTOString))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void editUser_CorrectInput_EditsUser() throws Exception {
+        userDTO.setFirstName("firstNameEdited");
+        userDTO.setLastName("lastNameEdited");
+        userDTO.setEmail("emailEdited");
+        String userDTOString = objectMapper.writeValueAsString(userDTO);
+        mockMvc.perform(post("/api/v1/users/" + user.getUserId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(userDTOString))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.firstName", equalTo(userDTO.getFirstName())))
+        .andExpect(jsonPath("$.lastName", equalTo(userDTO.getLastName())))
+        .andExpect(jsonPath("$.email", equalTo(userDTO.getEmail())));
     }
 
     @Test
@@ -202,5 +217,11 @@ public class UserControllerTest {
                 .andExpect(status().isOk()).andReturn();
 
         assertNotNull(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void deleteUser_UserExists_UserDeleted() throws Exception {
+        mockMvc.perform(delete("/api/v1/users/" + user.getUserId()))
+                .andExpect(status().isOk());
     }
 }

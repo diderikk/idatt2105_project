@@ -28,9 +28,10 @@ import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.UserSecurityDetails;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
+import idatt2105.backend.Model.DTO.GETUserDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
-import idatt2105.backend.Model.DTO.UserDTO;
+import idatt2105.backend.Model.DTO.POSTUserDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import idatt2105.backend.Repository.UserRepository;
@@ -59,14 +60,13 @@ public class UserService implements UserDetailsService {
      * @return UserDTO
      * @throws NotFoundException if iser not found
      */
-    public UserDTO getUser(long userId) throws NotFoundException {
+    public GETUserDTO getUser(long userId) throws NotFoundException {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (!optionalUser.isPresent()) {
             throw new NotFoundException("No user found with id: " + userId);
         }
         User user = optionalUser.get();
-        return new UserDTO(userId, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhoneNumber(),
-                user.getExpirationDate(), user.isAdmin());
+        return new GETUserDTO(user);
     }
 
     /**
@@ -78,7 +78,7 @@ public class UserService implements UserDetailsService {
      * @throws NullPointerException if some of the fields in dto are null
      * @throws EmailAlreadyExistsException if user with this email already exists
      */
-    public UserDTO createUser(UserDTO inputUser) throws EmailAlreadyExistsException, NullPointerException {
+    public GETUserDTO createUser(POSTUserDTO inputUser) throws EmailAlreadyExistsException, NullPointerException {
         if (inputUser.getEmail() == null || inputUser.getFirstName() == null || inputUser.getLastName() == null) {
             throw new NullPointerException("InputUserDTO object has some fields that are null");
         }
@@ -95,9 +95,35 @@ public class UserService implements UserDetailsService {
         createdUser.setHash(passwordEncoder.encode(createRandomPassword()));
         createdUser = userRepository.save(createdUser);
 
-        inputUser.setUserId(createdUser.getUserId());
-        return inputUser;
+        return new GETUserDTO(createdUser);
     }
+
+    /**
+     * Edits a given user if fields are not null.
+     * Checks if email already exists before allowing the edit user;
+     * @param userId
+     * @param inputUser
+     * @return
+     * @throws NotFoundException
+     * @throws EmailAlreadyExistsException
+     */
+    public GETUserDTO editUser(long userId, POSTUserDTO inputUser) throws NotFoundException, EmailAlreadyExistsException{
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if(userRepository.findUserByEmail(inputUser.getEmail()).isPresent()) 
+            throw new EmailAlreadyExistsException("Email " + inputUser.getEmail() + " already exists");
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
+            if(inputUser.getEmail() != null) user.setEmail(inputUser.getEmail());
+            if(inputUser.getFirstName() != null) user.setFirstName(inputUser.getFirstName());
+            if(inputUser.getLastName() != null) user.setLastName(inputUser.getLastName());
+            if(inputUser.getExpirationDate() != null) user.setExpirationDate(inputUser.getExpirationDate());
+            if(inputUser.getPhoneNumber() != null) user.setPhoneNumber(inputUser.getPhoneNumber());
+            user = userRepository.save(user);
+            
+            return new GETUserDTO(user);
+        }
+        throw new NotFoundException("No user found with id: " + userId);
+    } 
 
     /**
      * Changes password of a user, given by userId in the ChangePasswordDTO parameter.
@@ -183,6 +209,25 @@ public class UserService implements UserDetailsService {
         reservation = reservationRepository.save(reservation);
         reservationRepository.delete(reservation);
         return !reservationRepository.existsById(reservationId);
+    }
+
+    /**
+     * Deletes the user from the database and all their reservations
+     * @param userId
+     * @return true if deleted or throws exception otherwise
+     * @throws NotFoundException
+     */
+    public boolean deleteUser(long userId) throws NotFoundException{
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + userId);
+        User user = optionalUser.get();
+        user.getReservations().stream().forEach(reservation -> reservation.getSections().clear());
+        reservationRepository.saveAll(user.getReservations());
+        reservationRepository.deleteAll(user.getReservations());
+        user.getReservations().clear();
+        user = userRepository.save(user);
+        userRepository.delete(user);
+        return true;
     }
 
     /**
