@@ -58,10 +58,10 @@
         </div>
       </div>
     </nav>
-    <div id="application-wrapper">
+    <div id="application-wrapper" @click="closeNavBar">
       <router-view />
     </div>
-    <snackbar></snackbar>
+    <snackbar @click="closeNavBar"></snackbar>
   </div>
 </template>
 
@@ -78,13 +78,23 @@ export default defineComponent({
     const store = useStore();
 
     const isLoggedIn = computed(() => store.getters.isUserLoggedIn);
-    const isAdmin = computed(() => store.getters.getUser.admin);
+    const isAdmin = computed(() => store.getters.getUser.isAdmin);
 
     const toggleNavBar = () => {
       navBarIsActive.value = !navBarIsActive.value;
     };
 
+    router.afterEach((to, from, failure) => {
+      if (to.fullPath !== from.fullPath) {
+        navBarIsActive.value = false;
+      }
+    });
+
     const navBarIsActive = ref(false);
+
+    const closeNavBar = () => {
+      navBarIsActive.value = false;
+    };
 
     const logout = () => {
       store.dispatch("logout");
@@ -97,6 +107,7 @@ export default defineComponent({
       toggleNavBar,
       isAdmin,
       isLoggedIn,
+      closeNavBar,
     };
   },
 });
@@ -111,6 +122,14 @@ body {
   width: 60%;
   margin: auto;
   margin-top: 80px;
+}
+
+@media only screen and (max-width: 1020px) {
+  #application-wrapper {
+    width: 95%;
+    margin: auto;
+    margin-top: 80px;
+  }
 }
 
 #nav {
