@@ -109,7 +109,7 @@ public class ReservationService {
                 }
             }
         }
-        return new GETReservationDTO(reservation);
+        return new GETReservationDTO(reservationRepository.save(reservation));
     }
 
     /**
