@@ -9,14 +9,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
-public class RoomDTO {
+public class GETRoomDTO {
     private String roomCode;
     private List<GETSectionDTO> sections;
 
-    public RoomDTO(Room room) {
+    public GETRoomDTO(Room room) {
         roomCode = room.getRoomCode();
         if(room.getSections() != null) sections = room.getSections().stream().map(section -> new GETSectionDTO(section)).collect(Collectors.toList());
     }

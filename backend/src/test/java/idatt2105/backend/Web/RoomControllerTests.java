@@ -18,7 +18,8 @@ import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
-import idatt2105.backend.Model.DTO.RoomDTO;
+import idatt2105.backend.Model.DTO.GETRoomDTO;
+import idatt2105.backend.Model.DTO.POSTRoomDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -129,15 +130,30 @@ public class RoomControllerTests {
 
     @Test
     public void createRoom_ReturnCreatedRoomAndStatus_StatusOk() throws Exception {
-        RoomDTO roomDTO = new RoomDTO();
+        POSTRoomDTO roomDTO = new POSTRoomDTO();
         roomDTO.setRoomCode("roomCode");
-        roomDTO.setSections(List.of());
+        roomDTO.setSections(List.of(new POSTSectionDTO("sectionName", "roomCode")));
         String roomJson = objectMapper.writeValueAsString(roomDTO);
 
         this.mockMvc.perform(post("/api/v1/rooms")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(roomJson))
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.roomCode", is(roomDTO.getRoomCode())))
+                .andReturn();
+    }
+
+    @Test
+    public void editRoom_CorrectInput_EditsRoom() throws Exception{
+        POSTRoomDTO roomDTO = new POSTRoomDTO();
+        roomDTO.setRoomCode("roomCode");
+        roomDTO.setSections(List.of(new POSTSectionDTO("sectionName", "roomCode")));
+        String roomJson = objectMapper.writeValueAsString(roomDTO);
+
+        this.mockMvc.perform(post("/api/v1/rooms/"+room1.getRoomCode())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(roomJson))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.roomCode", is(roomDTO.getRoomCode())))
                 .andReturn();
     }
