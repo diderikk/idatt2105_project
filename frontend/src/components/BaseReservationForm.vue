@@ -15,7 +15,7 @@
         @blur="
           assignEndDate();
           checkStartDateValidity();
-          //Needs to be checked after the others to hinder the new startDate being used when assigning the end date whiche relies on the previous difference beteen stard date and end date
+          //Needs to be checked after the others to hinder the new startDate being used when assigning the end date which relies on the previous difference beteen start date and end date
           checkDifferenceStartDateEndDate();
         "
         type="date"
