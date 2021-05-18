@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import idatt2105.backend.Exception.EmailAlreadyExistsException;
+import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
+import idatt2105.backend.Model.DTO.GETRoomDTO;
 import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTUserDTO;
-import idatt2105.backend.Model.DTO.RoomDTO;
 import idatt2105.backend.Model.DTO.GETUserDTO;
 import idatt2105.backend.Service.UserService;
 import javassist.NotFoundException;
@@ -54,7 +54,7 @@ public class UserController {
         try {
             GETUserDTO createdUser = userService.createUser(inputUser);
             return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
-        } catch (EmailAlreadyExistsException | NullPointerException e) {
+        } catch (AlreadyExistsException | NullPointerException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -65,7 +65,7 @@ public class UserController {
         try {
             GETUserDTO createdUser = userService.editUser(userId, inputUser);
             return new ResponseEntity<>(createdUser, HttpStatus.OK);
-        } catch (EmailAlreadyExistsException | NotFoundException e) {
+        } catch (AlreadyExistsException | NotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -165,7 +165,7 @@ public class UserController {
 
     @GetMapping("/{user_id}/statistics/favourite-room")
     @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<RoomDTO> getFavouriteRoomOfUser(@PathVariable("user_id") long userId){
+    public ResponseEntity<GETRoomDTO> getFavouriteRoomOfUser(@PathVariable("user_id") long userId){
         try {
             return new ResponseEntity<>(userService.getFavouriteRoomOfUser(userId), HttpStatus.OK);
         } catch (NotFoundException e) {

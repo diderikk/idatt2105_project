@@ -24,7 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
-import idatt2105.backend.Exception.EmailAlreadyExistsException;
+import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
@@ -156,7 +156,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void createUser_InputIsCorrect_UserCreated() throws EmailAlreadyExistsException
+    public void createUser_InputIsCorrect_UserCreated() throws AlreadyExistsException
     {
         userDTO.setEmail("email123");
         GETUserDTO temp = userService.createUser(userDTO);
@@ -170,16 +170,16 @@ public class UserServiceTests {
     }
 
     @Test
-    public void createUser_InputIsWrong_UserNotCreated() throws EmailAlreadyExistsException
+    public void createUser_InputIsWrong_UserNotCreated() throws AlreadyExistsException
     {
         POSTUserDTO temp = new POSTUserDTO("firstName", "lastName", "email", "phoneNumber", null, false);
         Mockito.lenient().when(userRepository.findUserByEmail(temp.getEmail()))
         .thenReturn(Optional.of(this.user));
-        assertThrows(EmailAlreadyExistsException.class, () -> userService.createUser(userDTO));
+        assertThrows(AlreadyExistsException.class, () -> userService.createUser(userDTO));
     }
 
     @Test
-    public void editUser_InputIsCorrect_UserEdited() throws NotFoundException, EmailAlreadyExistsException{
+    public void editUser_InputIsCorrect_UserEdited() throws NotFoundException, AlreadyExistsException{
         POSTUserDTO temp = new POSTUserDTO("firstNameEdited", "lastNameEdited", "emailEdited", "phoneNumberEdited", null, false);
         user.setFirstName(temp.getFirstName());
         user.setLastName(temp.getLastName());

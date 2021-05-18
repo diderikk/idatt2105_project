@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionNameInRoomAlreadyExistsException;
 import idatt2105.backend.Exception.SectionNotOfThisRoomException;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
-import idatt2105.backend.Model.DTO.RoomDTO;
+import idatt2105.backend.Model.DTO.GETRoomDTO;
+import idatt2105.backend.Model.DTO.POSTRoomDTO;
 import idatt2105.backend.Service.RoomService;
 import javassist.NotFoundException;
 
@@ -29,8 +31,8 @@ public class RoomController {
     private RoomService roomService;
 
     @GetMapping
-    public ResponseEntity<List<RoomDTO>> getRooms() {
-        List<RoomDTO> rooms = roomService.getRooms();
+    public ResponseEntity<List<GETRoomDTO>> getRooms() {
+        List<GETRoomDTO> rooms = roomService.getRooms();
         if (rooms == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -38,9 +40,9 @@ public class RoomController {
     }
 
     @GetMapping("/{room_code}")
-    public ResponseEntity<RoomDTO> getRoom(@PathVariable("room_code") String roomCode) {
+    public ResponseEntity<GETRoomDTO> getRoom(@PathVariable("room_code") String roomCode) {
         try {
-            RoomDTO room = roomService.getRoom(roomCode);
+            GETRoomDTO room = roomService.getRoom(roomCode);
             return new ResponseEntity<>(room, HttpStatus.OK);
         } catch (NotFoundException e) {
             e.printStackTrace();
@@ -49,12 +51,24 @@ public class RoomController {
     }
 
     @PostMapping
-    public ResponseEntity<RoomDTO> createRoom(@RequestBody RoomDTO roomDTO) {
-        RoomDTO room = roomService.createRoom(roomDTO);
-        if (room == null) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<GETRoomDTO> createRoom(@RequestBody POSTRoomDTO roomDTO) {
+        try{
+            GETRoomDTO room = roomService.createRoom(roomDTO);
+            return new ResponseEntity<>(room, HttpStatus.CREATED);
+        } catch(AlreadyExistsException ex){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(room, HttpStatus.CREATED);
+        
+    }
+
+    @PostMapping("/{room_code}")
+    public ResponseEntity<GETRoomDTO> editRoom(@PathVariable("room_code") String roomCode, @RequestBody POSTRoomDTO roomDTO){
+        try{
+            GETRoomDTO room = roomService.editRoom(roomCode, roomDTO);
+            return new ResponseEntity<>(room, HttpStatus.OK);
+        } catch(AlreadyExistsException | IllegalArgumentException | NotFoundException ex){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/{room_code}/reservations")
@@ -83,14 +97,14 @@ public class RoomController {
     }
 
     @PostMapping("/{room_code}/sections")
-    public ResponseEntity<RoomDTO> addSectionToRoom(@PathVariable("room_code") String roomCode, @RequestBody POSTSectionDTO sectionDTO) {
+    public ResponseEntity<GETRoomDTO> addSectionToRoom(@PathVariable("room_code") String roomCode, @RequestBody POSTSectionDTO sectionDTO) {
         //Return HTTP 400 if roomCode does not match roomCode in sectionDTO
         if(!roomCode.equals(sectionDTO.getRoomCode())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         try {
-            RoomDTO roomDTO = roomService.addSectionToRoom(sectionDTO);
+            GETRoomDTO roomDTO = roomService.addSectionToRoom(sectionDTO);
             return new ResponseEntity<>(roomDTO, HttpStatus.OK);
         } catch (NotFoundException e) {
             e.printStackTrace();
@@ -102,7 +116,7 @@ public class RoomController {
     }
 
     @DeleteMapping("/{room_code}")
-    public ResponseEntity<RoomDTO> deleteRoom(@PathVariable("room_code") String roomCode) {
+    public ResponseEntity<GETRoomDTO> deleteRoom(@PathVariable("room_code") String roomCode) {
         try {
             if (roomService.deleteRoom(roomCode)) {
                 return new ResponseEntity<>(HttpStatus.OK);
@@ -116,7 +130,7 @@ public class RoomController {
     }
 
     @DeleteMapping("/{room_code}/sections/{section_id}")
-    public ResponseEntity<RoomDTO> deleteSectionOfRoom(@PathVariable("room_code") String roomCode, @PathVariable("section_id") long sectionId) {
+    public ResponseEntity<GETRoomDTO> deleteSectionOfRoom(@PathVariable("room_code") String roomCode, @PathVariable("section_id") long sectionId) {
         try {
             if (roomService.deleteSectionOfRoom(roomCode, sectionId)) {
                 return new ResponseEntity<>(HttpStatus.OK);
@@ -133,7 +147,17 @@ public class RoomController {
     }
 
     @GetMapping("/statistics/top-rooms")
-    public ResponseEntity<List<GETUserDTO>> getTopUsers(){
-        return new ResponseEntity<>(userService.getTopUsers(), HttpStatus.OK);
+    public ResponseEntity<List<GETRoomDTO>> getTopRooms(){
+        return new ResponseEntity<>(roomService.getTopRooms(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{room_code}/statistics/reservations-total-time")
+    public ResponseEntity<Float> getTotalTimeBooked(@PathVariable("room_code") String roomCode){
+        try {
+            return new ResponseEntity<>(roomService.getTotalTimeBooked(roomCode), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

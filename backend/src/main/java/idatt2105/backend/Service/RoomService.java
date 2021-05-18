@@ -11,15 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionNameInRoomAlreadyExistsException;
 import idatt2105.backend.Exception.SectionNotOfThisRoomException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
+import idatt2105.backend.Model.DTO.GETRoomDTO;
 import idatt2105.backend.Model.DTO.GETSectionDTO;
+import idatt2105.backend.Model.DTO.POSTRoomDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
-import idatt2105.backend.Model.DTO.RoomDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -43,25 +45,25 @@ public class RoomService {
      * @return RoomDTO object
      * @throws NotFoundException
      */
-    public RoomDTO getRoom(String roomCode) throws NotFoundException
+    public GETRoomDTO getRoom(String roomCode) throws NotFoundException
     {
         LOGGER.info("getRoom(String roomCode) called with roomCode: {}", roomCode); 
         Optional<Room> room = roomRepository.findById(roomCode);
         if(!room.isPresent()){
             throw new NotFoundException("No room found with room code: " + roomCode);
         }
-        return new RoomDTO(room.get());
+        return new GETRoomDTO(room.get());
     }
 
     /**
      * Returns all rooms stored in the database
      * @return List of rooms
      */
-    public List<RoomDTO> getRooms()
+    public List<GETRoomDTO> getRooms()
     {
         LOGGER.info("getRooms() called");
         List<Room> rooms = roomRepository.findAll();
-        return rooms.stream().map(room -> new RoomDTO(room)).collect(Collectors.toList());
+        return rooms.stream().map(room -> new GETRoomDTO(room)).collect(Collectors.toList());
     }
 
     /**
@@ -112,7 +114,7 @@ public class RoomService {
      * @param roomCode
      * @return RoomDTO object
      */
-    public RoomDTO createRoom(String roomCode)
+    public GETRoomDTO createRoom(String roomCode)
     {
         LOGGER.info("createRoomWith(String roomCode) called with roomCode: {}", roomCode);
 
@@ -121,28 +123,30 @@ public class RoomService {
         Room newRoom = new Room();
         newRoom.setRoomCode(roomCode);
         roomRepository.save(newRoom);
-        return new RoomDTO(newRoom);
+        return new GETRoomDTO(newRoom);
     }
 
     /**
      * Creates a new room from a given roomDTO
      * @param roomDTO
      * @return RoomDTO object
+     * @throws AlreadyExistsException
      */
-    public RoomDTO createRoom(RoomDTO roomDTO)
+    public GETRoomDTO createRoom(POSTRoomDTO roomDTO) throws AlreadyExistsException
     {
         LOGGER.info("createRoom(RoomDTO roomDTO) called with roomCode: {}", roomDTO.getRoomCode());
 
         // TODO: add ADMIN verification?
+        if(roomRepository.findById(roomDTO.getRoomCode()).isPresent()) throw new AlreadyExistsException("Room code already exists");
 
         Room newRoom = new Room();
         newRoom.setRoomCode(roomDTO.getRoomCode());
+        newRoom = roomRepository.save(newRoom);
 
-        List<GETSectionDTO> sectionDTOs = roomDTO.getSections();
+        List<POSTSectionDTO> sectionDTOs = roomDTO.getSections();
         List<Section> sections = new ArrayList<>();
-        for(GETSectionDTO sectionDTO : sectionDTOs) {
+        for(POSTSectionDTO sectionDTO : sectionDTOs) {
             Section section = new Section();
-            section.setSectionId(sectionDTO.getSectionId());
             section.setRoom(newRoom);
             section.setSectionName(sectionDTO.getSectionName());
             sections.add(section);
@@ -150,8 +154,19 @@ public class RoomService {
         newRoom.setSections(sections);
 
         sectionRepository.saveAll(sections);
-        roomRepository.save(newRoom);
-        return new RoomDTO(newRoom);
+        return new GETRoomDTO(newRoom);
+    }
+
+    public GETRoomDTO editRoom(String roomCode, POSTRoomDTO roomDTO) throws AlreadyExistsException, NotFoundException{
+        Optional<Room> optionalRoom = roomRepository.findById(roomCode);
+        if(!optionalRoom.isPresent()) throw new NotFoundException("Room with room code: " + roomDTO.getRoomCode() + " not found");
+        if(roomRepository.findById(roomDTO.getRoomCode()).isPresent()) throw new AlreadyExistsException("Room with room code: " + roomCode + " already exists");
+
+        if(roomDTO.getRoomCode() != null || !roomDTO.getSections().isEmpty() || roomDTO.getSections() != null){
+            deleteRoom(roomCode);
+            return createRoom(roomDTO);
+        }
+        throw new IllegalArgumentException("Either list was empty or null, or roomCode was null");
     }
 
     /**
@@ -217,7 +232,7 @@ public class RoomService {
      * @throws SectionNameInRoomAlreadyExistsException
      */
     @Transactional
-    public RoomDTO addSectionToRoom(POSTSectionDTO sectionDTO) throws NotFoundException, SectionNameInRoomAlreadyExistsException
+    public GETRoomDTO addSectionToRoom(POSTSectionDTO sectionDTO) throws NotFoundException, SectionNameInRoomAlreadyExistsException
     {
         LOGGER.info("addSectionToRoom(SectionDTO sectionDTO) called with roomCode: {}", sectionDTO.getRoomCode());
 
@@ -240,7 +255,7 @@ public class RoomService {
         sections.add(newSection);
         room.setSections(sections);
         sectionRepository.save(newSection);
-        return new RoomDTO(room);
+        return new GETRoomDTO(room);
     }
 
     /**
@@ -307,12 +322,12 @@ public class RoomService {
      * Finds top 5 most popular rooms.
      * @return List of rooms, empty list if no rooms were found
      */
-    public List<RoomDTO> getTopRooms() {
+    public List<GETRoomDTO> getTopRooms() {
         LOGGER.info("getTopRooms() was called");
         List<Room> rooms = roomRepository.getTopRooms();
-        List<RoomDTO> roomDTOs = new ArrayList<>();
+        List<GETRoomDTO> roomDTOs = new ArrayList<>();
         for(Room room : rooms) {
-            roomDTOs.add(new RoomDTO(room));
+            roomDTOs.add(new GETRoomDTO(room));
         }
         return roomDTOs;
     }

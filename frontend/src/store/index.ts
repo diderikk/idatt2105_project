@@ -7,6 +7,7 @@ import CreateUser from "@/interfaces/User/User.interface";
 import POSTReservation from "@/interfaces/Reservation/POSTReservation.interface";
 import Reservation from "@/interfaces/Reservation/Reservation.interface";
 import ReservationSorting from "@/interfaces/Reservation/ReservationSorting.interface";
+import Room from "@/interfaces/Room/Room.interface";
 
 export interface State {
   user: string;
@@ -97,7 +98,6 @@ export const store = createStore<State>({
         const userResponse = await backend.get(
           `/users/${response.data.userId}`
         );
-        console.log(userResponse.data);
         commit("setUser", userResponse.data);
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return true;
@@ -148,10 +148,8 @@ export const store = createStore<State>({
     },
     async getUser({ commit, getters }, userId: number) {
       const currentUser = getters.getUser;
-      console.log(currentUser.isAdmin);
       //Not letting users that aren't admins delete other users
       if (!currentUser.isAdmin && currentUser.userId !== userId) {
-        console.log("Halla");
         commit("setSnackbar", {
           title: "Not access to get user",
           status: SnackbarStatus.ERROR,
@@ -178,13 +176,13 @@ export const store = createStore<State>({
           `/users/${getters.getUser.userId}/reservations`,
           reservation
         );
+
         commit("setSnackbar", {
           title: "Reservation created",
           status: SnackbarStatus.SUCCESS,
         });
         return true;
       } catch (error) {
-        console.log(error);
         if (error.response.status === 400) {
           commit("setSnackbar", {
             title: "Already occupied",
@@ -254,6 +252,20 @@ export const store = createStore<State>({
           "/reservations/sort",
           sortingConfig
         );
+        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        return response.data;
+      } catch (error) {
+        commit("setSnackbar", {
+          title: "Could not find any reservations",
+          status: SnackbarStatus.ERROR,
+        });
+        return null;
+      }
+    },
+    async getRooms({ commit }) {
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        const response = await backend.get("/rooms");
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {

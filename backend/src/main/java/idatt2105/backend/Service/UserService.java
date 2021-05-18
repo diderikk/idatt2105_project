@@ -19,7 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import idatt2105.backend.Component.EmailComponent;
-import idatt2105.backend.Exception.EmailAlreadyExistsException;
+import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
@@ -28,12 +28,12 @@ import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.UserSecurityDetails;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
+import idatt2105.backend.Model.DTO.GETRoomDTO;
 import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.GETUserDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.POSTUserDTO;
-import idatt2105.backend.Model.DTO.RoomDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import idatt2105.backend.Repository.UserRepository;
@@ -84,14 +84,14 @@ public class UserService implements UserDetailsService {
      * @throws NullPointerException if some of the fields in dto are null
      * @throws EmailAlreadyExistsException if user with this email already exists
      */
-    public GETUserDTO createUser(POSTUserDTO inputUser) throws EmailAlreadyExistsException, NullPointerException {
+    public GETUserDTO createUser(POSTUserDTO inputUser) throws AlreadyExistsException, NullPointerException {
         LOGGER.info("createUser(POSTUserDTO inputUser) was called with inputUser's email: {}", inputUser.getEmail());
         if (inputUser.getEmail() == null || inputUser.getFirstName() == null || inputUser.getLastName() == null) {
             throw new NullPointerException("InputUserDTO object has some fields that are null");
         }
         // Check if email alrady exists
         if(userRepository.findUserByEmail(inputUser.getEmail()).isPresent()) {
-            throw new EmailAlreadyExistsException("Email " + inputUser.getEmail() + " already exists");
+            throw new AlreadyExistsException("Email " + inputUser.getEmail() + " already exists");
         }
         String randomPassword = createRandomPassword();
         User createdUser = new User();
@@ -115,13 +115,13 @@ public class UserService implements UserDetailsService {
      * @param inputUser
      * @return
      * @throws NotFoundException
-     * @throws EmailAlreadyExistsException
+     * @throws AlreadyExistsException
      */
-    public GETUserDTO editUser(long userId, POSTUserDTO inputUser) throws NotFoundException, EmailAlreadyExistsException{
+    public GETUserDTO editUser(long userId, POSTUserDTO inputUser) throws NotFoundException, AlreadyExistsException{
         LOGGER.info("editUser(long userId, POSTUserDTO inputUser) was called with userId: {}", userId);
         Optional<User> optionalUser = userRepository.findById(userId);
         if(userRepository.findUserByEmail(inputUser.getEmail()).isPresent()) 
-            throw new EmailAlreadyExistsException("Email " + inputUser.getEmail() + " already exists");
+            throw new AlreadyExistsException("Email " + inputUser.getEmail() + " already exists");
         if(optionalUser.isPresent()){
             User user = optionalUser.get();
             if(inputUser.getEmail() != null) user.setEmail(inputUser.getEmail());
@@ -296,7 +296,7 @@ public class UserService implements UserDetailsService {
     /**
      * Get number of reservations user has in total, both past, present and future
      * @param userId
-     * @return int, amount of reservations
+     * @return Integer, amount of reservations
      * @throws NotFoundException if no user was found, or reservations couldn't be counted
      */
     public Integer getResevationCountOfUser(long userId) throws NotFoundException {
@@ -330,10 +330,10 @@ public class UserService implements UserDetailsService {
     /**
      * Get favourite room of a user, given by userId
      * @param userId
-     * @return RoomDTO
+     * @return GETRoomDTO
      * @throws NotFoundException if no user was found, or no favourite room found
      */
-    public RoomDTO getFavouriteRoomOfUser(long userId) throws NotFoundException {
+    public GETRoomDTO getFavouriteRoomOfUser(long userId) throws NotFoundException {
         LOGGER.info("getFavouriteRoomOfUser(long userId) called with userId: {}", userId);
         if(!userRepository.existsById(userId)) {
             LOGGER.warn("Could not find user with id: {}. Throwing exception", userId);
@@ -344,7 +344,7 @@ public class UserService implements UserDetailsService {
             LOGGER.warn("Could not find user's favourite room, throwing exception");
             throw new NotFoundException("No favourite room found of user with userId: " + userId);
         }
-        return new RoomDTO(roomOptional.get());
+        return new GETRoomDTO(roomOptional.get());
     }
 
     /**
