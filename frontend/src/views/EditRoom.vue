@@ -17,6 +17,7 @@ import checksBeforeAsyncCall from "../utils/checksBeforeAsyncCall";
 import BaseRoomFormConfig from "../components/BaseRoomForm.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import { useStore } from "../store";
+import { useRouter } from "vue-router";
 import { RoomFormToRoom, RoomToRoomForm } from "../utils/roomUtils";
 import RoomForm from "../interfaces/Room/RoomForm.interface";
 export default defineComponent({
@@ -30,6 +31,7 @@ export default defineComponent({
   },
   setup(props) {
     const store = useStore();
+    const router = useRouter();
     const isDoneLoading = ref(false);
     const room: Ref<RoomForm> = ref({
       roomCode: "",
@@ -52,6 +54,7 @@ export default defineComponent({
     ) => {
       if (checksBeforeAsyncCall(checks, statuses)) {
         await store.dispatch("editRoom", { room: RoomFormToRoom(roomForm), roomCode: props.code });
+        if(roomForm.roomCode !== props.code) router.push(`/edit-room/${roomForm.roomCode}`);
       }
     };
 
