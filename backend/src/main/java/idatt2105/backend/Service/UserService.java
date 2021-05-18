@@ -19,7 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import idatt2105.backend.Component.EmailComponent;
-import idatt2105.backend.Exception.EmailAlreadyExistsException;
+import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Section;
@@ -78,15 +78,15 @@ public class UserService implements UserDetailsService {
      * @param inputUser
      * @return UserDTO that was created
      * @throws NullPointerException if some of the fields in dto are null
-     * @throws EmailAlreadyExistsException if user with this email already exists
+     * @throws AlreadyExistsException if user with this email already exists
      */
-    public GETUserDTO createUser(POSTUserDTO inputUser) throws EmailAlreadyExistsException, NullPointerException {
+    public GETUserDTO createUser(POSTUserDTO inputUser) throws AlreadyExistsException, NullPointerException {
         if (inputUser.getEmail() == null || inputUser.getFirstName() == null || inputUser.getLastName() == null) {
             throw new NullPointerException("InputUserDTO object has some fields that are null");
         }
         // Check if email alrady exists
         if(userRepository.findUserByEmail(inputUser.getEmail()).isPresent()) {
-            throw new EmailAlreadyExistsException("Email " + inputUser.getEmail() + " already exists");
+            throw new AlreadyExistsException("Email " + inputUser.getEmail() + " already exists");
         }
         String randomPassword = createRandomPassword();
         User createdUser = new User();
@@ -110,12 +110,12 @@ public class UserService implements UserDetailsService {
      * @param inputUser
      * @return
      * @throws NotFoundException
-     * @throws EmailAlreadyExistsException
+     * @throws AlreadyExistsException
      */
-    public GETUserDTO editUser(long userId, POSTUserDTO inputUser) throws NotFoundException, EmailAlreadyExistsException{
+    public GETUserDTO editUser(long userId, POSTUserDTO inputUser) throws NotFoundException, AlreadyExistsException{
         Optional<User> optionalUser = userRepository.findById(userId);
         if(userRepository.findUserByEmail(inputUser.getEmail()).isPresent()) 
-            throw new EmailAlreadyExistsException("Email " + inputUser.getEmail() + " already exists");
+            throw new AlreadyExistsException("Email " + inputUser.getEmail() + " already exists");
         if(optionalUser.isPresent()){
             User user = optionalUser.get();
             if(inputUser.getEmail() != null) user.setEmail(inputUser.getEmail());

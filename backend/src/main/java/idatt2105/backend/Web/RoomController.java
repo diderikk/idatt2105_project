@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionNameInRoomAlreadyExistsException;
 import idatt2105.backend.Exception.SectionNotOfThisRoomException;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
@@ -50,11 +51,13 @@ public class RoomController {
 
     @PostMapping
     public ResponseEntity<RoomDTO> createRoom(@RequestBody RoomDTO roomDTO) {
-        RoomDTO room = roomService.createRoom(roomDTO);
-        if (room == null) {
+        try{
+            RoomDTO room = roomService.createRoom(roomDTO);
+            return new ResponseEntity<>(room, HttpStatus.CREATED);
+        } catch(AlreadyExistsException ex){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(room, HttpStatus.CREATED);
+        
     }
 
     @GetMapping("/{room_code}/reservations")

@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionNameInRoomAlreadyExistsException;
 import idatt2105.backend.Exception.SectionNotOfThisRoomException;
 import idatt2105.backend.Model.Reservation;
@@ -201,7 +202,7 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void createRoom_UsingRoomDTO_ReturnsRoom()
+    public void createRoom_UsingRoomDTO_ReturnsRoom() throws AlreadyExistsException
     {
         String roomCode = "A3";
         RoomDTO roomDTO = new RoomDTO();

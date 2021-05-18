@@ -5,8 +5,8 @@ package idatt2105.backend.Exception;
  * multiple times. Can be when editing user information,
  * or adding new information. 
  */
-public class EmailAlreadyExistsException extends Exception{
-    public EmailAlreadyExistsException(String errorMessage) {
+public class AlreadyExistsException extends Exception{
+    public AlreadyExistsException(String errorMessage) {
         super(errorMessage);
     }
 }

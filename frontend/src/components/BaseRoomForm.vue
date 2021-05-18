@@ -22,7 +22,8 @@
         feedbackStatus: sectionsStatus,
       }"
     >
-      <span>
+      <span @blur="addSectionHandler">
+        
         <input
           v-model="sectionInput"
           type="text"
@@ -44,7 +45,7 @@
         v-if="button.action.numberOfArgs === 4"
         :class="button.class"
         @click="
-          button.action.function(checks, statuses, registerInformation, userId)
+          button.action.function(checks, statuses, registerInformation, roomCode)
         "
       >
         {{ button.title }}
@@ -59,7 +60,7 @@
       <button
         v-else-if="button.action.numberOfArgs === 2"
         :class="button.class"
-        @click="button.action.function(registerInformation, userId)"
+        @click="button.action.function(registerInformation, roomCode)"
       >
         {{ button.title }}
       </button>

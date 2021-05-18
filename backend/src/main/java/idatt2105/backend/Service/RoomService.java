@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionNameInRoomAlreadyExistsException;
 import idatt2105.backend.Exception.SectionNotOfThisRoomException;
 import idatt2105.backend.Model.Reservation;
@@ -128,13 +129,14 @@ public class RoomService {
      * Creates a new room from a given roomDTO
      * @param roomDTO
      * @return RoomDTO object
+     * @throws AlreadyExistsException
      */
-    public RoomDTO createRoom(RoomDTO roomDTO)
+    public RoomDTO createRoom(RoomDTO roomDTO) throws AlreadyExistsException
     {
         LOGGER.info("createRoom(RoomDTO roomDTO) called with roomCode: {}", roomDTO.getRoomCode());
 
         // TODO: add ADMIN verification?
-        if(roomRepository.findById(roomDTO.getRoomCode()).isPresent()) return null;
+        if(roomRepository.findById(roomDTO.getRoomCode()).isPresent()) throw new AlreadyExistsException("Room code already exists");
 
         Room newRoom = new Room();
         newRoom.setRoomCode(roomDTO.getRoomCode());

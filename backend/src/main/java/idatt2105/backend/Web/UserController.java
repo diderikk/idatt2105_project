@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import idatt2105.backend.Exception.EmailAlreadyExistsException;
+import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
@@ -51,7 +51,7 @@ public class UserController {
         try {
             GETUserDTO createdUser = userService.createUser(inputUser);
             return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
-        } catch (EmailAlreadyExistsException | NullPointerException e) {
+        } catch (AlreadyExistsException | NullPointerException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -62,7 +62,7 @@ public class UserController {
         try {
             GETUserDTO createdUser = userService.editUser(userId, inputUser);
             return new ResponseEntity<>(createdUser, HttpStatus.OK);
-        } catch (EmailAlreadyExistsException | NotFoundException e) {
+        } catch (AlreadyExistsException | NotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
