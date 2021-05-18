@@ -45,7 +45,7 @@
         v-if="button.action.numberOfArgs === 4"
         :class="button.class"
         @click="
-          button.action.function(checks, statuses, registerInformation, roomCode)
+          button.action.function(checks, statuses, registerInformation, roomCodeProp)
         "
       >
         {{ button.title }}
@@ -60,7 +60,7 @@
       <button
         v-else-if="button.action.numberOfArgs === 2"
         :class="button.class"
-        @click="button.action.function(registerInformation, roomCode)"
+        @click="button.action.function(registerInformation, roomCodeProp)"
       >
         {{ button.title }}
       </button>
@@ -87,7 +87,7 @@ export default defineComponent({
       required: false,
       type: Object as () => RoomForm,
     },
-    roomCodeInput: {
+    roomCodeProp: {
       required: false,
       type: String,
     },
@@ -135,8 +135,6 @@ export default defineComponent({
       registerInformation.sections.unshift({
         sectionName: sectionInput.value,
       } as Section);
-      console.log(sectionInput.value);
-      console.log(registerInformation.sections);
       checkSectionsValidity();
     };
 
