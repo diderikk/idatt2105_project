@@ -2,10 +2,8 @@ package idatt2105.backend.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -381,8 +379,8 @@ public class RoomServiceTest {
 
     @Test
     public void getTopRooms_FindsAllTopRooms_ReturnsListOfRooms() {
-        int amountReservationsSection1 = section1.getReservations().size();
-        int amountReservationsSection2 = section2.getReservations().size();
+        int amountReservationsSection1 = (section1.getReservations() == null) ? 0 : section1.getReservations().size();
+        int amountReservationsSection2 = (section2.getReservations() == null) ? 0 : section2.getReservations().size();
         Room roomA = section1.getRoom();
         Room roomB = section2.getRoom();
 
@@ -420,9 +418,11 @@ public class RoomServiceTest {
     public void getTotalTimeBooked_RoomExists_ReturnsFloat() throws NotFoundException {
         Long sum = 0L;
         for(Section section : room1.getSections()) {
-            for(Reservation reservation : section.getReservations()) {
-                long hours = Duration.between(reservation.getStartTime(), reservation.getEndTime()).toHours();
-                sum += hours;
+            if(section.getReservations() != null) {
+                for(Reservation reservation : section.getReservations()) {
+                    long hours = Duration.between(reservation.getStartTime(), reservation.getEndTime()).toHours();
+                    sum += hours;
+                }
             }
         }
 

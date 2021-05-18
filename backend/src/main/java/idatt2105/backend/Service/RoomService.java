@@ -157,12 +157,21 @@ public class RoomService {
         return new GETRoomDTO(newRoom);
     }
 
+    /**
+     * Edits a room, given by roomCode and information from POSTRoomDTO
+     * @param roomCode
+     * @param roomDTO
+     * @return GETRoomDTO of the edited toom
+     * @throws AlreadyExistsException if room with same code already exists
+     * @throws NotFoundException if no room with the given roomCode was found
+     */
     public GETRoomDTO editRoom(String roomCode, POSTRoomDTO roomDTO) throws AlreadyExistsException, NotFoundException{
+        LOGGER.info("editRoom(String roomCode, POSTRoomDTO roomDTO) called with roomCode: {}", roomCode);
         Optional<Room> optionalRoom = roomRepository.findById(roomCode);
         if(!optionalRoom.isPresent()) throw new NotFoundException("Room with room code: " + roomDTO.getRoomCode() + " not found");
         if(roomRepository.findById(roomDTO.getRoomCode()).isPresent()) throw new AlreadyExistsException("Room with room code: " + roomCode + " already exists");
 
-        if(roomDTO.getRoomCode() != null || !roomDTO.getSections().isEmpty() || roomDTO.getSections() != null){
+        if(roomDTO.getRoomCode() != null && roomDTO.getSections() != null && !roomDTO.getSections().isEmpty()){
             deleteRoom(roomCode);
             return createRoom(roomDTO);
         }
@@ -301,7 +310,6 @@ public class RoomService {
         LOGGER.info("deleteSectionOfRoom(String roomCode, long sectionId) called with roomCode: {}, and sectionId: {}", roomCode, sectionId);
         Optional<Section> sectionOptional = sectionRepository.findById(sectionId);
         Optional<Room> roomOptional = roomRepository.findById(roomCode);
-        LOGGER.info("HALLA JÆVEL!");
         // Throw exceptions if no section or room is present, or if section has room == null
         if(!sectionOptional.isPresent()) throw new NotFoundException("No section found with id: " + sectionId);
         if(!roomOptional.isPresent()) throw new NotFoundException("No room found with room code: " + roomCode);
