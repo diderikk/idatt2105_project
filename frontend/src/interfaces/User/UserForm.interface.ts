@@ -1,8 +1,8 @@
-export default interface CreateUser {
+export default interface UserForm {
   firstName: string;
   lastName: string;
   email: string;
-  phoneNationalCode: string;
   phoneNumber: string;
+  phoneNationalCode: string;
   expirationDate: string;
 }

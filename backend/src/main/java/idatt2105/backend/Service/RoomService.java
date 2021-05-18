@@ -134,9 +134,11 @@ public class RoomService {
         LOGGER.info("createRoom(RoomDTO roomDTO) called with roomCode: {}", roomDTO.getRoomCode());
 
         // TODO: add ADMIN verification?
+        if(roomRepository.findById(roomDTO.getRoomCode()).isPresent()) return null;
 
         Room newRoom = new Room();
         newRoom.setRoomCode(roomDTO.getRoomCode());
+        newRoom = roomRepository.save(newRoom);
 
         List<GETSectionDTO> sectionDTOs = roomDTO.getSections();
         List<Section> sections = new ArrayList<>();
@@ -150,7 +152,6 @@ public class RoomService {
         newRoom.setSections(sections);
 
         sectionRepository.saveAll(sections);
-        roomRepository.save(newRoom);
         return new RoomDTO(newRoom);
     }
 

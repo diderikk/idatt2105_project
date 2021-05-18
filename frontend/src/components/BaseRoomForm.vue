@@ -29,25 +29,51 @@
           placeholder="Section"
           class="input"
         />
-        <button class="button is-success" @click="addSectionHandler">+</button>
+        <button class="button is-success form" @click="addSectionHandler">+</button>
       </span>
       <div class="box" v-for="(section, index) in sections" :key="index">
         {{ section.sectionName }}
-        <button class="button is-danger" @click="removeSectionHandler(index)">
+        <button class="button is-danger form" @click="removeSectionHandler(index)">
           -
         </button>
       </div>
     </base-form-field-input>
+
+    <span v-for="(button, index) in config.buttons" :key="index">
+      <button
+        v-if="button.action.numberOfArgs === 4"
+        :class="button.class"
+        @click="
+          button.action.function(checks, statuses, registerInformation, userId)
+        "
+      >
+        {{ button.title }}
+      </button>
+      <button
+        v-if="button.action.numberOfArgs === 3"
+        :class="button.class"
+        @click="button.action.function(checks, statuses, registerInformation)"
+      >
+        {{ button.title }}
+      </button>
+      <button
+        v-else-if="button.action.numberOfArgs === 2"
+        :class="button.class"
+        @click="button.action.function(registerInformation, userId)"
+      >
+        {{ button.title }}
+      </button>
+    </span>
   </div>
 </template>
 
 <script lang="ts">
-import Room from "../interfaces/Room.interface";
 import { defineComponent, reactive, ref, toRefs } from "vue";
 import BaseFormFieldInput from "../components/BaseFormFieldInput.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import BaseFormConfig from "../interfaces/config/BaseFormConfig.interface";
-import Section from "../interfaces/Sections/Section.interface";
+import Section from "../interfaces/Section/Section.interface";
+import RoomForm from "../interfaces/Room/RoomForm.interface";
 export default defineComponent({
   name: "CreateRoom",
   components: { BaseFormFieldInput },
@@ -58,7 +84,11 @@ export default defineComponent({
     },
     baseRoom: {
       required: false,
-      type: Object as () => Room,
+      type: Object as () => RoomForm,
+    },
+    roomCodeInput: {
+      required: false,
+      type: String,
     },
   },
   setup(props) {
@@ -114,6 +144,10 @@ export default defineComponent({
       checkSectionsValidity();
     };
 
+    const checks = ref([checkRoomCodeValidity, checkSectionsValidity]);
+
+    const statuses = ref([roomCodeStatus, sectionsStatus]);
+
     return {
       sectionInput,
       registerInformation,
@@ -124,6 +158,8 @@ export default defineComponent({
       addSectionHandler,
       removeSectionHandler,
       ...toRefs(registerInformation),
+      statuses,
+      checks,
     };
   },
 });
@@ -139,8 +175,8 @@ ul {
   list-style-type: none;
 }
 
-button{
-    width: 4%;
+.form {
+  width: 4%;
 }
 
 .box {
@@ -150,5 +186,6 @@ button{
   align-items: center;
   padding: 0%;
   padding-left: 1.2%;
+  height: 2.5em;
 }
 </style>

@@ -8,23 +8,24 @@
 import { defineComponent, Ref } from "vue";
 import BaseUserFormConfig from "../components/BaseUserForm.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
-import CreateUser from "../interfaces/CreateUser.interface";
+import UserForm from "../interfaces/User/UserForm.interface";
+import { useStore } from "../store";
 import checksBeforeAsyncCall from "../utils/checksBeforeAsyncCall";
+import { UserFormToUser } from "../utils/userUtils";
 export default defineComponent({
-  name: "EditUser",
+  name: "CreateUser",
   components: {
     BaseUserFormConfig,
   },
   setup() {
-    const register = (
+    const store = useStore();
+    const register = async (
       checks: Array<() => void>,
       statuses: Array<Ref<InputFieldFeedbackStatus>>,
-      registerForm: CreateUser
+      registerForm: UserForm
     ) => {
       if (checksBeforeAsyncCall(checks, statuses)) {
-        //TODO Add async call and remove content
-        console.log("Created user: REMOVE ME");
-        console.log(registerForm);
+        await store.dispatch("createUser", UserFormToUser(registerForm));
       }
     };
 

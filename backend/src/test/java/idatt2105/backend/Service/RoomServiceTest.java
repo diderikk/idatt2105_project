@@ -1,7 +1,9 @@
 package idatt2105.backend.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -192,6 +194,7 @@ public class RoomServiceTest {
     public void createRoom_UsingRoomId_ReturnsRoom()
     {
         String roomCode = "A3";
+        Mockito.lenient().when(roomRepository.findById(roomCode)).thenReturn(null);
         RoomDTO room = roomService.createRoom(roomCode);
         assertNotNull(room);
         assertThat(room.getRoomCode()).isEqualTo(roomCode);
@@ -213,6 +216,10 @@ public class RoomServiceTest {
         section4.setSectionId(3);
 
         roomDTO.setSections(List.of(section3, section4));
+
+        Room temp = new Room();
+        temp.setRoomCode(roomCode);
+        Mockito.when(roomRepository.save(temp)).thenReturn(temp);
 
         RoomDTO room = roomService.createRoom(roomDTO);
         assertNotNull(room);

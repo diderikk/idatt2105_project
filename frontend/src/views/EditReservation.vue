@@ -1,6 +1,14 @@
 <template>
   <div>
+    <!--Displaying an unfilled form if it is loading in data, and a filled in form when the data arrives-->
     <base-reservation-form-config
+      v-if="isDoneLoading"
+      :baseReservation="reservation"
+      :config="config"
+      :reservationId="parseInt(id)"
+    ></base-reservation-form-config>
+    <base-reservation-form-config
+      v-else
       :baseReservation="reservation"
       :config="config"
     ></base-reservation-form-config>
@@ -8,47 +16,74 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, Ref } from "vue";
+import { defineComponent, onBeforeMount, reactive, ref, Ref, watch } from "vue";
 import BaseReservationFormConfig from "../components/BaseReservationForm.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
-import CreateReservation from "../interfaces/CreateReservation.interface";
-import CreateUser from "../interfaces/CreateUser.interface";
+import POSTReservation from "../interfaces/Reservation/POSTReservation.interface";
 import checksBeforeAsyncCall from "../utils/checksBeforeAsyncCall";
+import ReservationForm from "../interfaces/Reservation/ReservationForm.interface";
+import { useStore } from "../store";
+import {
+  POSTReservationToResrevationForm,
+  reservationFormToPOSTReservtion,
+} from "../utils/reservationUtils";
+
 export default defineComponent({
-  name: "EditUser",
+  name: "EditReservation",
   components: {
     BaseReservationFormConfig,
   },
-  setup() {
-    //TODO remove testdata and do async call for actual user
-    const reservation: CreateReservation = reactive({
-      roomCode: "A4-121",
-      sections: ["Kalle", "Hei"],
-      description: "Hei",
-      startDate: "2021-07-07",
-      endDate: "2021-07-08",
-      startTime: "02:00",
-      endTime: "03:00",
-      limit: "12",
+  props: {
+    id: {
+      required: true,
+      type: String,
+    },
+  },
+  setup(props) {
+    const store = useStore();
+
+    onBeforeMount(async () => {
+      const response: POSTReservation = await store.dispatch(
+        "getReservation",
+        props.id
+      );
+      if (response !== null) {
+        reservation.value = POSTReservationToResrevationForm(response);
+        isDoneLoading.value = true;
+      }
     });
+
+    const reservation: Ref<ReservationForm> = ref({
+      roomCode: "",
+      sections: [],
+      reservationText: "",
+      startDate: "",
+      endDate: "",
+      startTime: "",
+      endTime: "",
+      amountOfPeople: "",
+    });
+
+    const isDoneLoading = ref(false);
 
     const editReservation = (
       checks: Array<() => void>,
       statuses: Array<Ref<InputFieldFeedbackStatus>>,
-      registerInformation: CreateUser
+      registerInformation: ReservationForm,
+      reservationId: number
     ) => {
       if (checksBeforeAsyncCall(checks, statuses)) {
-        //TODO Add async call and remove content
-        console.log("Edited reservation: REMOVE ME");
-        console.log(registerInformation);
+        console.log(reservationId);
+        store.dispatch("editReservation", {
+          id: reservationId,
+          ...reservationFormToPOSTReservtion(registerInformation),
+        });
       }
     };
 
-    const deleteReservation = (registerInformation: CreateUser) => {
-      if (window.confirm("Are you sure you want do delete the reservation?")) {
-        //TODO Add async call
-        console.log("Reservation deleted: REMOVE ME");
-        console.log(registerInformation);
+    const deleteReservation = (reservationId: number) => {
+      if (window.confirm("Are you sure you want to delete the reservation?")) {
+        store.dispatch("deleteReservation", reservationId);
       }
     };
 
@@ -58,10 +93,10 @@ export default defineComponent({
         {
           title: "Confirm edit",
           class: "button is-link is-primary",
-          action: { function: editReservation, numberOfArgs: 3 },
+          action: { function: editReservation, numberOfArgs: 4 },
         },
         {
-          title: "Delete resertvation",
+          title: "Delete reservation",
           class: "button is-danger",
           action: {
             function: deleteReservation,
@@ -73,6 +108,7 @@ export default defineComponent({
 
     return {
       reservation,
+      isDoneLoading,
       config,
       editReservation,
       deleteReservation,

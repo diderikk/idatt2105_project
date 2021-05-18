@@ -52,7 +52,7 @@ public class RoomController {
     public ResponseEntity<RoomDTO> createRoom(@RequestBody RoomDTO roomDTO) {
         RoomDTO room = roomService.createRoom(roomDTO);
         if (room == null) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(room, HttpStatus.CREATED);
     }

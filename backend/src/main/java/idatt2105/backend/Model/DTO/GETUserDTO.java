@@ -2,6 +2,8 @@ package idatt2105.backend.Model.DTO;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import idatt2105.backend.Model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +22,7 @@ public class GETUserDTO {
     private String email;
     private String phoneNumber;
     private LocalDate expirationDate;
+    @JsonProperty("isAdmin")
     private boolean isAdmin;
 
     public GETUserDTO(User user) {
