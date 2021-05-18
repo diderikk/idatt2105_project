@@ -157,12 +157,21 @@ public class RoomService {
         return new GETRoomDTO(newRoom);
     }
 
+    /**
+     * Edits a room, given by roomCode and information from POSTRoomDTO
+     * @param roomCode
+     * @param roomDTO
+     * @return GETRoomDTO of the edited toom
+     * @throws AlreadyExistsException if room with same code already exists
+     * @throws NotFoundException if no room with the given roomCode was found
+     */
     public GETRoomDTO editRoom(String roomCode, POSTRoomDTO roomDTO) throws AlreadyExistsException, NotFoundException{
+        LOGGER.info("editRoom(String roomCode, POSTRoomDTO roomDTO) called with roomCode: {}", roomCode);
         Optional<Room> optionalRoom = roomRepository.findById(roomCode);
         if(!optionalRoom.isPresent()) throw new NotFoundException("Room with room code: " + roomDTO.getRoomCode() + " not found");
         if(roomRepository.findById(roomDTO.getRoomCode()).isPresent()) throw new AlreadyExistsException("Room with room code: " + roomCode + " already exists");
 
-        if(roomDTO.getRoomCode() != null || !roomDTO.getSections().isEmpty() || roomDTO.getSections() != null){
+        if(roomDTO.getRoomCode() != null && roomDTO.getSections() != null && !roomDTO.getSections().isEmpty()){
             deleteRoom(roomCode);
             return createRoom(roomDTO);
         }
@@ -276,9 +285,10 @@ public class RoomService {
         // Delete all sections and reservations of this room, if there are any
         if(room.get().getSections() != null) {
             for(Section section : room.get().getSections()) {
-                Optional<List<Long>> reservationIds = sectionRepository.getAllReservationIdsOfSection(section.getSectionId());
-                if(reservationIds.isPresent()) {
-                    reservationRepository.deleteGivenReservations(reservationIds.get());
+                List<Long> reservationIds = sectionRepository.getAllReservationIdsOfSection(section.getSectionId());
+                if(reservationIds != null) {
+                    reservationRepository.deleteGivenReservationsDependencies(reservationIds);
+                    reservationRepository.deleteGivenReservations(reservationIds);
                 }
                 sectionRepository.delete(section);
             }
@@ -301,7 +311,6 @@ public class RoomService {
         LOGGER.info("deleteSectionOfRoom(String roomCode, long sectionId) called with roomCode: {}, and sectionId: {}", roomCode, sectionId);
         Optional<Section> sectionOptional = sectionRepository.findById(sectionId);
         Optional<Room> roomOptional = roomRepository.findById(roomCode);
-
         // Throw exceptions if no section or room is present, or if section has room == null
         if(!sectionOptional.isPresent()) throw new NotFoundException("No section found with id: " + sectionId);
         if(!roomOptional.isPresent()) throw new NotFoundException("No room found with room code: " + roomCode);
@@ -310,12 +319,43 @@ public class RoomService {
         if(!sectionOptional.get().getRoom().getRoomCode().equals(roomCode)) throw new SectionNotOfThisRoomException("Section with id " + sectionId + " is not of room with code " + roomCode);
 
         // Delete all reservations of the section, if there are any
-        Optional<List<Long>> reservationIds = sectionRepository.getAllReservationIdsOfSection(sectionId);
-        if(reservationIds.isPresent()) {
-            reservationRepository.deleteGivenReservations(reservationIds.get());
+        List<Long> reservationIds = sectionRepository.getAllReservationIdsOfSection(sectionId);
+        if(reservationIds != null) {
+            reservationRepository.deleteGivenReservationsDependencies(reservationIds);
+            reservationRepository.deleteGivenReservations(reservationIds);
         }
         sectionRepository.deleteById(sectionId);
         return !sectionRepository.existsById(sectionId);
+    }
+
+    /**
+     * Finds top 5 most popular rooms.
+     * @return List of rooms, empty list if no rooms were found
+     */
+    public List<GETRoomDTO> getTopRooms() {
+        LOGGER.info("getTopRooms() was called");
+        List<Room> rooms = roomRepository.getTopRooms();
+        List<GETRoomDTO> roomDTOs = new ArrayList<>();
+        for(Room room : rooms) {
+            roomDTOs.add(new GETRoomDTO(room));
+        }
+        return roomDTOs;
+    }
+
+    /**
+     * Get total time (in hours) a room has been booked before.
+     * Room is determined by roomCode parameter.
+     * @param roomCode
+     * @return Long of total time in hours
+     * @throws NotFoundException if room was not found
+     */
+    public Long getTotalHoursBooked(String roomCode) throws NotFoundException {
+        LOGGER.info("getTotalHoursBooked(String roomCode) called with roomCode: {}", roomCode);
+        Optional<Long> sumOptional = roomRepository.getTotalHoursBooked(roomCode);
+        if(!sumOptional.isPresent()) {
+            throw new NotFoundException("No room found with room code: " + roomCode);
+        }
+        return sumOptional.get();
     }
 
     /**

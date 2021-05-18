@@ -1,10 +1,9 @@
 package idatt2105.backend.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,11 +26,13 @@ import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.POSTRoomDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
+import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import javassist.NotFoundException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -50,6 +51,9 @@ public class RoomServiceTest {
 
     @Mock
     private SectionRepository sectionRepository;
+
+    @Mock
+    private ReservationRepository reservationRepository;
 
     Room room1;
     Room room2;
@@ -82,11 +86,13 @@ public class RoomServiceTest {
         section1 = new Section();
         section1.setRoom(room1);
         section1.setSectionId(1);
+        section1.setSectionName("Section1");
         section1.setReservations(List.of(reservation1, reservation2));
 
         section2 = new Section();
         section2.setRoom(room1);
         section2.setSectionId(2);
+        section2.setSectionName("Section2");
 
         room1.setSections(List.of(section1, section2));
 
@@ -114,6 +120,13 @@ public class RoomServiceTest {
         Mockito.lenient()
         .when(roomRepository.findAll())
         .thenReturn(List.of(room1, room2));
+
+        Mockito.lenient()
+        .when(sectionRepository.getAllReservationIdsOfSection(section1.getSectionId()))
+        .thenReturn(List.of(reservation1.getReservationId(), reservation2.getReservationId()));
+        Mockito.lenient()
+        .when(sectionRepository.getAllReservationIdsOfSection(section2.getSectionId()))
+        .thenReturn(null);
     }
 
     @Test
@@ -355,6 +368,10 @@ public class RoomServiceTest {
     @Test
     public void deleteSectionOfRoom_SectionIsDeleted_ReturnsTrue() throws NotFoundException, SectionNotOfThisRoomException
     {
+        Mockito.lenient()
+        .when(sectionRepository.getAllReservationIdsOfSection(section2.getSectionId()))
+        .thenReturn(null);
+
         boolean isDeleted = roomService.deleteSectionOfRoom(room1.getRoomCode(), section2.getSectionId());
         assertTrue(isDeleted);
     }
@@ -375,5 +392,63 @@ public class RoomServiceTest {
     public void deleteSectionOfRoom_SectionIsNotOfThisRoom_ReturnsFalse() throws NotFoundException, SectionNotOfThisRoomException
     {
         assertThrows(SectionNotOfThisRoomException.class, () -> roomService.deleteSectionOfRoom(room2.getRoomCode(), section2.getSectionId()));
+    }
+
+    @Test
+    public void getTopRooms_FindsAllTopRooms_ReturnsListOfRooms() {
+        int amountReservationsSection1 = (section1.getReservations() == null) ? 0 : section1.getReservations().size();
+        int amountReservationsSection2 = (section2.getReservations() == null) ? 0 : section2.getReservations().size();
+        Room roomA = section1.getRoom();
+        Room roomB = section2.getRoom();
+
+        if(roomA.getRoomCode().equals(roomB.getRoomCode())) {
+            if(room1.getRoomCode().equals(roomA.getRoomCode())) {
+                Mockito.lenient()
+                .when(roomRepository.getTopRooms())
+                .thenReturn(List.of(room1, room2));
+            } else {
+                Mockito.lenient()
+                .when(roomRepository.getTopRooms())
+                .thenReturn(List.of(room2, room1));
+            }
+        } else {
+            if(amountReservationsSection1 > amountReservationsSection2) {
+                Mockito.lenient()
+                .when(roomRepository.getTopRooms())
+                .thenReturn(List.of(roomA, roomB));
+            } else {
+                Mockito.lenient()
+                .when(roomRepository.getTopRooms())
+                .thenReturn(List.of(roomB, roomA));
+            }
+        }
+
+        List<GETRoomDTO> rooms = roomService.getTopRooms();
+        assertNotNull(rooms);
+        assertThat(rooms.get(0).getRoomCode()).isEqualTo(room1.getRoomCode());
+        assertThat(rooms.get(0).getSections().get(0).getSectionId()).isEqualTo(room1.getSections().get(0).getSectionId());
+        assertThat(rooms.get(0).getSections().get(1).getSectionId()).isEqualTo(room1.getSections().get(1).getSectionId());
+        assertThat(rooms.get(1).getRoomCode()).isEqualTo(room2.getRoomCode());
+    }
+
+    @Test
+    public void getTotalTimeBooked_RoomExists_ReturnsFloat() throws NotFoundException {
+        Long sum = 0L;
+        for(Section section : room1.getSections()) {
+            if(section.getReservations() != null) {
+                for(Reservation reservation : section.getReservations()) {
+                    long hours = Duration.between(reservation.getStartTime(), reservation.getEndTime()).toHours();
+                    sum += hours;
+                }
+            }
+        }
+
+        Mockito.lenient()
+        .when(roomRepository.getTotalHoursBooked(room1.getRoomCode()))
+        .thenReturn(Optional.of(sum));
+
+        Long totalTime = roomService.getTotalHoursBooked(room1.getRoomCode());
+        assertNotNull(totalTime);
+        assertEquals(sum, totalTime);
     }
 }

@@ -22,11 +22,14 @@ import idatt2105.backend.Component.EmailComponent;
 import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.Reservation;
+import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.UserSecurityDetails;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
+import idatt2105.backend.Model.DTO.GETRoomDTO;
+import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.GETUserDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
@@ -65,6 +68,7 @@ public class UserService implements UserDetailsService {
      * @throws NotFoundException if iser not found
      */
     public GETUserDTO getUser(long userId) throws NotFoundException {
+        LOGGER.info("getUser(long userId) was called with userId: {}", userId);
         Optional<User> optionalUser = userRepository.findById(userId);
         if (!optionalUser.isPresent()) {
             throw new NotFoundException("No user found with id: " + userId);
@@ -80,9 +84,10 @@ public class UserService implements UserDetailsService {
      * @param inputUser
      * @return UserDTO that was created
      * @throws NullPointerException if some of the fields in dto are null
-     * @throws AlreadyExistsException if user with this email already exists
+     * @throws EmailAlreadyExistsException if user with this email already exists
      */
     public GETUserDTO createUser(POSTUserDTO inputUser) throws AlreadyExistsException, NullPointerException {
+        LOGGER.info("createUser(POSTUserDTO inputUser) was called with inputUser's email: {}", inputUser.getEmail());
         if (inputUser.getEmail() == null || inputUser.getFirstName() == null || inputUser.getLastName() == null) {
             throw new NullPointerException("InputUserDTO object has some fields that are null");
         }
@@ -115,6 +120,7 @@ public class UserService implements UserDetailsService {
      * @throws AlreadyExistsException
      */
     public GETUserDTO editUser(long userId, POSTUserDTO inputUser) throws NotFoundException, AlreadyExistsException{
+        LOGGER.info("editUser(long userId, POSTUserDTO inputUser) was called with userId: {}", userId);
         Optional<User> optionalUser = userRepository.findById(userId);
         if(userRepository.findUserByEmail(inputUser.getEmail()).isPresent()) 
             throw new AlreadyExistsException("Email " + inputUser.getEmail() + " already exists");
@@ -140,6 +146,7 @@ public class UserService implements UserDetailsService {
      * @throws ValidationException if old password didn't match
      */
     public boolean changePassword(ChangePasswordDTO dto) throws ValidationException, NotFoundException {
+        LOGGER.info("changePassword(ChangePasswordDTO dto) was called with dto userId: {}", dto.getUserId());
         Optional<User> optionalUser = userRepository.findById(dto.getUserId());
         if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + dto.getUserId());
         if(!passwordEncoder.matches(dto.getOldPassword(), optionalUser.get().getHash())) {
@@ -158,6 +165,7 @@ public class UserService implements UserDetailsService {
      * @throws NotFoundException if user not found
      */
     public List<GETReservationDTO> getUserReservations(long userId) throws NotFoundException {
+        LOGGER.info("getUserReservations(long userId) was called with userId: {}", userId);
         Optional<User> optionalUser = userRepository.findById(userId);
         if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + userId);
         User user = optionalUser.get();
@@ -192,6 +200,7 @@ public class UserService implements UserDetailsService {
      * @throws NotFoundException if user not found
      */
     public POSTReservationDTO addUserReservation(long userId, POSTReservationDTO dto) throws NotFoundException, SectionAlreadyBookedException {
+        LOGGER.info("addUserReservation(long userId, POSTReservationDTO dto) was called with userId: {}", userId);
         Optional<User> optionalUser = userRepository.findById(userId);
         if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + userId);
         User user = optionalUser.get();
@@ -225,6 +234,7 @@ public class UserService implements UserDetailsService {
      * @throws NotFoundException if user not found
      */
     public boolean removeUserReservation(long userId, long reservationId) throws NotFoundException {
+        LOGGER.info("removeUserReservation(long userId, long reservationId) was called with userId: {}", userId);
         Optional<User> optionalUser = userRepository.findById(userId);
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
         if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + userId);
@@ -243,6 +253,7 @@ public class UserService implements UserDetailsService {
      * @throws NotFoundException
      */
     public boolean deleteUser(long userId) throws NotFoundException{
+        LOGGER.info("deleteUser(long userId) was called with userId: {}", userId);
         Optional<User> optionalUser = userRepository.findById(userId);
         if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + userId);
         User user = optionalUser.get();
@@ -282,6 +293,98 @@ public class UserService implements UserDetailsService {
             userSecurityDetails.setAccountNonExpired(!expired);
         }
         return userSecurityDetails;
+    }
+
+    /**
+     * Gets sum (in hours) of all reservations user has done in the past.
+     * @param userId
+     * @return Float of hours
+     * @throws NotFoundException if no user with id exists, or if no sum of reservations could be found
+     */
+    public Float getSumTimeInHoursOfAllUserReservations(long userId) throws NotFoundException {
+        LOGGER.info("getSumTimeInHoursOfAllUserReservations(long userId) called with userId: {}", userId);
+        if(!userRepository.existsById(userId)) {
+            LOGGER.warn("Could not find user with id: {}. Throwing exception", userId);
+            throw new NotFoundException("No user found with id: " + userId);
+        }
+        Optional<Float> sum = userRepository.getSumTimeInHoursOfAllUserReservations(userId);
+        if(!sum.isPresent()) throw new NotFoundException("Sum of all reservations couldn't be found. User might not have any reservations");
+        if(sum.get() > 0f) return sum.get();
+        return 0f;
+    }
+
+    /**
+     * Get number of reservations user has in total, both past, present and future
+     * @param userId
+     * @return Integer, amount of reservations
+     * @throws NotFoundException if no user was found, or reservations couldn't be counted
+     */
+    public Integer getResevationCountOfUser(long userId) throws NotFoundException {
+        LOGGER.info("getResevationCountOfUser(long userId) called with userId: {}", userId);
+        if(!userRepository.existsById(userId)) {
+            LOGGER.warn("Could not find user with id: {}. Throwing exception", userId);
+            throw new NotFoundException("No user found with id: " + userId);
+        }
+        Optional<Integer> countOptional = userRepository.getResevationCountOfUser(userId);
+        if(!countOptional.isPresent()) {
+            LOGGER.warn("Could not find user reservation count. Throwing exception");
+            throw new NotFoundException("No user reservations count found");
+        }
+        return countOptional.get();
+    }
+
+    /**
+     * Finds top 5 most users with most reservations.
+     * @return List of users, empty list if no users were found
+     */
+    public List<GETUserDTO> getTopUsers() {
+        LOGGER.info("getTopUsers() was called");
+        List<User> users = userRepository.getTopUsers();
+        List<GETUserDTO> userDTOs= new ArrayList<>();
+        for(User user : users) {
+            userDTOs.add(new GETUserDTO(user));
+        }
+        return userDTOs;
+    }
+
+    /**
+     * Get favourite room of a user, given by userId
+     * @param userId
+     * @return GETRoomDTO
+     * @throws NotFoundException if no user was found, or no favourite room found
+     */
+    public GETRoomDTO getFavouriteRoomOfUser(long userId) throws NotFoundException {
+        LOGGER.info("getFavouriteRoomOfUser(long userId) called with userId: {}", userId);
+        if(!userRepository.existsById(userId)) {
+            LOGGER.warn("Could not find user with id: {}. Throwing exception", userId);
+            throw new NotFoundException("No user found with id: " + userId);
+        }
+        Optional<Room> roomOptional = userRepository.getFavouriteRoomOfUser(userId);
+        if(!roomOptional.isPresent()) {
+            LOGGER.warn("Could not find user's favourite room, throwing exception");
+            throw new NotFoundException("No favourite room found of user with userId: " + userId);
+        }
+        return new GETRoomDTO(roomOptional.get());
+    }
+
+    /**
+     * Get favourite section of a user, given by userId
+     * @param userId
+     * @return GETSectionDTO
+     * @throws NotFoundException if no user was found, or no favourite section found
+     */
+    public GETSectionDTO getFavouriteSectionOfUser(long userId) throws NotFoundException {
+        LOGGER.info("getFavouriteSectionOfUser(long userId) called with userId: {}", userId);
+        if(!userRepository.existsById(userId)) {
+            LOGGER.warn("Could not find user with id: {}. Throwing exception", userId);
+            throw new NotFoundException("No user found with id: " + userId);
+        }
+        Optional<Section> sectionOptional = userRepository.getFavouriteSectionOfUser(userId);
+        if(!sectionOptional.isPresent()) {
+            LOGGER.warn("Could not find user's favourite section, throwing exception");
+            throw new NotFoundException("No favourite section found of user with userId: " + userId);
+        }
+        return new GETSectionDTO(sectionOptional.get());
     }
 
     /**
