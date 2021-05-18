@@ -26,6 +26,7 @@ import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.POSTRoomDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
+import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import javassist.NotFoundException;
@@ -50,6 +51,9 @@ public class RoomServiceTest {
 
     @Mock
     private SectionRepository sectionRepository;
+
+    @Mock
+    private ReservationRepository reservationRepository;
 
     Room room1;
     Room room2;
@@ -82,11 +86,13 @@ public class RoomServiceTest {
         section1 = new Section();
         section1.setRoom(room1);
         section1.setSectionId(1);
+        section1.setSectionName("Section1");
         section1.setReservations(List.of(reservation1, reservation2));
 
         section2 = new Section();
         section2.setRoom(room1);
         section2.setSectionId(2);
+        section2.setSectionName("Section2");
 
         room1.setSections(List.of(section1, section2));
 
@@ -114,6 +120,13 @@ public class RoomServiceTest {
         Mockito.lenient()
         .when(roomRepository.findAll())
         .thenReturn(List.of(room1, room2));
+
+        Mockito.lenient()
+        .when(sectionRepository.getAllReservationIdsOfSection(section1.getSectionId()))
+        .thenReturn(List.of(reservation1.getReservationId(), reservation2.getReservationId()));
+        Mockito.lenient()
+        .when(sectionRepository.getAllReservationIdsOfSection(section2.getSectionId()))
+        .thenReturn(null);
     }
 
     @Test
@@ -355,6 +368,10 @@ public class RoomServiceTest {
     @Test
     public void deleteSectionOfRoom_SectionIsDeleted_ReturnsTrue() throws NotFoundException, SectionNotOfThisRoomException
     {
+        Mockito.lenient()
+        .when(sectionRepository.getAllReservationIdsOfSection(section2.getSectionId()))
+        .thenReturn(null);
+
         boolean isDeleted = roomService.deleteSectionOfRoom(room1.getRoomCode(), section2.getSectionId());
         assertTrue(isDeleted);
     }

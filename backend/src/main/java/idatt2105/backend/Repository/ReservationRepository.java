@@ -15,7 +15,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     // This is a modifying query which deletes all reservations given by reservationIds list
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM reservation_section WHERE reservation_section.reservation_id IN (?1); DELETE FROM reservation WHERE reservation.reservation_id IN (?1)", nativeQuery = true)
+    @Query(value = "DELETE FROM reservation_section WHERE reservation_section.reservation_id IN (?1)", nativeQuery = true)
+    void deleteGivenReservationsDependencies(List<Long> reservationIds);
+
+    // This is a modifying query which deletes all reservations given by reservationIds list
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM reservation WHERE reservation.reservation_id IN (?1)", nativeQuery = true)
     void deleteGivenReservations(List<Long> reservationIds);
 
     // Returns all reservations in the future sorted by date

@@ -287,6 +287,7 @@ public class RoomService {
             for(Section section : room.get().getSections()) {
                 List<Long> reservationIds = sectionRepository.getAllReservationIdsOfSection(section.getSectionId());
                 if(reservationIds != null) {
+                    reservationRepository.deleteGivenReservationsDependencies(reservationIds);
                     reservationRepository.deleteGivenReservations(reservationIds);
                 }
                 sectionRepository.delete(section);
@@ -320,6 +321,7 @@ public class RoomService {
         // Delete all reservations of the section, if there are any
         List<Long> reservationIds = sectionRepository.getAllReservationIdsOfSection(sectionId);
         if(reservationIds != null) {
+            reservationRepository.deleteGivenReservationsDependencies(reservationIds);
             reservationRepository.deleteGivenReservations(reservationIds);
         }
         sectionRepository.deleteById(sectionId);
