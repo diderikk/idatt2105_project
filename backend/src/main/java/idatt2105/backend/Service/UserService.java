@@ -324,7 +324,9 @@ public class UserService implements UserDetailsService {
         Section section = sectionOptional.get();
         if(section.getReservations() == null) throw new NullPointerException("Section tries to access reservation list that is null");
         for (Reservation reservation : section.getReservations()) {
-            if((reservationDTO.getStartTime().isAfter(reservation.getStartTime()) && reservationDTO.getStartTime().isBefore(reservation.getEndTime()))
+            if((reservationDTO.getStartTime().isEqual(reservation.getStartTime()))
+                || (reservationDTO.getEndTime().isEqual(reservation.getEndTime()))
+                || (reservationDTO.getStartTime().isAfter(reservation.getStartTime()) && reservationDTO.getStartTime().isBefore(reservation.getEndTime()))
                 || (reservationDTO.getEndTime().isAfter(reservation.getStartTime()) && reservationDTO.getEndTime().isBefore(reservation.getEndTime()))
                 || (reservationDTO.getStartTime().isBefore(reservation.getStartTime()) && reservationDTO.getEndTime().isAfter(reservation.getEndTime()))) {
                 return true;
