@@ -21,6 +21,7 @@ public class GETSectionDTO {
 
     public GETSectionDTO(Section section) {
         sectionId = section.getSectionId();
+        sectionName = section.getSectionName();
         if(section.getRoom() != null) roomCode = section.getRoom().getRoomCode();
     }
 }
