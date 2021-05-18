@@ -281,10 +281,12 @@ export default defineComponent({
       }
     });
 
+    /**
+     * Sorts the rooms alphabetically based on the room code when the rooms change
+     */
     watch(
       () => rooms.value,
       () => {
-        //Sorts all alphabetically based on the room code
         rooms.value.sort((a, b) => {
           if (a.roomCode.toLowerCase() < b.roomCode.toLowerCase()) {
             return -1;
@@ -446,6 +448,10 @@ export default defineComponent({
     };
 
     const startDateEndDateDifferenceInDays = ref(0);
+
+    /**
+     * Finds the difference between the start date and end date in days
+     */
     const checkDifferenceStartDateEndDate = () => {
       //Not using Math.abs since end date always is equal to or above start date
       if (
@@ -464,15 +470,13 @@ export default defineComponent({
 
     /**
      * Assigns end date based on the selected start date
+     * Using the difference in days between the start date and end date = x.
+     * The end date is set x dates after the start date.
      * Meaning that when a users selects a date 3 months from now the user does not need to go 3 months in the future when using the end date datpicker
      */
     const assignEndDate = () => {
-      console.log("Hei");
       if (registerInformation.startDate.trim() === "") return;
-      console.log(startDateEndDateDifferenceInDays.value);
-
       if (startDateEndDateDifferenceInDays.value > 0) {
-        console.log("hei");
         const date = new Date(startDateAsDate.value);
         date.setDate(date.getDate() + startDateEndDateDifferenceInDays.value);
         registerInformation.endDate = dateToString(date);
@@ -480,17 +484,6 @@ export default defineComponent({
       }
       registerInformation.endDate = registerInformation.startDate;
     };
-
-    //TODO removede
-    /**
-     * Returns the max date for the startDate picker
-     */
-    /*const maxDateStartDateField = computed(() => {
-      return registerInformation.endDate.trim() === "" ||
-        maxDate < new Date(registerInformation.endDate)
-        ? maxDateString.value
-        : registerInformation.endDate;
-    });*/
 
     /**
      * Calculates error message for starDate based on the constraints available
@@ -642,6 +635,7 @@ export default defineComponent({
       }
     };
 
+    //The checks to be sent to the button actions
     const checks = ref([
       checkRoomValidity,
       checkSectionValidity,
@@ -651,6 +645,7 @@ export default defineComponent({
       checkAmountOfPeopleValidity,
     ]);
 
+    //The statuses to be sent to the button actions
     const statuses = ref([
       roomStatus,
       sectionStatus,
@@ -674,8 +669,6 @@ export default defineComponent({
       handleCheckBoxChange,
       minDate,
       maxDate,
-      //TODO remove
-      //maxDateStartDateField,
       startDateEndDateDifferenceInDays,
       checkDifferenceStartDateEndDate,
       minDateEndDateField,
