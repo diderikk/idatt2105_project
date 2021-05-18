@@ -351,7 +351,7 @@ export const store = createStore<State>({
     async deleteRoom({ commit }, roomCode: string){
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        await backend.post(`/rooms/${roomCode}`);
+        await backend.delete(`/rooms/${roomCode}`);
 
         commit("setSnackbar", {
           title: "Room deleted",

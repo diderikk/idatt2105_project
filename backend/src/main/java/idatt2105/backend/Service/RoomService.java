@@ -169,7 +169,7 @@ public class RoomService {
         LOGGER.info("editRoom(String roomCode, POSTRoomDTO roomDTO) called with roomCode: {}", roomCode);
         Optional<Room> optionalRoom = roomRepository.findById(roomCode);
         if(!optionalRoom.isPresent()) throw new NotFoundException("Room with room code: " + roomDTO.getRoomCode() + " not found");
-        if(roomRepository.findById(roomDTO.getRoomCode()).isPresent()) throw new AlreadyExistsException("Room with room code: " + roomCode + " already exists");
+        if(roomRepository.findById(roomDTO.getRoomCode()).isPresent() && !roomCode.equals(roomDTO.getRoomCode())) throw new AlreadyExistsException("Room with room code: " + roomCode + " already exists");
 
         if(roomDTO.getRoomCode() != null && roomDTO.getSections() != null && !roomDTO.getSections().isEmpty()){
             deleteRoom(roomCode);

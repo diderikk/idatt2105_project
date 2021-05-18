@@ -42,15 +42,6 @@
 
     <span v-for="(button, index) in config.buttons" :key="index">
       <button
-        v-if="button.action.numberOfArgs === 4"
-        :class="button.class"
-        @click="
-          button.action.function(checks, statuses, registerInformation, roomCodeProp)
-        "
-      >
-        {{ button.title }}
-      </button>
-      <button
         v-if="button.action.numberOfArgs === 3"
         :class="button.class"
         @click="button.action.function(checks, statuses, registerInformation)"
@@ -58,9 +49,9 @@
         {{ button.title }}
       </button>
       <button
-        v-else-if="button.action.numberOfArgs === 2"
+        v-else-if="button.action.numberOfArgs === 0"
         :class="button.class"
-        @click="button.action.function(registerInformation, roomCodeProp)"
+        @click="button.action.function()"
       >
         {{ button.title }}
       </button>
@@ -86,10 +77,6 @@ export default defineComponent({
     baseRoom: {
       required: false,
       type: Object as () => RoomForm,
-    },
-    roomCodeProp: {
-      required: false,
-      type: String,
     },
   },
   setup(props) {
@@ -186,5 +173,9 @@ ul {
   padding: 0%;
   padding-left: 1.2%;
   height: 2.5em;
+}
+
+.margin-left{
+    margin-left: 5px;
 }
 </style>

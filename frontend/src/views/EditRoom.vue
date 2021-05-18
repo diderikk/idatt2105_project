@@ -2,13 +2,11 @@
   <base-room-form-config
       v-if="isDoneLoading"
       :baseRoom="room"
-      :roomCodeProp="code"
       :config="config"
     ></base-room-form-config>
     <base-room-form-config
       v-else
       :baseRoom="room"
-      :roomCodeProp="code"
       :config="config"
     ></base-room-form-config>
 </template>
@@ -51,16 +49,15 @@ export default defineComponent({
       checks: Array<() => void>,
       statuses: Array<Ref<InputFieldFeedbackStatus>>,
       roomForm: RoomForm,
-      roomCode: string
     ) => {
       if (checksBeforeAsyncCall(checks, statuses)) {
-        await store.dispatch("editRoom", { room: RoomFormToRoom(roomForm), roomCode: roomCode });
+        await store.dispatch("editRoom", { room: RoomFormToRoom(roomForm), roomCode: props.code });
       }
     };
 
-    const deleteRoom = async (roomCode: string) => {
+    const deleteRoom = async () => {
       if (window.confirm("Are you sure you want do delete the room?")) {
-        await store.dispatch("deleteUser", roomCode);
+        await store.dispatch("deleteRoom", props.code);
       }
     };
 
@@ -70,14 +67,14 @@ export default defineComponent({
           {
           title: "Confirm edit",
           class: "button is-link is-primary",
-          action: { function: editRoom, numberOfArgs: 4 },
+          action: { function: editRoom, numberOfArgs: 3 },
         },
         {
           title: "Delete room",
-          class: "button is-danger",
+          class: "button is-danger margin-left",
           action: {
             function: deleteRoom,
-            numberOfArgs: 2,
+            numberOfArgs: 0,
           },
         },
       ],
