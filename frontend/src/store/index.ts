@@ -7,6 +7,7 @@ import CreateUser from "@/interfaces/User/User.interface";
 import POSTReservation from "@/interfaces/Reservation/POSTReservation.interface";
 import Reservation from "@/interfaces/Reservation/Reservation.interface";
 import ReservationSorting from "@/interfaces/Reservation/ReservationSorting.interface";
+import Room from "@/interfaces/Room/Room.interface";
 
 export interface State {
   user: string;

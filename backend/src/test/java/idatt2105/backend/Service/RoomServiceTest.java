@@ -1,7 +1,9 @@
 package idatt2105.backend.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionNameInRoomAlreadyExistsException;
 import idatt2105.backend.Exception.SectionNotOfThisRoomException;
 import idatt2105.backend.Model.Reservation;
@@ -192,13 +195,14 @@ public class RoomServiceTest {
     public void createRoom_UsingRoomId_ReturnsRoom()
     {
         String roomCode = "A3";
+        Mockito.lenient().when(roomRepository.findById(roomCode)).thenReturn(null);
         RoomDTO room = roomService.createRoom(roomCode);
         assertNotNull(room);
         assertThat(room.getRoomCode()).isEqualTo(roomCode);
     }
 
     @Test
-    public void createRoom_UsingRoomDTO_ReturnsRoom()
+    public void createRoom_UsingRoomDTO_ReturnsRoom() throws AlreadyExistsException
     {
         String roomCode = "A3";
         RoomDTO roomDTO = new RoomDTO();
@@ -213,6 +217,10 @@ public class RoomServiceTest {
         section4.setSectionId(3);
 
         roomDTO.setSections(List.of(section3, section4));
+
+        Room temp = new Room();
+        temp.setRoomCode(roomCode);
+        Mockito.when(roomRepository.save(temp)).thenReturn(temp);
 
         RoomDTO room = roomService.createRoom(roomDTO);
         assertNotNull(room);

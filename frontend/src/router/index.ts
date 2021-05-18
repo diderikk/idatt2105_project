@@ -48,6 +48,11 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
   },
   {
+    path: "/create-room",
+    name: "CreateRoom",
+    component: () => import("../views/CreateRoom.vue"),
+  },
+  {
     path: "/log-in",
     name: "LogIn",
     component: () => import("../views/LogIn.vue"),

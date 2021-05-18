@@ -208,7 +208,7 @@ import BaseFormFieldInput from "../components/BaseFormFieldInput.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import { dateToString, removeTimeFromDate } from "../utils/date";
 import SectionForCheckBox from "../interfaces/Section/SectionForCheckBox.interface";
-import Room from "../interfaces/Room.interface";
+import Room from "../interfaces/Room/RoomForm.interface";
 import BaseFormConfig from "../interfaces/config/BaseFormConfig.interface";
 import Section from "../interfaces/Section/Section.interface";
 import ReservationForm from "../interfaces/Reservation/ReservationForm.interface";
