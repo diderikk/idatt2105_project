@@ -22,7 +22,7 @@
         feedbackStatus: sectionsStatus,
       }"
     >
-      <span @blur="addSectionHandler">
+      <span @blur="addSectionHandler" id="sectionInput">
         
         <input
           v-model="sectionInput"
@@ -165,7 +165,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-span {
+#sectionInput {
   display: flex;
   flex-direction: row;
 }

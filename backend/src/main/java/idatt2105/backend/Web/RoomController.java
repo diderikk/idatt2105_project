@@ -66,9 +66,11 @@ public class RoomController {
         try{
             GETRoomDTO room = roomService.editRoom(roomCode, roomDTO);
             return new ResponseEntity<>(room, HttpStatus.OK);
-        } catch(AlreadyExistsException | IllegalArgumentException | NotFoundException ex){
+        } catch(IllegalArgumentException | AlreadyExistsException ex){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        } catch(NotFoundException ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } 
     }
 
     @GetMapping("/{room_code}/reservations")

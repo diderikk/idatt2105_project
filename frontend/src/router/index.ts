@@ -71,6 +71,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/CreateRoom.vue"),
   },
   {
+    path: "/edit-room/:code",
+    name: "EditRoom",
+    component: () => import("../views/EditRoom.vue"),
+    props: true
+  },
+  {
     path: "/log-in",
     name: "LogIn",
     meta: {
