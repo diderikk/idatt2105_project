@@ -20,7 +20,7 @@ export interface State {
 
 export const key: InjectionKey<Store<State>> = Symbol();
 
-export const store = createStore<State>({
+export const store: Store<State> = createStore<State>({
   state: {
     user: localStorage.getItem("user") || "",
     token: localStorage.getItem("token") || "",
@@ -200,7 +200,10 @@ export const store = createStore<State>({
     async editReservation({ commit }, reservation: Reservation) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        await backend.post(`/reservations/${reservation.id}`, reservation);
+        await backend.post(
+          `/reservations/${reservation.reservationId}`,
+          reservation
+        );
         commit("setSnackbar", {
           title: "Reservation edited",
           status: SnackbarStatus.SUCCESS,
@@ -245,13 +248,31 @@ export const store = createStore<State>({
         return null;
       }
     },
-    async getReservations({ commit }, sortingConfig: ReservationSorting) {
+    async getReservations({ commit }, sortingConfig?: ReservationSorting) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        const response = await backend.post(
-          "/reservations/sort",
-          sortingConfig
-        );
+        let response;
+        const currentUser = store.getters.getUser;
+        if (sortingConfig === undefined) {
+          if (currentUser.isAdmin) {
+            response = await backend.get("/reservations");
+          } else {
+            response = await backend.get(
+              `/users/${currentUser.userId}/reservations`
+            );
+          }
+        } else {
+          if (currentUser.isAdmin) {
+            response = await backend.post("/reservations/sort", sortingConfig);
+          } else {
+            //TODO add endpoint for sorting reservations for user
+            response = await backend.post(
+              `/users/${currentUser.userId}/reservations/sort`,
+              sortingConfig
+            );
+          }
+        }
+
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {

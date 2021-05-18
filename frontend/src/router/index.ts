@@ -79,6 +79,15 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/LogIn.vue"),
   },
   {
+    path: "/reservation-feed",
+    name: "ReservationFeed",
+    meta: {
+      title: "Reservation feed",
+      parmission: "User",
+    },
+    component: () => import("../views/ReservationFeed.vue"),
+  },
+  {
     path: "/:catchAll(.*)",
     name: "NotFound",
     component: () => import("../views/PageNotFound.vue"),

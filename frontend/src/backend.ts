@@ -2,7 +2,7 @@ import axios from "axios";
 import router from "./router";
 import { store } from "./store";
 
-const isTesting = false;
+const isTesting = true;
 const backend = axios.create({
   baseURL: isTesting
     ? "https://localhost:8443/api/v1"
