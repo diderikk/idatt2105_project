@@ -281,6 +281,8 @@ public class UserService implements UserDetailsService {
         return 0f;
     }
 
+    
+
     /**
      * Creates a random password
      * @return randomly created password

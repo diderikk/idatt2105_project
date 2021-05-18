@@ -13,7 +13,7 @@ import idatt2105.backend.Model.Room;
 public interface RoomRepository extends JpaRepository<Room, String> {
     // Find top 5 most popular rooms with most reservations
     @Query(value = "SELECT room.* FROM room LEFT JOIN section ON room.room_code = section.room_code LEFT JOIN reservation_section ON reservation_section.section_id = section.section_id GROUP BY room.room_code ORDER BY COUNT(room.room_code) DESC LIMIT 5", nativeQuery = true)
-    Optional<List<Room>> getTopRooms();
+    List<Room> getTopRooms();
 
     // Find total time this room was booked in the past
     @Query(value = "SELECT SUM(TIMESTAMPDIFF(HOUR, reservation.start_time, reservation.end_time)) AS SumTime FROM reservation " +

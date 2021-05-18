@@ -261,9 +261,9 @@ public class RoomService {
         // Delete all sections and reservations of this room, if there are any
         if(room.get().getSections() != null) {
             for(Section section : room.get().getSections()) {
-                Optional<List<Long>> reservationIds = sectionRepository.getAllReservationIdsOfSection(section.getSectionId());
-                if(reservationIds.isPresent()) {
-                    reservationRepository.deleteGivenReservations(reservationIds.get());
+                List<Long> reservationIds = sectionRepository.getAllReservationIdsOfSection(section.getSectionId());
+                if(reservationIds != null) {
+                    reservationRepository.deleteGivenReservations(reservationIds);
                 }
                 sectionRepository.delete(section);
             }
@@ -295,16 +295,35 @@ public class RoomService {
         if(!sectionOptional.get().getRoom().getRoomCode().equals(roomCode)) throw new SectionNotOfThisRoomException("Section with id " + sectionId + " is not of room with code " + roomCode);
 
         // Delete all reservations of the section, if there are any
-        Optional<List<Long>> reservationIds = sectionRepository.getAllReservationIdsOfSection(sectionId);
-        if(reservationIds.isPresent()) {
-            reservationRepository.deleteGivenReservations(reservationIds.get());
+        List<Long> reservationIds = sectionRepository.getAllReservationIdsOfSection(sectionId);
+        if(reservationIds != null) {
+            reservationRepository.deleteGivenReservations(reservationIds);
         }
         sectionRepository.deleteById(sectionId);
         return !sectionRepository.existsById(sectionId);
     }
 
+    /**
+     * Finds top 5 most popular rooms.
+     * @return List of rooms, empty list if no rooms were found
+     */
     public List<Room> getTopRooms() {
-        
+        return roomRepository.getTopRooms();
+    }
+
+    /**
+     * Get total time (in hours) a room has been booked before.
+     * Room is determined by roomCode parameter.
+     * @param roomCode
+     * @return Float of total time in hours
+     * @throws NotFoundException if room was not found
+     */
+    public Float getTotalTimeBooked(String roomCode) throws NotFoundException {
+        Optional<Float> sumOptional = roomRepository.getTotalHoursBooked(roomCode);
+        if(!sumOptional.isPresent()) {
+            throw new NotFoundException("No room found with room code: " + roomCode);
+        }
+        return sumOptional.get();
     }
 
     /**
