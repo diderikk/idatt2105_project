@@ -307,8 +307,14 @@ public class RoomService {
      * Finds top 5 most popular rooms.
      * @return List of rooms, empty list if no rooms were found
      */
-    public List<Room> getTopRooms() {
-        return roomRepository.getTopRooms();
+    public List<RoomDTO> getTopRooms() {
+        LOGGER.info("getTopRooms() was called");
+        List<Room> rooms = roomRepository.getTopRooms();
+        List<RoomDTO> roomDTOs = new ArrayList<>();
+        for(Room room : rooms) {
+            roomDTOs.add(new RoomDTO(room));
+        }
+        return roomDTOs;
     }
 
     /**
@@ -319,6 +325,7 @@ public class RoomService {
      * @throws NotFoundException if room was not found
      */
     public Float getTotalTimeBooked(String roomCode) throws NotFoundException {
+        LOGGER.info("getTotalTimeBooked(String roomCode) called with roomCode: {}", roomCode);
         Optional<Float> sumOptional = roomRepository.getTotalHoursBooked(roomCode);
         if(!sumOptional.isPresent()) {
             throw new NotFoundException("No room found with room code: " + roomCode);

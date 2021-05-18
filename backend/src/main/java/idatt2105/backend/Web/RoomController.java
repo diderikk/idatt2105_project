@@ -131,4 +131,9 @@ public class RoomController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
+    @GetMapping("/statistics/top-rooms")
+    public ResponseEntity<List<GETUserDTO>> getTopUsers(){
+        return new ResponseEntity<>(userService.getTopUsers(), HttpStatus.OK);
+    }
 }

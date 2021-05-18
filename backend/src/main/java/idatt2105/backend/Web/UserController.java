@@ -7,6 +7,7 @@ import javax.xml.bind.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,8 +20,10 @@ import idatt2105.backend.Exception.EmailAlreadyExistsException;
 import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
+import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTUserDTO;
+import idatt2105.backend.Model.DTO.RoomDTO;
 import idatt2105.backend.Model.DTO.GETUserDTO;
 import idatt2105.backend.Service.UserService;
 import javassist.NotFoundException;
@@ -129,5 +132,56 @@ public class UserController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } 
+    }
+
+    @GetMapping("/{user_id}/statistics/reservations-total-time")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Float> getSumTimeInHoursOfAllUserReservations(@PathVariable("user_id") long userId){
+        try {
+            return new ResponseEntity<>(userService.getSumTimeInHoursOfAllUserReservations(userId), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/{user_id}/statistics/reservations-count")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Integer> getReservationCountOfUser(@PathVariable("user_id") long userId){
+        try {
+            return new ResponseEntity<>(userService.getResevationCountOfUser(userId), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // Only admin should be able to get this information
+    @GetMapping("/statistics/top-users")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<GETUserDTO>> getTopUsers(){
+        return new ResponseEntity<>(userService.getTopUsers(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{user_id}/statistics/favourite-room")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<RoomDTO> getFavouriteRoomOfUser(@PathVariable("user_id") long userId){
+        try {
+            return new ResponseEntity<>(userService.getFavouriteRoomOfUser(userId), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/{user_id}/statistics/favourite-section")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<GETSectionDTO> getFavouriteSectionOfUser(@PathVariable("user_id") long userId){
+        try {
+            return new ResponseEntity<>(userService.getFavouriteSectionOfUser(userId), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
