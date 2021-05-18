@@ -34,6 +34,8 @@ import idatt2105.backend.Model.DTO.GETUserDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.POSTUserDTO;
+import idatt2105.backend.Model.DTO.SortingDTO;
+import idatt2105.backend.Model.Enum.SortingTypeEnum;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import idatt2105.backend.Repository.UserRepository;
@@ -169,6 +171,24 @@ public class UserService implements UserDetailsService {
         User user = optionalUser.get();
         return user.getReservations().stream().map(reservation -> new GETReservationDTO(reservation))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Finds and returns all filtered reservations sorted, that this user has made;
+     * @param userId
+     * @param dto
+     * @return List of reservations
+     */
+    public List<GETReservationDTO> getSortedAndFilteredReservations(long userId, SortingDTO dto){
+        List<Reservation> reservations;
+        String roomQuery = "%" + dto.getRoomQuery() + "%";
+
+        if(dto.getSortType() == SortingTypeEnum.AMOUNT_OF_PEOPLE) 
+            reservations = reservationRepository.getUserFutureReservationSortedByPeople(roomQuery, userId);
+        else
+            reservations = reservationRepository.getUserFutureReservationSortedByDate(roomQuery, userId);
+        
+        return reservations.stream().map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
     }
 
     /**

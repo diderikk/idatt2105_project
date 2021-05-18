@@ -24,6 +24,7 @@ import idatt2105.backend.Model.DTO.GETRoomDTO;
 import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTUserDTO;
+import idatt2105.backend.Model.DTO.SortingDTO;
 import idatt2105.backend.Model.DTO.GETUserDTO;
 import idatt2105.backend.Service.UserService;
 import javassist.NotFoundException;
@@ -94,6 +95,11 @@ public class UserController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @PostMapping("/{user_id}/reservations/sort")
+    public ResponseEntity<List<GETReservationDTO>> getSortedAndFilteredUserReservations(@PathVariable("user_id") long userId, @RequestBody SortingDTO dto){
+        return new ResponseEntity<>(userService.getSortedAndFilteredReservations(userId, dto), HttpStatus.OK);
     }
 
     @PostMapping("/{user_id}/reservations")
