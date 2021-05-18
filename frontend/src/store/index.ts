@@ -265,34 +265,6 @@ export const store = createStore<State>({
         return null;
       }
     },
-    async createRoom({ commit }, room: Room) {
-      commit("setSnackbarStatus", SnackbarStatus.LOADING);
-      try{
-        await backend.post(
-          "/rooms",
-          room
-        );
-        commit("setSnackbar", {
-          title: "Room created",
-          status: SnackbarStatus.SUCCESS,
-        });
-        return true;
-      } catch(error){
-        console.log(error)
-        if(error.response.status === 400){
-          commit("setSnackbar", {
-            title: "Room code already occupied",
-            status: SnackbarStatus.ERROR,
-          });
-        }
-        else{
-          commit("setSnackbar", {
-            title: "Could not create room",
-            status: SnackbarStatus.ERROR,
-          });
-        }
-      }
-    }
   },
 });
 
