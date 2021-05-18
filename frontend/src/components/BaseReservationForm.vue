@@ -11,10 +11,12 @@
       <input
         v-model="startDate"
         :min="minDateString"
-        :max="maxDateStartDateField"
+        :max="maxDateString"
         @blur="
-          checkStartDateValidity();
           assignEndDate();
+          checkStartDateValidity();
+          //Needs to be checked after the others to hinder the new startDate being used when assigning the end date which relies on the previous difference beteen start date and end date
+          checkDifferenceStartDateEndDate();
         "
         type="date"
         class="input"
@@ -32,7 +34,10 @@
         v-model="endDate"
         :min="minDateEndDateField"
         :max="maxDateEndDateField"
-        @blur="checkEndDateValidity"
+        @blur="
+          checkEndDateValidity();
+          checkDifferenceStartDateEndDate();
+        "
         type="date"
         :disabled="disableEndDateField"
         class="input"
@@ -197,6 +202,7 @@
 import {
   computed,
   defineComponent,
+  onBeforeMount,
   onMounted,
   reactive,
   Ref,
@@ -212,6 +218,7 @@ import Room from "../interfaces/Room/RoomForm.interface";
 import BaseFormConfig from "../interfaces/config/BaseFormConfig.interface";
 import Section from "../interfaces/Section/Section.interface";
 import ReservationForm from "../interfaces/Reservation/ReservationForm.interface";
+import { useStore } from "../store";
 export default defineComponent({
   name: "BaseReservationForm",
   components: { BaseFormFieldInput },
@@ -230,6 +237,8 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const store = useStore();
+
     //Object containing all the information to be used in the form
     const registerInformation: ReservationForm = reactive(
       Object.assign(
@@ -263,50 +272,32 @@ export default defineComponent({
       } else roomStatus.value = InputFieldFeedbackStatus.ERROR;
     };
 
-    //TODO remove testdata and replace with async call to server
-    const rooms: Ref<Array<Room>> = ref([
-      {
-        roomCode: "A4-112",
-        sections: [
-          {
-            sectionName: "Bord 1",
-          },
-        ],
-      },
-      {
-        roomCode: "Rom 2",
-        sections: [
-          {
-            sectionName: "3",
-          },
-        ],
-      },
-      {
-        roomCode: "A4-121",
-        sections: [
-          {
-            sectionName: "Kalle",
-          },
-          {
-            sectionName: "Hei",
-          },
-        ],
-      },
-      {
-        roomCode: "A4-100",
-        sections: [],
-      },
-    ]);
-    //Sorts all alphabeticalle based on the room code
-    rooms.value.sort((a, b) => {
-      if (a.roomCode.toLowerCase() < b.roomCode.toLowerCase()) {
-        return -1;
+    //TODO get rooms and section based on the selected date and time
+    const rooms: Ref<Array<Room>> = ref([]);
+    onBeforeMount(async () => {
+      const response = await store.dispatch("getRooms");
+      if (response !== null) {
+        rooms.value = response;
       }
-      if (a.roomCode.toLowerCase() > b.roomCode.toLowerCase()) {
-        return 1;
-      }
-      return 0;
     });
+
+    /**
+     * Sorts the rooms alphabetically based on the room code when the rooms change
+     */
+    watch(
+      () => rooms.value,
+      () => {
+        rooms.value.sort((a, b) => {
+          if (a.roomCode.toLowerCase() < b.roomCode.toLowerCase()) {
+            return -1;
+          }
+          if (a.roomCode.toLowerCase() > b.roomCode.toLowerCase()) {
+            return 1;
+          }
+          return 0;
+        });
+      }
+    );
 
     //Sections
     const availableSections: Ref<SectionForCheckBox[]> = ref([]);
@@ -451,38 +442,55 @@ export default defineComponent({
       startDateStatus.value =
         startDateAsDate.value <= maxDate &&
         startDateAsDate.value >= minDate &&
-        (startDateAsDate.value <= endDateAsDate.value ||
-          registerInformation.endDate === "") &&
         registerInformation.startDate !== ""
           ? InputFieldFeedbackStatus.SUCCESS
           : InputFieldFeedbackStatus.ERROR;
     };
 
+    const startDateEndDateDifferenceInDays = ref(0);
+
     /**
-     * Assigns end date based on the selected start date
-     * Meaning that when a users selects a date 3 months from now the user does not need to go 3 months in the future when using the end date datpicker
+     * Finds the difference between the start date and end date in days
      */
-    const assignEndDate = () => {
-      if (registerInformation.startDate.trim() !== "")
-        registerInformation.endDate = registerInformation.startDate;
+    const checkDifferenceStartDateEndDate = () => {
+      //Not using Math.abs since end date always is equal to or above start date
+      if (
+        registerInformation.startDate.trim() === "" ||
+        registerInformation.endDate.trim() === ""
+      ) {
+        startDateEndDateDifferenceInDays.value = 0;
+        return;
+      }
+      const difference =
+        endDateAsDate.value.getTime() - startDateAsDate.value.getTime();
+      startDateEndDateDifferenceInDays.value = Math.ceil(
+        difference / (24 * 3600 * 1000)
+      );
     };
 
     /**
-     * Returns the max date for the startDate picker
+     * Assigns end date based on the selected start date
+     * Using the difference in days between the start date and end date = x.
+     * The end date is set x dates after the start date.
+     * Meaning that when a users selects a date 3 months from now the user does not need to go 3 months in the future when using the end date datpicker
      */
-    const maxDateStartDateField = computed(() => {
-      return registerInformation.endDate.trim() === "" ||
-        maxDate < new Date(registerInformation.endDate)
-        ? maxDateString.value
-        : registerInformation.endDate;
-    });
+    const assignEndDate = () => {
+      if (registerInformation.startDate.trim() === "") return;
+      if (startDateEndDateDifferenceInDays.value > 0) {
+        const date = new Date(startDateAsDate.value);
+        date.setDate(date.getDate() + startDateEndDateDifferenceInDays.value);
+        registerInformation.endDate = dateToString(date);
+        return;
+      }
+      registerInformation.endDate = registerInformation.startDate;
+    };
 
     /**
      * Calculates error message for starDate based on the constraints available
      */
     const startDateErrorMessage = computed(
       () =>
-        `Select a date between ${minDateString.value} and ${maxDateStartDateField.value}`
+        `Select a date between ${minDateString.value} and ${maxDateString.value}`
     );
 
     //End date
@@ -627,6 +635,7 @@ export default defineComponent({
       }
     };
 
+    //The checks to be sent to the button actions
     const checks = ref([
       checkRoomValidity,
       checkSectionValidity,
@@ -636,6 +645,7 @@ export default defineComponent({
       checkAmountOfPeopleValidity,
     ]);
 
+    //The statuses to be sent to the button actions
     const statuses = ref([
       roomStatus,
       sectionStatus,
@@ -659,7 +669,8 @@ export default defineComponent({
       handleCheckBoxChange,
       minDate,
       maxDate,
-      maxDateStartDateField,
+      startDateEndDateDifferenceInDays,
+      checkDifferenceStartDateEndDate,
       minDateEndDateField,
       maxDateEndDateField,
       minDateString,
