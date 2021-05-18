@@ -152,9 +152,9 @@ public class RoomController {
     }
 
     @GetMapping("/{room_code}/statistics/reservations-total-time")
-    public ResponseEntity<Float> getTotalTimeBooked(@PathVariable("room_code") String roomCode){
+    public ResponseEntity<Long> getTotalTimeBooked(@PathVariable("room_code") String roomCode){
         try {
-            return new ResponseEntity<>(roomService.getTotalTimeBooked(roomCode), HttpStatus.OK);
+            return new ResponseEntity<>(roomService.getTotalHoursBooked(roomCode), HttpStatus.OK);
         } catch (NotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

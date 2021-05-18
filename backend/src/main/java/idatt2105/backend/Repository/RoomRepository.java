@@ -20,5 +20,5 @@ public interface RoomRepository extends JpaRepository<Room, String> {
     "JOIN reservation_section ON reservation_section.reservation_id = reservation.reservation_id " +
     "JOIN section ON section.section_id = reservation_section.section_id " +
     "WHERE section.room_code = ?1 AND reservation.end_time <= NOW()", nativeQuery = true)
-    Optional<Float> getTotalHoursBooked(String roomCode);
+    Optional<Long> getTotalHoursBooked(String roomCode);
 }

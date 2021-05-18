@@ -27,7 +27,7 @@ public class SectionController {
     }
 
     @GetMapping("/{section_id}/statistics/reservations-total-time")
-    public ResponseEntity<Float> getTotalTimeBooked(@PathVariable("section_id") long sectionId){
+    public ResponseEntity<Long> getTotalTimeBooked(@PathVariable("section_id") long sectionId){
         try {
             return new ResponseEntity<>(sectionService.getTotalTimeBooked(sectionId), HttpStatus.OK);
         } catch (NotFoundException e) {

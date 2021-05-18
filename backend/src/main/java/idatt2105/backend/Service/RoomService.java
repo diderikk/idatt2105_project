@@ -301,7 +301,7 @@ public class RoomService {
         LOGGER.info("deleteSectionOfRoom(String roomCode, long sectionId) called with roomCode: {}, and sectionId: {}", roomCode, sectionId);
         Optional<Section> sectionOptional = sectionRepository.findById(sectionId);
         Optional<Room> roomOptional = roomRepository.findById(roomCode);
-
+        LOGGER.info("HALLA JÆVEL!");
         // Throw exceptions if no section or room is present, or if section has room == null
         if(!sectionOptional.isPresent()) throw new NotFoundException("No section found with id: " + sectionId);
         if(!roomOptional.isPresent()) throw new NotFoundException("No room found with room code: " + roomCode);
@@ -336,12 +336,12 @@ public class RoomService {
      * Get total time (in hours) a room has been booked before.
      * Room is determined by roomCode parameter.
      * @param roomCode
-     * @return Float of total time in hours
+     * @return Long of total time in hours
      * @throws NotFoundException if room was not found
      */
-    public Float getTotalTimeBooked(String roomCode) throws NotFoundException {
-        LOGGER.info("getTotalTimeBooked(String roomCode) called with roomCode: {}", roomCode);
-        Optional<Float> sumOptional = roomRepository.getTotalHoursBooked(roomCode);
+    public Long getTotalHoursBooked(String roomCode) throws NotFoundException {
+        LOGGER.info("getTotalHoursBooked(String roomCode) called with roomCode: {}", roomCode);
+        Optional<Long> sumOptional = roomRepository.getTotalHoursBooked(roomCode);
         if(!sumOptional.isPresent()) {
             throw new NotFoundException("No room found with room code: " + roomCode);
         }

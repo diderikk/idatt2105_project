@@ -28,6 +28,6 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
     @Query(value = "SELECT SUM(TIMESTAMPDIFF(HOUR, reservation.start_time, reservation.end_time)) AS SumTime FROM reservation " +
     "JOIN reservation_section ON reservation_section.reservation_id = reservation.reservation_id " +
     "WHERE reservation_section.section_id = ?1 AND reservation.end_time <= NOW()", nativeQuery = true)
-    Optional<Float> getTotalHoursBooked(long sectionId);
+    Optional<Long> getTotalHoursBooked(long sectionId);
 }
 
