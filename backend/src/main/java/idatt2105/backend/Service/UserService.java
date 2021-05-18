@@ -173,13 +173,12 @@ public class UserService implements UserDetailsService {
      */
     public List<GETReservationDTO> getSortedAndFilteredReservations(long userId, SortingDTO dto){
         List<Reservation> reservations;
-        String nameQuery = dto.getNameQuery() + "%";
         String roomQuery = "%" + dto.getRoomQuery() + "%";
 
         if(dto.getSortType() == SortingTypeEnum.AMOUNT_OF_PEOPLE) 
-            reservations = reservationRepository.getUserFutureReservationSortedByPeople(nameQuery,roomQuery, userId);
+            reservations = reservationRepository.getUserFutureReservationSortedByPeople(roomQuery, userId);
         else
-            reservations = reservationRepository.getUserFutureReservationSortedByDate(nameQuery,roomQuery, userId);
+            reservations = reservationRepository.getUserFutureReservationSortedByDate(roomQuery, userId);
         
         return reservations.stream().map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
     }

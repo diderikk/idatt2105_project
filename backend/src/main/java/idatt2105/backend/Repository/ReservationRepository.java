@@ -33,15 +33,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> getFutureReservationSortedByPeople(String nameQuery, String roomQuery);
 
     @Query(value = "SELECT reservation.* FROM reservation JOIN user "+
-    "ON (reservation.user_id = user.user_id AND start_time > NOW() AND user.user_id = ?3 AND (user.first_name LIKE ?1 OR user.last_name LIKE ?1)) JOIN reservation_section "+
+    "ON (reservation.user_id = user.user_id AND start_time > NOW() AND user.user_id = ?3) JOIN reservation_section "+
     "ON (reservation.reservation_id = reservation_section.reservation_id) JOIN section "+
     "ON (reservation_section.section_id = section.section_id AND section.room_code LIKE ?2) WHERE start_time > NOW() ORDER BY amount_of_people DESC", nativeQuery = true)
-    List<Reservation> getUserFutureReservationSortedByPeople(String nameQuery, String roomQuery, Long userId);
+    List<Reservation> getUserFutureReservationSortedByPeople(String roomQuery, Long userId);
 
     @Query(value = "SELECT reservation.* FROM reservation JOIN user "+
-    "ON (reservation.user_id = user.user_id AND start_time > NOW() AND user.user_id = ?3 AND (user.first_name LIKE ?1 OR user.last_name LIKE ?1)) JOIN reservation_section "+
+    "ON (reservation.user_id = user.user_id AND start_time > NOW() AND user.user_id = ?3) JOIN reservation_section "+
     "ON (reservation.reservation_id = reservation_section.reservation_id) JOIN section "+
     "ON (reservation_section.section_id = section.section_id AND section.room_code LIKE ?2) WHERE start_time > NOW() ORDER BY start_time", nativeQuery = true)
-    List<Reservation> getUserFutureReservationSortedByDate(String nameQuery, String roomQuery, Long userId);
+    List<Reservation> getUserFutureReservationSortedByDate(String roomQuery, Long userId);
 
 }
