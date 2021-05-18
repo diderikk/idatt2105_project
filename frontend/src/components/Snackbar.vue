@@ -19,8 +19,8 @@
 <script lang="ts">
 import { computed, defineComponent, ref, watch } from "vue";
 //TODO Change useStore import to the one defined in authentication branch
-import { useStore } from "vuex";
-import SnackBarStatus from "../enum/SnackbarStatus.enum";
+import { useStore } from "../store";
+import SnackbarStatus from "../enum/SnackbarStatus.enum";
 import PulseLoader from "vue-spinner/src/PulseLoader.vue";
 export default defineComponent({
   name: "Snackbar",
@@ -48,13 +48,15 @@ export default defineComponent({
     watch(
       () => snackbar.value.status,
       () => {
-        if (snackbar.value.status != SnackBarStatus.NONE) {
+        if (snackbar.value.status === SnackbarStatus.NONE) {
+          visible.value = false;
+        } else if (snackbar.value.status === SnackbarStatus.LOADING) {
+          visible.value = true;
+        } else {
           visible.value = true;
           setTimeout(() => {
             visible.value = false;
           }, 7000);
-        } else {
-          visible.value = false;
         }
       }
     );
@@ -63,21 +65,21 @@ export default defineComponent({
      * Checks if the snackbar status is loading
      */
     const isLoading = computed(
-      () => snackbar.value.status === SnackBarStatus.LOADING
+      () => snackbar.value.status === SnackbarStatus.LOADING
     );
 
     /**
      * Checks if the snackbar status is error
      */
     const isError = computed(
-      () => snackbar.value.status === SnackBarStatus.ERROR
+      () => snackbar.value.status === SnackbarStatus.ERROR
     );
 
     /**
      * Checks if the snackbar status is success
      */
     const isSuccess = computed(
-      () => snackbar.value.status === SnackBarStatus.SUCCESS
+      () => snackbar.value.status === SnackbarStatus.SUCCESS
     );
 
     /**

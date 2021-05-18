@@ -1,6 +1,5 @@
 package idatt2105.backend.Service;
 
-import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -259,7 +258,7 @@ public class UserService implements UserDetailsService {
         userSecurityDetails.setGrantedAuthorities(grantedAuthorities);
         userSecurityDetails.setUserId(user.getUserId());
         if(user.getExpirationDate() != null){
-            boolean expired = user.getExpirationDate().isAfter(LocalDate.now());
+            boolean expired = user.getExpirationDate().isBefore(LocalDate.now());
             userSecurityDetails.setAccountNonExpired(!expired);
         }
         return userSecurityDetails;
@@ -287,10 +286,25 @@ public class UserService implements UserDetailsService {
      * @return randomly created password
      */
     private String createRandomPassword() {
-        byte[] bytes = new byte[30];
-        SecureRandom secureRandom = new SecureRandom();
-        secureRandom.nextBytes(bytes);
-        return String.valueOf(bytes);
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < 30; i++) {
+            int randNum = (int)Math.floor(Math.random()*3 + 1);
+            switch (randNum) {
+                case 1:
+                    sb.append(Character.toString((char)Math.floor(Math.random()*(57-48+1) + 48)));
+                    break;
+                case 2:
+                    sb.append(Character.toString((char)Math.floor(Math.random()*(90-65+1) + 65)));
+                    break;
+                case 3:
+                    sb.append(Character.toString((char)Math.floor(Math.random()*(122-97+1) + 97)));
+                    break;
+                default:
+                    sb.append(Character.toString((char)Math.floor(Math.random()*(122-97+1) + 97)));
+                    break;
+            }
+        }
+        return sb.toString();
     }
 
     /**
