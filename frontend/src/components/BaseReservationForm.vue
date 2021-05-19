@@ -609,7 +609,7 @@ export default defineComponent({
     });
 
     /**
-     * When start date/time and end date/time has been added
+     * When start date/time and end date/time has been added or changed
      */
     watch(
       () => registerInformation.startDate + registerInformation.endDate + registerInformation.startTime + registerInformation.endTime,
