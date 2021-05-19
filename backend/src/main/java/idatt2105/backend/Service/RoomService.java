@@ -165,11 +165,12 @@ public class RoomService {
      * @throws AlreadyExistsException if room with same code already exists
      * @throws NotFoundException if no room with the given roomCode was found
      */
+    @Transactional
     public GETRoomDTO editRoom(String roomCode, POSTRoomDTO roomDTO) throws AlreadyExistsException, NotFoundException{
         LOGGER.info("editRoom(String roomCode, POSTRoomDTO roomDTO) called with roomCode: {}", roomCode);
         Optional<Room> optionalRoom = roomRepository.findById(roomCode);
         if(!optionalRoom.isPresent()) throw new NotFoundException("Room with room code: " + roomDTO.getRoomCode() + " not found");
-        if(roomRepository.findById(roomDTO.getRoomCode()).isPresent()) throw new AlreadyExistsException("Room with room code: " + roomCode + " already exists");
+        if(roomRepository.findById(roomDTO.getRoomCode()).isPresent() && !roomCode.equals(roomDTO.getRoomCode())) throw new AlreadyExistsException("Room with room code: " + roomCode + " already exists");
 
         if(roomDTO.getRoomCode() != null && roomDTO.getSections() != null && !roomDTO.getSections().isEmpty()){
             deleteRoom(roomCode);

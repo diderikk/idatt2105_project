@@ -8,6 +8,7 @@ import POSTReservation from "@/interfaces/Reservation/POSTReservation.interface"
 import Reservation from "@/interfaces/Reservation/Reservation.interface";
 import ReservationSorting from "@/interfaces/Reservation/ReservationSorting.interface";
 import Room from "@/interfaces/Room/Room.interface";
+import EditRoom from "@/interfaces/Room/EditRoom.interface";
 
 export interface State {
   user: string;
@@ -276,6 +277,20 @@ export const store = createStore<State>({
         return null;
       }
     },
+    async getRoom({ commit }, roomCode: string){
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        const response = await backend.get(`/rooms/${roomCode}`);
+        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        return response.data;
+      } catch (error) {
+        commit("setSnackbar", {
+          title: "Could not find a room",
+          status: SnackbarStatus.ERROR,
+        });
+        return null;
+      }
+    },
     async createRoom({ commit }, room: Room) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
@@ -302,6 +317,62 @@ export const store = createStore<State>({
         return false;
       }
     },
+    async editRoom({ commit }, editRoom: EditRoom) {
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        await backend.post(`/rooms/${editRoom.originalRoomCode}`, {roomCode: editRoom.roomCode, sections: editRoom.sections} as Room);
+
+        commit("setSnackbar", {
+          title: "Room edited",
+          status: SnackbarStatus.SUCCESS,
+        });
+        return true;
+      } catch(error){
+        if(error.response.status === 400){
+          commit("setSnackbar", {
+            title: "Room code is already occupied",
+            status: SnackbarStatus.ERROR,
+          });
+        }
+        else if(error.response.status === 404){
+          commit("setSnackbar", {
+            title: "No room with the given room code exists",
+            status: SnackbarStatus.ERROR,
+          });
+        }
+        else{
+          commit("setSnackbar", {
+            title: "Could not edit room",
+            status: SnackbarStatus.ERROR,
+          });
+        }
+      }
+    },
+    async deleteRoom({ commit }, roomCode: string){
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        await backend.delete(`/rooms/${roomCode}`);
+
+        commit("setSnackbar", {
+          title: "Room deleted",
+          status: SnackbarStatus.SUCCESS,
+        });
+        return true;
+      } catch(error){
+        if(error.response.status === 404){
+          commit("setSnackbar", {
+            title: "No room with the given room code exists",
+            status: SnackbarStatus.ERROR,
+          });
+        }
+        else{
+          commit("setSnackbar", {
+            title: "Could not delete room",
+            status: SnackbarStatus.ERROR,
+          });
+        }
+      }
+    }
   },
 });
 
