@@ -49,20 +49,11 @@
         feedbackStatus: phoneNumberStatus,
       }"
     >
-      <span>+</span>
-      <input
-        v-model="phoneNationalCode"
-        @blur="checkPhoneNumberValidity"
-        type="text"
-        placeholder="47"
-        id="phoneNationalCode"
-        class="input"
-      />
       <input
         v-model="phoneNumber"
         @blur="checkPhoneNumberValidity"
         type="tel"
-        placeholder="Example:12345678"
+        placeholder="Example:+47 12345678"
         id="phoneNumber"
         class="input"
       />
@@ -82,6 +73,13 @@
         placeholder="Expiration date"
         class="input"
     /></base-form-field-input>
+    <div class="field">
+      <label class="checkbox"
+        ><input type="checkbox" :checked="isAdmin" @change="changeUserLevel" />
+        Is the user an admin?</label
+      >
+    </div>
+
     <span v-for="(button, index) in config.buttons" :key="index">
       <button
         v-if="button.action.numberOfArgs === 4"
@@ -100,9 +98,9 @@
         {{ button.title }}
       </button>
       <button
-        v-else-if="button.action.numberOfArgs === 2"
+        v-else-if="button.action.numberOfArgs === 1"
         :class="button.class"
-        @click="button.action.function(registerInformation, userId)"
+        @click="button.action.function(userId)"
       >
         {{ button.title }}
       </button>
@@ -137,8 +135,6 @@ export default defineComponent({
     BaseFormFieldInput,
   },
   setup(props) {
-    // Defined from the RFC 5322
-    const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
     const registerInformation = reactive(
       //Need object assign to create a new object, to hinder mutating a prop
       Object.assign(
@@ -148,9 +144,9 @@ export default defineComponent({
           firstName: "",
           lastName: "",
           email: "",
-          phoneNationalCode: "",
           phoneNumber: "",
           expirationDate: "",
+          isAdmin: false,
         }
       )
     );
@@ -170,24 +166,29 @@ export default defineComponent({
           : InputFieldFeedbackStatus.ERROR;
     };
 
+    // Defined from the RFC 5322
+    const emailRegex =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/;
     const emailStatus = ref(InputFieldFeedbackStatus.NONE);
     const checkEmailValidity = () => {
       emailStatus.value =
-        emailRegex.test(registerInformation.email.trim())
+        emailRegex.test(registerInformation.email.trim()) ||
+        //Root user does not need email, and emails are unique in backend therefore no one else can create a user with that email
+        registerInformation.email.trim() === "root"
           ? InputFieldFeedbackStatus.SUCCESS
           : InputFieldFeedbackStatus.ERROR;
     };
 
     const phoneNumberStatus = ref(InputFieldFeedbackStatus.NONE);
+    //Taken from answer by Remigius Stalder at: https://stackoverflow.com/questions/4338267/validate-phone-number-with-javascript
+    const phoneRegex = /^[+]?[\s./0-9]*[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/;
+
     const checkPhoneNumberValidity = () => {
-      phoneNumberStatus.value =
-        //Solomon islands have 5 digits, thats the smallest I could find
-        registerInformation.phoneNumber.trim().length >= 5 &&
-        !isNaN(+registerInformation.phoneNumber.trim()) &&
-        registerInformation.phoneNationalCode.trim().length >= 1 &&
-        !isNaN(+registerInformation.phoneNationalCode.trim())
-          ? InputFieldFeedbackStatus.SUCCESS
-          : InputFieldFeedbackStatus.ERROR;
+      phoneNumberStatus.value = phoneRegex.test(
+        registerInformation.phoneNumber.trim()
+      )
+        ? InputFieldFeedbackStatus.SUCCESS
+        : InputFieldFeedbackStatus.ERROR;
     };
 
     const expirationDateStatus = ref(InputFieldFeedbackStatus.NONE);
@@ -207,6 +208,10 @@ export default defineComponent({
         expirationDateAsDate.value >= tommorrow
           ? InputFieldFeedbackStatus.SUCCESS
           : InputFieldFeedbackStatus.ERROR;
+    };
+
+    const changeUserLevel = () => {
+      registerInformation.isAdmin = !registerInformation.isAdmin;
     };
 
     const checks = ref([
@@ -240,6 +245,7 @@ export default defineComponent({
       expirationDateStatus,
       tommorrowAsString,
       checkExpirationDateValidity,
+      changeUserLevel,
       checks,
       statuses,
     };
@@ -248,17 +254,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-#phoneNationalCode {
-  width: 3vw;
-  display: inline;
-  margin-left: 10px;
-}
-#phoneNumber {
-  display: inline;
-  width: 92.1%;
-  margin-left: 10px;
-}
-
 button {
   margin-right: 5px;
 }

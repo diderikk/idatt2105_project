@@ -14,10 +14,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, reactive, ref, Ref } from "vue";
+import { defineComponent, onMounted, ref, Ref } from "vue";
+import { useRouter } from "vue-router";
 import BaseUserFormConfig from "../components/BaseUserForm.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
-import POSTUser from "../interfaces/User/User.interface";
 import UserForm from "../interfaces/User/UserForm.interface";
 import { store } from "../store";
 import checksBeforeAsyncCall from "../utils/checksBeforeAsyncCall";
@@ -34,27 +34,28 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const router = useRouter();
+
     //TODO remove testdata and do async call for actual user
     const user: Ref<UserForm> = ref({
       firstName: "",
       lastName: "",
       email: "",
-      phoneNationalCode: "",
       phoneNumber: "",
       expirationDate: "",
+      isAdmin: false,
     });
     const isDoneLoading = ref(false);
 
-    onBeforeMount(async () => {
+    onMounted(async () => {
       const response = await store.dispatch("getUser", props.id);
-      console.log(response);
       if (response !== null) {
-        user.value = UserToUserForm(response.data);
+        user.value = UserToUserForm(response);
         isDoneLoading.value = true;
       }
     });
 
-    const editProfile = (
+    const editProfile = async (
       checks: Array<() => void>,
       statuses: Array<Ref<InputFieldFeedbackStatus>>,
       registerInformation: UserForm,
@@ -69,15 +70,11 @@ export default defineComponent({
       }
     };
 
-    const deleteProfile = async (
-      registerInformation: UserForm,
-      userId: number
-    ) => {
+    const deleteProfile = async (userId: number) => {
       if (window.confirm("Are you sure you want to delete the user?")) {
-        store.dispatch("deleteUser");
-        //TODO Add async call
-        console.log("User deleted: REMOVE ME");
-        console.log(registerInformation);
+        if (await store.dispatch("deleteUser", userId)) {
+          router.push("/user-feed");
+        }
       }
     };
 

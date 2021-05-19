@@ -1,9 +1,5 @@
-export default interface User {
+import UserForm from "./UserForm.interface";
+
+export default interface User extends UserForm {
   userId: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  isAdmin: boolean;
-  expirationDate: string;
 }
