@@ -95,10 +95,13 @@ export default defineComponent({
       router.push(`/edit-reservation/${props.reservation.reservationId}`);
     };
 
-    const deleteReservation = (id: number) => {
+    const deleteReservation = async (id: number) => {
       if (window.confirm("Are you sure you want to delete the reservation?")) {
         if (
-          store.dispatch("deleteReservation", props.reservation.reservationId)
+          await store.dispatch(
+            "deleteReservation",
+            props.reservation.reservationId
+          )
         ) {
           emit("reload", id);
         }
