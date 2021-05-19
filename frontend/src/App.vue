@@ -131,6 +131,7 @@ body {
   width: 60%;
   margin: auto;
   margin-top: 80px;
+  margin-bottom: 10px;
 }
 
 @media only screen and (max-width: 1020px) {

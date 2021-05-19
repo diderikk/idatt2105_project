@@ -1,6 +1,5 @@
 <template>
-  <div class="box">
-  </div>
+  <div class="box"></div>
 </template>
 
 <script lang="ts">
@@ -12,9 +11,7 @@ import { store } from "../store";
 import { UserToUserForm } from "../utils/userUtils";
 export default defineComponent({
   name: "UserProfile",
-  components: {
-      
-  },
+  components: {},
   props: {
     id: {
       required: true,
@@ -26,20 +23,20 @@ export default defineComponent({
       firstName: "",
       lastName: "",
       email: "",
-      phoneNationalCode: "",
       phoneNumber: "",
       expirationDate: "",
+      isAdmin: false,
     });
     const userStats: Ref<UserStats> = ref({
-        hoursOfReservations: 0,
-        totalReservations: 0,
-        favouriteRoom: {
-          roomCode: "",
-          sections: [] as POSTSection[],
-        },
-        favouriteSection: {
-          sectionName: "",
-        },
+      hoursOfReservations: 0,
+      totalReservations: 0,
+      favouriteRoom: {
+        roomCode: "",
+        sections: [] as POSTSection[],
+      },
+      favouriteSection: {
+        sectionName: "",
+      },
     });
     const isDoneLoadingUser = ref(false);
     const isDoneLoadingStatistics = ref(false);

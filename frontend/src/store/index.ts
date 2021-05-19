@@ -9,6 +9,7 @@ import Reservation from "@/interfaces/Reservation/Reservation.interface";
 import ReservationSorting from "@/interfaces/Reservation/ReservationSorting.interface";
 import Room from "@/interfaces/Room/Room.interface";
 import EditRoom from "@/interfaces/Room/EditRoom.interface";
+import { UserToUserForm } from "@/utils/userUtils";
 import TimeInterval from "@/interfaces/TimeInterval.interface";
 
 export interface State {
@@ -115,7 +116,27 @@ export const store: Store<State> = createStore<State>({
         return false;
       }
     },
-    async deleteUser({ commit, getters }, userId: number): Promise<boolean> {
+    async editUser({ commit }, user: User) {
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        console.log(user);
+        await backend.post(`/users/${user.userId}`, UserToUserForm(user));
+        commit("setSnackbar", {
+          content: `User edited`,
+          status: SnackbarStatus.SUCCESS,
+        });
+        return true;
+      } catch (error) {
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not edit user",
+            status: SnackbarStatus.ERROR,
+          });
+        }
+        return false;
+      }
+    },
+    async deleteUser({ commit }, userId: number): Promise<boolean> {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         await backend.delete(`/users/${userId}`);
@@ -331,14 +352,14 @@ export const store: Store<State> = createStore<State>({
         return null;
       }
     },
-    async getAvailableRooms({ commit }, times: TimeInterval){
+    async getAvailableRooms({ commit }, times: TimeInterval) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
-      try{
+      try {
         const response = await backend.post("/rooms/available", times);
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
-      } catch(error) {
-        if(error !== null){
+      } catch (error) {
+        if (error !== null) {
           commit("setSnackbar", {
             content: "Could not find any rooms",
             status: SnackbarStatus.ERROR,
