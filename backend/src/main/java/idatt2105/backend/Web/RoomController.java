@@ -58,6 +58,11 @@ public class RoomController {
         return new ResponseEntity<>(roomService.getAvailableRooms(dto), HttpStatus.OK);
     }
 
+    @PostMapping("/available/{reservation_id}")
+    public ResponseEntity<List<GETRoomDTO>> getAvailableRooms(@PathVariable("reservation_id") long reservationId,@RequestBody TimeIntervalDTO dto) {
+        return new ResponseEntity<>(roomService.getAvailableRooms(dto, reservationId), HttpStatus.OK);
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<GETRoomDTO> createRoom(@RequestBody POSTRoomDTO roomDTO) {

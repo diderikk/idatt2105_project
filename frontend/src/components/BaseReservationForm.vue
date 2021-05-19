@@ -612,17 +612,33 @@ export default defineComponent({
      * When start date/time and end date/time has been added or changed
      */
     watch(
-      () => registerInformation.startDate + registerInformation.endDate + registerInformation.startTime + registerInformation.endTime,
+      () =>
+        registerInformation.startDate +
+        registerInformation.endDate +
+        registerInformation.startTime +
+        registerInformation.endTime,
       async () => {
         if (isDateAndTimeSelected.value) {
           const startTime =
             registerInformation.startDate + " " + registerInformation.startTime;
           const endTime =
             registerInformation.endDate + " " + registerInformation.endTime;
-          const response = await store.dispatch("getAvailableRooms", {
-            startTime,
-            endTime,
-          });
+          let response;
+          if (props.reservationId)
+            response = await store.dispatch("getAvailableRooms", {
+              times: {
+                startTime,
+                endTime,
+              },
+              reservationId: props.reservationId,
+            });
+          else
+            response = await store.dispatch("getAvailableRooms", {
+              times: {
+                startTime,
+                endTime,
+              },
+            });
           if (response !== null) {
             rooms.value = response;
           }

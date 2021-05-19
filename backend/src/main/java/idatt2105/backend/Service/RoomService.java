@@ -79,6 +79,10 @@ public class RoomService {
         return roomRepository.getAvailableRooms(dto.getStartTime(), dto.getEndTime()).stream().map(room -> new GETRoomDTO(room)).collect(Collectors.toList());
     }
 
+    public List<GETRoomDTO> getAvailableRooms(TimeIntervalDTO dto, long reservationId){
+        return roomRepository.getAvailableRooms(dto.getStartTime(), dto.getEndTime(), reservationId).stream().map(room -> new GETRoomDTO(room)).collect(Collectors.toList());
+    }
+
     /**
      * Returns a specific section of a specific room given by roomCode and sectionID
      * @param roomCode
