@@ -1,5 +1,5 @@
-import CreateReservation from "./POSTReservation.interface";
+import POSTReservation from "./POSTReservation.interface";
 
-export default interface Reservation extends CreateReservation {
-  id: number;
+export default interface Reservation extends POSTReservation {
+  reservationId: number;
 }

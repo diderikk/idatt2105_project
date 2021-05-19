@@ -91,7 +91,7 @@ const routes: Array<RouteRecordRaw> = [
       title: "Edit Room",
     },
     component: () => import("../views/EditRoom.vue"),
-    props: true
+    props: true,
   },
   {
     path: "/log-in",
@@ -100,6 +100,15 @@ const routes: Array<RouteRecordRaw> = [
       title: "Log in",
     },
     component: () => import("../views/LogIn.vue"),
+  },
+  {
+    path: "/reservation-feed",
+    name: "ReservationFeed",
+    meta: {
+      title: "Reservation feed",
+      parmission: "User",
+    },
+    component: () => import("../views/ReservationFeed.vue"),
   },
   {
     path: "/users",

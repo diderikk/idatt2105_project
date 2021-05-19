@@ -318,8 +318,12 @@ export default defineComponent({
      */
     const mapSections = () => {
       const sections: Section[] =
-        rooms.value.find((r) => r.roomCode === registerInformation.roomCode)
-          ?.sections ?? [];
+        rooms.value.find((r) => {
+          console.log("Roomcodes");
+          console.log("r" + r.roomCode);
+          console.log("r" + registerInformation.roomCode);
+          r.roomCode === registerInformation.roomCode;
+        })?.sections ?? [];
       availableSections.value =
         sections?.map((s: Section) => {
           return { ...s, selected: false };
@@ -343,7 +347,6 @@ export default defineComponent({
      */
     onMounted(() => {
       mapSections();
-
       if (registerInformation.sections.length !== 0) {
         availableSections.value.forEach((section) => {
           const index = registerInformation.sections.findIndex(

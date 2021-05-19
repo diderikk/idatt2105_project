@@ -24,7 +24,7 @@ import checksBeforeAsyncCall from "../utils/checksBeforeAsyncCall";
 import ReservationForm from "../interfaces/Reservation/ReservationForm.interface";
 import { useStore } from "../store";
 import {
-  POSTReservationToResrevationForm,
+  POSTReservationToReservationForm,
   reservationFormToPOSTReservtion,
 } from "../utils/reservationUtils";
 
@@ -48,7 +48,8 @@ export default defineComponent({
         props.id
       );
       if (response !== null) {
-        reservation.value = POSTReservationToResrevationForm(response);
+        reservation.value = POSTReservationToReservationForm(response);
+        console.log(reservation.value);
         isDoneLoading.value = true;
       }
     });
