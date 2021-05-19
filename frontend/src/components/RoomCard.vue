@@ -13,8 +13,12 @@
     </div>
     <div class="card-footer">
       <a @click="joinChat" href="#" class="card-footer-item">Join Chat</a>
-      <a @click="editRoom" href="#" class="card-footer-item">Edit</a>
-      <a @click="deleteRoom" href="#" class="card-footer-item">Delete</a>
+      <a v-if="isAdmin" @click="editRoom" href="#" class="card-footer-item"
+        >Edit</a
+      >
+      <a v-if="isAdmin" @click="deleteRoom" href="#" class="card-footer-item"
+        >Delete</a
+      >
     </div>
   </div>
 </template>
@@ -31,6 +35,10 @@ export default defineComponent({
     room: {
       required: true,
       type: Object as () => Room,
+    },
+    isAdmin: {
+      required: true,
+      type: Boolean,
     },
   },
   setup(props, { emit }) {
@@ -51,7 +59,7 @@ export default defineComponent({
 
     return {
       editRoom,
-      deleteRoom
+      deleteRoom,
     };
   },
 });

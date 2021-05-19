@@ -12,6 +12,7 @@
         v-for="(room, index) in availableRooms"
         :key="index"
         :room="room"
+        :isAdmin="isAdmin"
         @reload="reload(false)"
         >{{ room }}</room-card
       >
@@ -20,18 +21,19 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, Ref, ref } from "vue";
 import { useStore } from "../store";
 import Room from "../interfaces/Room/Room.interface";
 import RoomCard from "../components/RoomCard.vue";
 
 export default defineComponent({
-  name: "UserFeed",
+  name: "RoomFeed",
   components: { RoomCard },
   setup() {
     const store = useStore();
     const searchInput = ref("");
     const rooms = ref([] as Room[]);
+    const isAdmin : Ref<Boolean> = ref(store.getters.getUser.isAdmin);
 
     onMounted(async () => {
       await reload(true);
@@ -54,10 +56,11 @@ export default defineComponent({
     const sectionContainsSeach = (room: Room): boolean => {
         for(const section of room.sections) if(section.sectionName.toLowerCase().startsWith(searchInput.value.toLowerCase())) return true;
         return false;
-    }
+    };
 
     return {
       searchInput,
+      isAdmin,
       rooms,
       reload,
       availableRooms,

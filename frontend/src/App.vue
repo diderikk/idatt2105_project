@@ -39,7 +39,7 @@
           <router-link v-if="isAdmin" class="navbar-item" to="/create-room"
             >Create Room</router-link
           >
-          <router-link v-if="isAdmin" class="navbar-item" to="/rooms"
+          <router-link class="navbar-item" to="/rooms"
             >Rooms</router-link
           >
         </div>
