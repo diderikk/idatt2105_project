@@ -137,6 +137,7 @@ public class UserService implements UserDetailsService {
             if(inputUser.getLastName() != null) user.setLastName(inputUser.getLastName());
             if(inputUser.getExpirationDate() != null) user.setExpirationDate(inputUser.getExpirationDate());
             if(inputUser.getPhoneNumber() != null) user.setPhoneNumber(inputUser.getPhoneNumber());
+            user.setAdmin(inputUser.isAdmin());
             user = userRepository.save(user);
             
             return new GETUserDTO(user);
