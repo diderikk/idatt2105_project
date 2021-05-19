@@ -207,7 +207,6 @@
 import {
   computed,
   defineComponent,
-  onBeforeMount,
   onMounted,
   reactive,
   Ref,
@@ -613,7 +612,7 @@ export default defineComponent({
      * When start date/time and end date/time has been added
      */
     watch(
-      () => isDateAndTimeSelected.value,
+      () => registerInformation.startDate + registerInformation.endDate + registerInformation.startTime + registerInformation.endTime,
       async () => {
         if (isDateAndTimeSelected.value) {
           const startTime =
