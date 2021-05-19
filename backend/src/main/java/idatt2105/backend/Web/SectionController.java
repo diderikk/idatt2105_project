@@ -23,14 +23,16 @@ public class SectionController {
     private SectionService sectionService;
     
     @GetMapping("/statistics/top-sections")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<GETSectionDTO>> getTopSections(){
         return new ResponseEntity<>(sectionService.getTopSections(), HttpStatus.OK);
     }
 
     @GetMapping("/{section_id}/statistics/reservations-total-time")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Long> getTotalTimeBooked(@PathVariable("section_id") long sectionId){
         try {
-            return new ResponseEntity<>(sectionService.getTotalTimeBooked(sectionId), HttpStatus.OK);
+            return new ResponseEntity<>(sectionService.getTotalHoursBooked(sectionId), HttpStatus.OK);
         } catch (NotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
