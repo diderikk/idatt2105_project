@@ -9,6 +9,8 @@ import Reservation from "@/interfaces/Reservation/Reservation.interface";
 import ReservationSorting from "@/interfaces/Reservation/ReservationSorting.interface";
 import Room from "@/interfaces/Room/Room.interface";
 import EditRoom from "@/interfaces/Room/EditRoom.interface";
+import UserForm from "@/interfaces/User/UserForm.interface";
+import { UserToUserForm } from "@/utils/userUtils";
 
 export interface State {
   user: string;
@@ -114,7 +116,27 @@ export const store = createStore<State>({
         return false;
       }
     },
-    async deleteUser({ commit, getters }, userId: number): Promise<boolean> {
+    async editUser({ commit }, user: User) {
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        console.log(user);
+        await backend.post(`/users/${user.userId}`, UserToUserForm(user));
+        commit("setSnackbar", {
+          content: `User edited`,
+          status: SnackbarStatus.SUCCESS,
+        });
+        return true;
+      } catch (error) {
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not edit user",
+            status: SnackbarStatus.ERROR,
+          });
+        }
+        return false;
+      }
+    },
+    async deleteUser({ commit }, userId: number): Promise<boolean> {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         await backend.delete(`/users/${userId}`);

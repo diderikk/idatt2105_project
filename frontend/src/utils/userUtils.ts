@@ -15,11 +15,6 @@ export const UserToUserForm = (user: User): UserForm => {
 export const UserFormToUser = (user: UserForm, userId?: number): User => {
   return {
     userId: userId ?? -1,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    phoneNumber: user.phoneNumber,
-    expirationDate: user.expirationDate,
-    isAdmin: user.isAdmin,
+    ...user,
   };
 };

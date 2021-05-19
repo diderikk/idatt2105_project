@@ -45,7 +45,7 @@
     <base-form-field-input
       :config="{
         title: 'Phone number',
-        errorHelperMessage: 'Enter the users national code and phone number',
+        errorHelperMessage: 'Enter a phone number e.g. +47 12345678',
         feedbackStatus: phoneNumberStatus,
       }"
     >
@@ -62,7 +62,8 @@
     <base-form-field-input
       :config="{
         title: 'Expiration date',
-        errorHelperMessage: 'Enter an upcoming date',
+        errorHelperMessage:
+          'Enter an upcoming date (Admins don\'t need expiration date)',
         feedbackStatus: expirationDateStatus,
       }"
       ><input
@@ -75,7 +76,14 @@
     /></base-form-field-input>
     <div class="field">
       <label class="checkbox"
-        ><input type="checkbox" :checked="isAdmin" @change="changeUserLevel" />
+        ><input
+          type="checkbox"
+          :checked="isAdmin"
+          @change="
+            changeUserLevel();
+            checkExpirationDateValidity();
+          "
+        />
         Is the user an admin?</label
       >
     </div>
@@ -105,6 +113,7 @@
         {{ button.title }}
       </button>
     </span>
+    <button @click="clear" class="button is-danger">Clear</button>
   </div>
 </template>
 
@@ -204,8 +213,10 @@ export default defineComponent({
 
     const checkExpirationDateValidity = () => {
       expirationDateStatus.value =
-        registerInformation.expirationDate.trim() !== "" &&
-        expirationDateAsDate.value >= tommorrow
+        (registerInformation.expirationDate.trim() !== "" &&
+          expirationDateAsDate.value >= tommorrow) ||
+        (registerInformation.isAdmin &&
+          registerInformation.expirationDate.trim() === "")
           ? InputFieldFeedbackStatus.SUCCESS
           : InputFieldFeedbackStatus.ERROR;
     };
@@ -230,6 +241,18 @@ export default defineComponent({
       expirationDateStatus,
     ]);
 
+    const clear = () => {
+      registerInformation.firstName = "";
+      registerInformation.lastName = "";
+      registerInformation.email = "";
+      registerInformation.phoneNumber = "";
+      registerInformation.expirationDate = "";
+      registerInformation.isAdmin = false;
+      statuses.value.forEach(
+        (status) => (status.value = InputFieldFeedbackStatus.NONE)
+      );
+    };
+
     return {
       //Also need the basic registerInformation object to be able to call it from @click which is not possible when using ...toRefs()
       registerInformation,
@@ -248,6 +271,7 @@ export default defineComponent({
       changeUserLevel,
       checks,
       statuses,
+      clear,
     };
   },
 });
