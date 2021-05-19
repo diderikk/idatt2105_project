@@ -42,7 +42,6 @@ export default defineComponent({
       const response = await store.dispatch("getRoom", props.code);
       if (response !== null) {
         room.value = RoomToRoomForm(response);
-        console.log(room.value);
         isDoneLoading.value = true;
       }
     });

@@ -319,7 +319,6 @@ export const store = createStore<State>({
     },
     async editRoom({ commit }, editRoom: EditRoom) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
-      console.log(editRoom);
       try {
         await backend.post(`/rooms/${editRoom.originalRoomCode}`, {roomCode: editRoom.roomCode, sections: editRoom.sections} as Room);
 
