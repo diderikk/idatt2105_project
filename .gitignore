@@ -36,4 +36,4 @@ build/
 config.properties
 
 ### Keystore ###
-keystore/*
+keystore/

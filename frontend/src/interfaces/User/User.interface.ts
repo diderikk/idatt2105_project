@@ -1,4 +1,4 @@
-export default interface POSTUser {
+export default interface User {
   userId: number;
   firstName: string;
   lastName: string;

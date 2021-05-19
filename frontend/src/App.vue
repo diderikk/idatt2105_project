@@ -36,8 +36,8 @@
           <router-link v-if="isAdmin" class="navbar-item" to="/create-user"
             >Create new user</router-link
           >
-          <router-link v-if="isAdmin" class="navbar-item" to="/edit-user"
-            >Edit user</router-link
+          <router-link v-if="isAdmin" class="navbar-item" to="/users"
+            >Browse users</router-link
           >
         </div>
         <div class="navbar-end">

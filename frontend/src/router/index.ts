@@ -68,7 +68,21 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/create-room",
     name: "CreateRoom",
+    meta: {
+      permisson: "Admin",
+      title: "Create Room",
+    },
     component: () => import("../views/CreateRoom.vue"),
+  },
+  {
+    path: "/edit-room/:code",
+    name: "EditRoom",
+    meta: {
+      permisson: "Admin",
+      title: "Edit Room",
+    },
+    component: () => import("../views/EditRoom.vue"),
+    props: true,
   },
   {
     path: "/log-in",
@@ -86,6 +100,15 @@ const routes: Array<RouteRecordRaw> = [
       parmission: "User",
     },
     component: () => import("../views/ReservationFeed.vue"),
+  },
+  {
+    path: "/users",
+    name: "UserFeed",
+    meta: {
+      title: "Users",
+      permission: "Admin",
+    },
+    component: () => import("../views/UserFeed.vue"),
   },
   {
     path: "/:catchAll(.*)",
