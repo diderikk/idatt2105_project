@@ -173,9 +173,6 @@ export default defineComponent({
     const emailStatus = ref(InputFieldFeedbackStatus.NONE);
     const checkEmailValidity = () => {
       emailStatus.value =
-        registerInformation.email.trim() !== "" &&
-        registerInformation.email.includes("@") &&
-        registerInformation.email.includes(".") &&
         emailRegex.test(registerInformation.email.trim())
           ? InputFieldFeedbackStatus.SUCCESS
           : InputFieldFeedbackStatus.ERROR;
