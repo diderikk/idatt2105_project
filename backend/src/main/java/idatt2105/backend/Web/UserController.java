@@ -163,7 +163,7 @@ public class UserController {
     }
 
     @GetMapping("/{user_id}/statistics")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<UserStatisticsDTO> getStatistics(@PathVariable("user_id") long userId){
         try{
             UserStatisticsDTO userStatistics = userService.getStatistics(userId);
