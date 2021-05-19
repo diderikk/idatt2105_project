@@ -40,6 +40,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/{user_id}")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<GETUserDTO> getUser(@PathVariable("user_id") long userId){
         try {
             GETUserDTO user = userService.getUser(userId);
@@ -50,7 +51,14 @@ public class UserController {
         }
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<GETUserDTO>> getUsers(){
+        return new ResponseEntity<>(userService.getUsers(), HttpStatus.OK);
+    }
+
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<GETUserDTO> createUser(@RequestBody POSTUserDTO inputUser){
         try {
             GETUserDTO createdUser = userService.createUser(inputUser);
@@ -62,6 +70,7 @@ public class UserController {
     }
 
     @PostMapping("/{user_id}")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<GETUserDTO> editUser(@PathVariable("user_id") long userId, @RequestBody POSTUserDTO inputUser){
         try {
             GETUserDTO createdUser = userService.editUser(userId, inputUser);
@@ -73,6 +82,7 @@ public class UserController {
     }
 
     @PutMapping("/{user_id}/password")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> changePassword(@PathVariable("user_id") long userId, @RequestBody ChangePasswordDTO dto) {
         try {
             boolean successful = userService.changePassword(dto);
@@ -88,6 +98,7 @@ public class UserController {
     }
 
     @GetMapping("/{user_id}/reservations")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<GETReservationDTO>> getUserReservations(@PathVariable("user_id") long userId){
         try {
             return new ResponseEntity<>(userService.getUserReservations(userId), HttpStatus.OK);
@@ -98,11 +109,13 @@ public class UserController {
     }
 
     @PostMapping("/{user_id}/reservations/sort")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<GETReservationDTO>> getSortedAndFilteredUserReservations(@PathVariable("user_id") long userId, @RequestBody SortingDTO dto){
         return new ResponseEntity<>(userService.getSortedAndFilteredReservations(userId, dto), HttpStatus.OK);
     }
 
     @PostMapping("/{user_id}/reservations")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<POSTReservationDTO> addUserReservation(@PathVariable("user_id") long userId, @RequestBody POSTReservationDTO dto){
         try {
             POSTReservationDTO newDto = userService.addUserReservation(userId, dto);
@@ -117,6 +130,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{user_id}/reservations/{reservation_id}")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> removeUserReservation(@PathVariable("user_id") long userId, @PathVariable("reservation_id") long reservationId){
         try {
             boolean successful = userService.removeUserReservation(userId, reservationId);
@@ -129,6 +143,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{user_id}")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable("user_id") long userId){
         try{
             boolean successful = userService.deleteUser(userId);

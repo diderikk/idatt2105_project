@@ -77,6 +77,11 @@ public class UserService implements UserDetailsService {
         return new GETUserDTO(user);
     }
 
+    public List<GETUserDTO> getUsers(){
+        LOGGER.info("getUsers() was called");
+        return userRepository.findAll().stream().map(user -> new GETUserDTO(user)).collect(Collectors.toList());
+    }
+
     /**
      * Creates user based on given information from UserDTO and stores it in database.
      * Also checks if email, first name and last name fields in given DTO are not null.
