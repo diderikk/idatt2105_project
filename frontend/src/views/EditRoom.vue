@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, ref, Ref } from "vue";
+import { defineComponent, onMounted, ref, Ref } from "vue";
 import checksBeforeAsyncCall from "../utils/checksBeforeAsyncCall";
 import BaseRoomFormConfig from "../components/BaseRoomForm.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
@@ -38,7 +38,7 @@ export default defineComponent({
       sections: [],
     });
 
-    onBeforeMount(async () => {
+    onMounted(async () => {
       const response = await store.dispatch("getRoom", props.code);
       if (response !== null) {
         room.value = RoomToRoomForm(response);
@@ -53,7 +53,7 @@ export default defineComponent({
       roomForm: RoomForm,
     ) => {
       if (checksBeforeAsyncCall(checks, statuses)) {
-        await store.dispatch("editRoom", { room: RoomFormToRoom(roomForm), roomCode: props.code });
+        await store.dispatch("editRoom", {...RoomFormToRoom(roomForm), originalRoomCode: props.code });
         if(roomForm.roomCode !== props.code) router.push(`/edit-room/${roomForm.roomCode}`);
       }
     };

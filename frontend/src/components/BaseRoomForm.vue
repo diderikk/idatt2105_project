@@ -4,7 +4,7 @@
     <base-form-field-input
       :config="{
         title: 'Room Code',
-        errorHelperMessage: 'Enter a room code',
+        errorHelperMessage: roomCodeInputError,
         feedbackStatus: roomCodeStatus,
       }"
       ><input
@@ -81,6 +81,7 @@ export default defineComponent({
   },
   setup(props) {
     const sectionInput = ref("");
+    const roomCodeInputError = ref("Enter a room code");
     const registerInformation = reactive(
       //Need object assign to create a new object, to hinder mutating a prop
       Object.assign(
@@ -95,11 +96,15 @@ export default defineComponent({
 
     const roomCodeStatus = ref(InputFieldFeedbackStatus.NONE);
     const checkRoomCodeValidity = () => {
-      //TODO: Check if roomCode already exists
-      roomCodeStatus.value =
-        registerInformation.roomCode.trim() !== ""
-          ? InputFieldFeedbackStatus.SUCCESS
-          : InputFieldFeedbackStatus.ERROR;
+      if(registerInformation.roomCode.trim() === ""){
+        roomCodeInputError.value = "Enter a room code";
+        roomCodeStatus.value = InputFieldFeedbackStatus.ERROR;
+      }
+      else if(!(/^[A-Za-z0-9-_æøåÆØÅ]{4,}$/i).test(registerInformation.roomCode.trim())){
+        roomCodeInputError.value = "Syntax error: Use only alfabet, numbers, -, _, no spaces and length must be grater than 3"
+        roomCodeStatus.value = InputFieldFeedbackStatus.ERROR;
+      }
+      else roomCodeStatus.value = InputFieldFeedbackStatus.SUCCESS;
     };
 
     const sectionsStatus = ref(InputFieldFeedbackStatus.NONE);
@@ -135,6 +140,7 @@ export default defineComponent({
     const statuses = ref([roomCodeStatus, sectionsStatus]);
 
     return {
+      roomCodeInputError,
       sectionInput,
       registerInformation,
       roomCodeStatus,

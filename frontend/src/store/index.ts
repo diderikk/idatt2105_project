@@ -8,6 +8,7 @@ import POSTReservation from "@/interfaces/Reservation/POSTReservation.interface"
 import Reservation from "@/interfaces/Reservation/Reservation.interface";
 import ReservationSorting from "@/interfaces/Reservation/ReservationSorting.interface";
 import Room from "@/interfaces/Room/Room.interface";
+import EditRoom from "@/interfaces/Room/EditRoom.interface";
 
 export interface State {
   user: string;
@@ -316,11 +317,11 @@ export const store = createStore<State>({
         return false;
       }
     },
-    async editRoom({ commit }, editRoom:{room: Room, roomCode: string}) {
+    async editRoom({ commit }, editRoom: EditRoom) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       console.log(editRoom);
       try {
-        await backend.post(`/rooms/${editRoom.roomCode}`, editRoom.room);
+        await backend.post(`/rooms/${editRoom.originalRoomCode}`, {roomCode: editRoom.roomCode, sections: editRoom.sections} as Room);
 
         commit("setSnackbar", {
           title: "Room edited",
