@@ -1,11 +1,14 @@
 package idatt2105.backend.Service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -24,7 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
-import idatt2105.backend.Exception.EmailAlreadyExistsException;
+import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
@@ -33,6 +36,8 @@ import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.UserSecurityDetails;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
+import idatt2105.backend.Model.DTO.GETRoomDTO;
+import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.POSTUserDTO;
@@ -86,6 +91,8 @@ public class UserServiceTests {
         reservation.setReservationId(1);
         reservation.setReservationText("reservationText");
         reservation.setAmountOfPeople(1);
+        reservation.setStartTime(LocalDateTime.of(2001, 1, 1, 1, 1, 1));
+        reservation.setEndTime(LocalDateTime.of(2001, 1, 1, 3, 1, 1));
         reservation.setUser(user);
         ArrayList<Reservation> reservations = new ArrayList<>();
         reservations.add(reservation);
@@ -135,6 +142,9 @@ public class UserServiceTests {
         Mockito.lenient()
         .when(sectionRepository.findSectionBySectionNameAndRoomCode("sectionName", "roomCode"))
         .thenReturn(Optional.of(section));
+
+        Mockito.lenient().when(userRepository.existsById(user.getUserId()))
+        .thenReturn(true);
     }
 
     @Test
@@ -150,13 +160,13 @@ public class UserServiceTests {
     }
     
     @Test
-    public void getUser_IdDoesNotExist_UserIsNull() throws NotFoundException
+    public void getUser_IdDoesNotExist_ThrowsNotFoundException() throws NotFoundException
     {
         assertThrows(NotFoundException.class, () -> userService.getUser(0L));
     }
 
     @Test
-    public void createUser_InputIsCorrect_UserCreated() throws EmailAlreadyExistsException
+    public void createUser_InputIsCorrect_UserCreated() throws AlreadyExistsException
     {
         userDTO.setEmail("email123");
         GETUserDTO temp = userService.createUser(userDTO);
@@ -170,16 +180,16 @@ public class UserServiceTests {
     }
 
     @Test
-    public void createUser_InputIsWrong_UserNotCreated() throws EmailAlreadyExistsException
+    public void createUser_InputIsWrong_ThrowsAlreadyExistsException() throws AlreadyExistsException
     {
         POSTUserDTO temp = new POSTUserDTO("firstName", "lastName", "email", "phoneNumber", null, false);
         Mockito.lenient().when(userRepository.findUserByEmail(temp.getEmail()))
         .thenReturn(Optional.of(this.user));
-        assertThrows(EmailAlreadyExistsException.class, () -> userService.createUser(userDTO));
+        assertThrows(AlreadyExistsException.class, () -> userService.createUser(userDTO));
     }
 
     @Test
-    public void editUser_InputIsCorrect_UserEdited() throws NotFoundException, EmailAlreadyExistsException{
+    public void editUser_InputIsCorrect_UserEdited() throws NotFoundException, AlreadyExistsException{
         POSTUserDTO temp = new POSTUserDTO("firstNameEdited", "lastNameEdited", "emailEdited", "phoneNumberEdited", null, false);
         user.setFirstName(temp.getFirstName());
         user.setLastName(temp.getLastName());
@@ -203,7 +213,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void changePassword_OldPasswordIsWrong_PasswordNotChanged() throws ValidationException, NotFoundException
+    public void changePassword_OldPasswordIsWrong_ThrowsValidationException() throws ValidationException, NotFoundException
     {
         Mockito.lenient().when(passwordEncoder.matches(any(), any()))
         .thenReturn(false);
@@ -219,7 +229,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void getUserReservations_WrongId_ReturnsEmptyList() throws NotFoundException
+    public void getUserReservations_WrongId_ThrowsNotFoundException() throws NotFoundException
     {
         assertThrows(NotFoundException.class, () -> userService.getUserReservations(0));
     }
@@ -236,7 +246,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void addUserReservation_WrongSectionId_ReservationNotAdded() throws NotFoundException, SectionAlreadyBookedException
+    public void addUserReservation_WrongSectionId_ThrowsNotFoundException() throws NotFoundException, SectionAlreadyBookedException
     {
         user.setReservations(new ArrayList<>());
         List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO("fake", room.getRoomCode()));
@@ -246,7 +256,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void addUserReservation_WrongUserId_ReservationNotAdded() throws NotFoundException, SectionAlreadyBookedException
+    public void addUserReservation_WrongUserId_ThrowsNotFoundException() throws NotFoundException, SectionAlreadyBookedException
     {
         user.setReservations(new ArrayList<>());
         List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO("sectionName", room.getRoomCode()));
@@ -256,7 +266,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void removeUserReservation_WrongUserId_ReturnsFalse() throws NotFoundException
+    public void removeUserReservation_WrongUserId_ThrowsNotFoundException() throws NotFoundException
     {
         assertThrows(NotFoundException.class, () -> userService.removeUserReservation(0, 1));
     }
@@ -273,7 +283,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void loadUserByUsername_WrongUserId_ExceptionsThrown()
+    public void loadUserByUsername_WrongUserId_ThrowsNoSuckElementException()
     {
         assertThrows(NoSuchElementException.class, () -> userService.loadUserByUsername("email1"));
     }
@@ -285,7 +295,91 @@ public class UserServiceTests {
     }
 
     @Test
-    public void deleteUser_WrongId_ExceptionThrown() throws NotFoundException{
+    public void deleteUser_WrongId_ThrowsNotFoundException() throws NotFoundException{
         assertThrows(NotFoundException.class, () -> userService.deleteUser(0));
     }
+
+    @Test
+    public void getSumTimeInHoursOfAllUserReservations_UserExists_ReturnsFloatSum() throws NotFoundException {
+        Mockito.lenient()
+        .when(userRepository.getSumTimeInHoursOfAllUserReservations(user.getUserId()))
+        .thenReturn(Optional.of(Duration.between(reservation.getStartTime(), reservation.getEndTime()).toHours()));
+
+        Long sum = userService.getSumTimeInHoursOfAllUserReservations(user.getUserId());
+        assertNotNull(sum);
+        assertEquals(Duration.between(reservation.getStartTime(), reservation.getEndTime()).toHours(), sum);
+    }
+
+    @Test
+    public void getSumTimeInHoursOfAllUserReservations_UserDoesNotExists_ThrowsNotFoundException() throws NotFoundException {
+        assertThrows(NotFoundException.class, () -> userService.getSumTimeInHoursOfAllUserReservations(-1));
+    }
+
+    @Test
+    public void getReservationCountOfUser_UserExists_ReturnsIntegerCount() throws NotFoundException {
+        Mockito.lenient()
+        .when(userRepository.getResevationCountOfUser(user.getUserId()))
+        .thenReturn(Optional.of(user.getReservations().size()));
+
+        Integer count = userService.getResevationCountOfUser(user.getUserId());
+        assertNotNull(count);
+        assertEquals(user.getReservations().size(), count);
+    }
+
+    @Test
+    public void getReservationCountOfUser_UserDoesNotExists_ThrowsNotFoundException() throws NotFoundException {
+        assertThrows(NotFoundException.class, () -> userService.getResevationCountOfUser(-1));
+    }
+    
+    @Test
+    public void getTopUsers_FindsTopUsers_ReturnsListOfUsers() {
+        Mockito.lenient()
+        .when(userRepository.getTopUsers())
+        .thenReturn(List.of(user));
+
+        List<GETUserDTO> users = userService.getTopUsers();
+        assertNotNull(users);
+        assertThat(!users.isEmpty());
+        assertEquals(user.getUserId(), users.get(0).getUserId());
+        assertEquals(user.getEmail(), users.get(0).getEmail());
+        assertEquals(user.getFirstName(), users.get(0).getFirstName());
+        assertEquals(user.getLastName(), users.get(0).getLastName());
+    }
+
+
+    @Test
+    public void getFavouriteRoomOfUser_UserExists_ReturnsRoom() throws NotFoundException {
+        Mockito.lenient()
+        .when(userRepository.getFavouriteRoomOfUser(user.getUserId()))
+        .thenReturn(Optional.of(room));
+
+        GETRoomDTO roomDTO = userService.getFavouriteRoomOfUser(user.getUserId());
+        assertNotNull(roomDTO);
+        assertEquals(room.getRoomCode(), roomDTO.getRoomCode());
+        assertEquals(room.getSections(), roomDTO.getSections());
+    }
+
+    @Test
+    public void getFavouriteRoomOfUser_UserDoesNotExists_ThrowsNotFoundException() throws NotFoundException {
+        assertThrows(NotFoundException.class, () -> userService.getFavouriteRoomOfUser(-1));
+    }
+
+    @Test
+    public void getFavouriteSectionOfUser_UserExists_ReturnsRoom() throws NotFoundException {
+        Mockito.lenient()
+        .when(userRepository.getFavouriteSectionOfUser(user.getUserId()))
+        .thenReturn(Optional.of(section));
+
+        GETSectionDTO sectionDTO = userService.getFavouriteSectionOfUser(user.getUserId());
+        assertNotNull(sectionDTO);
+        assertEquals(section.getSectionId(), sectionDTO.getSectionId());
+        assertEquals(section.getSectionName(), sectionDTO.getSectionName());
+        assertEquals(section.getRoom().getRoomCode(), sectionDTO.getRoomCode());
+    }
+
+    @Test
+    public void getFavouriteSectionOfUser_UserDoesNotExists_ThrowsNotFoundException() throws NotFoundException {
+        assertThrows(NotFoundException.class, () -> userService.getFavouriteSectionOfUser(-1));
+    }
+
 }

@@ -1,7 +1,9 @@
 package idatt2105.backend.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,20 +15,24 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionNameInRoomAlreadyExistsException;
 import idatt2105.backend.Exception.SectionNotOfThisRoomException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
-import idatt2105.backend.Model.DTO.RoomDTO;
+import idatt2105.backend.Model.DTO.GETRoomDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.GETSectionDTO;
+import idatt2105.backend.Model.DTO.POSTRoomDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
+import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import javassist.NotFoundException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,6 +51,9 @@ public class RoomServiceTest {
 
     @Mock
     private SectionRepository sectionRepository;
+
+    @Mock
+    private ReservationRepository reservationRepository;
 
     Room room1;
     Room room2;
@@ -77,11 +86,13 @@ public class RoomServiceTest {
         section1 = new Section();
         section1.setRoom(room1);
         section1.setSectionId(1);
+        section1.setSectionName("Section1");
         section1.setReservations(List.of(reservation1, reservation2));
 
         section2 = new Section();
         section2.setRoom(room1);
         section2.setSectionId(2);
+        section2.setSectionName("Section2");
 
         room1.setSections(List.of(section1, section2));
 
@@ -109,12 +120,19 @@ public class RoomServiceTest {
         Mockito.lenient()
         .when(roomRepository.findAll())
         .thenReturn(List.of(room1, room2));
+
+        Mockito.lenient()
+        .when(sectionRepository.getAllReservationIdsOfSection(section1.getSectionId()))
+        .thenReturn(List.of(reservation1.getReservationId(), reservation2.getReservationId()));
+        Mockito.lenient()
+        .when(sectionRepository.getAllReservationIdsOfSection(section2.getSectionId()))
+        .thenReturn(null);
     }
 
     @Test
     public void getRoom_IdExists_RoomIsCorrect() throws NotFoundException
     {
-        RoomDTO roomDTO = roomService.getRoom(room1.getRoomCode());
+        GETRoomDTO roomDTO = roomService.getRoom(room1.getRoomCode());
         assertNotNull(roomDTO);
         assertThat(roomDTO.getRoomCode()).isEqualTo(room1.getRoomCode());
         assertThat(roomDTO.getSections().get(0).getSectionId()).isEqualTo(room1.getSections().get(0).getSectionId());
@@ -122,7 +140,7 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void getRoom_IdDoesNotExists_ReturnsNull() throws NotFoundException
+    public void getRoom_IdDoesNotExists_ThrowsNotFoundException() throws NotFoundException
     {
         assertThrows(NotFoundException.class, () -> roomService.getRoom("-1"));
     }
@@ -130,7 +148,7 @@ public class RoomServiceTest {
     @Test
     public void getRooms_RoomsExists_ReturnsListOfRooms()
     {
-        List<RoomDTO> rooms = roomService.getRooms();
+        List<GETRoomDTO> rooms = roomService.getRooms();
         assertNotNull(rooms);
         assertThat(rooms.get(0).getRoomCode()).isEqualTo(room1.getRoomCode());
         assertThat(rooms.get(0).getSections().get(0).getSectionId()).isEqualTo(room1.getSections().get(0).getSectionId());
@@ -148,19 +166,19 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void getSectionOfRoom_RoomNotExist_ReturnsNull() throws NotFoundException
+    public void getSectionOfRoom_RoomNotExist_ThrowsNotFoundException() throws NotFoundException
     {
         assertThrows(NotFoundException.class, () -> roomService.getSectionOfRoom("-1", section1.getSectionId()));
     }
 
     @Test
-    public void getSectionOfRoom_SectionNotExist_ReturnsNull() throws NotFoundException
+    public void getSectionOfRoom_SectionNotExist_ThrowsNotFoundException() throws NotFoundException
     {
         assertThrows(NotFoundException.class, () -> roomService.getSectionOfRoom(room1.getRoomCode(), -1));
     }
 
     @Test
-    public void getSectionOfRoom_SectionNotInRightRoom_ReturnsNull() throws NotFoundException
+    public void getSectionOfRoom_SectionNotInRightRoom_ThrowsNullPointerException() throws NotFoundException
     {
         assertThrows(NullPointerException.class, () -> roomService.getSectionOfRoom(room2.getRoomCode(), section1.getSectionId()));
     }
@@ -177,13 +195,13 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void getSectionsOfRoom_RoomNotExist_ReturnsEmptyList() throws NotFoundException
+    public void getSectionsOfRoom_RoomNotExist_ThrowsNotFoundException() throws NotFoundException
     {
         assertThrows(NotFoundException.class, () -> roomService.getSectionsOfRoom("-1"));
     }
 
     @Test
-    public void getSectionsOfRoom_RoomHasNoSections_ReturnsEmptyList() throws NotFoundException
+    public void getSectionsOfRoom_RoomHasNoSections_ThrowsNullPointerException() throws NotFoundException
     {
         assertThrows(NullPointerException.class, () -> roomService.getSectionsOfRoom(room2.getRoomCode()));
     }
@@ -192,34 +210,68 @@ public class RoomServiceTest {
     public void createRoom_UsingRoomId_ReturnsRoom()
     {
         String roomCode = "A3";
-        RoomDTO room = roomService.createRoom(roomCode);
+        Mockito.lenient().when(roomRepository.findById(roomCode)).thenReturn(null);
+        GETRoomDTO room = roomService.createRoom(roomCode);
         assertNotNull(room);
         assertThat(room.getRoomCode()).isEqualTo(roomCode);
     }
 
     @Test
-    public void createRoom_UsingRoomDTO_ReturnsRoom()
+    public void createRoom_UsingRoomDTO_ReturnsRoom() throws AlreadyExistsException
     {
         String roomCode = "A3";
-        RoomDTO roomDTO = new RoomDTO();
+        POSTRoomDTO roomDTO = new POSTRoomDTO();
         roomDTO.setRoomCode(roomCode);
 
-        GETSectionDTO section3 = new GETSectionDTO();
+        POSTSectionDTO section3 = new POSTSectionDTO();
         section3.setRoomCode(roomCode);
-        section3.setSectionId(2);
+        section3.setSectionName("sectionName3");
 
-        GETSectionDTO section4 = new GETSectionDTO();
+        POSTSectionDTO section4 = new POSTSectionDTO();
         section4.setRoomCode(roomCode);
-        section4.setSectionId(3);
+        section4.setSectionName("sectionName4");
 
         roomDTO.setSections(List.of(section3, section4));
 
-        RoomDTO room = roomService.createRoom(roomDTO);
+        Room temp = new Room();
+        temp.setRoomCode(roomCode);
+        Mockito.when(roomRepository.save(temp)).thenReturn(temp);
+
+        GETRoomDTO room = roomService.createRoom(roomDTO);
         assertNotNull(room);
         assertThat(room.getRoomCode()).isEqualTo(roomCode);
-        assertThat(room.getSections().get(0).getSectionId()).isEqualTo(section3.getSectionId());
+        assertThat(room.getSections().get(0).getSectionName()).isEqualTo(section3.getSectionName());
         assertThat(room.getSections().get(0).getRoomCode()).isEqualTo(section3.getRoomCode());
-        assertThat(room.getSections().get(1).getSectionId()).isEqualTo(section4.getSectionId());
+        assertThat(room.getSections().get(1).getSectionName()).isEqualTo(section4.getSectionName());
+        assertThat(room.getSections().get(1).getRoomCode()).isEqualTo(section4.getRoomCode());
+    }
+
+    @Test
+    public void editRoom_CorrectInput_Returns() throws AlreadyExistsException, NotFoundException {
+        String roomCode = "A3";
+        POSTRoomDTO roomDTO = new POSTRoomDTO();
+        roomDTO.setRoomCode(roomCode);
+
+        POSTSectionDTO section3 = new POSTSectionDTO();
+        section3.setRoomCode(roomCode);
+        section3.setSectionName("sectionName3");
+
+        POSTSectionDTO section4 = new POSTSectionDTO();
+        section4.setRoomCode(roomCode);
+        section4.setSectionName("sectionName4");
+
+        roomDTO.setSections(List.of(section3, section4));
+
+        Room temp = new Room();
+        temp.setRoomCode(roomCode);
+        Mockito.when(roomRepository.save(temp)).thenReturn(temp);
+
+        GETRoomDTO room = roomService.editRoom(room1.getRoomCode(), roomDTO);
+        assertNotNull(room);
+        assertThat(room.getRoomCode()).isEqualTo(roomCode);
+        assertThat(room.getSections().get(0).getSectionName()).isEqualTo(section3.getSectionName());
+        assertThat(room.getSections().get(0).getRoomCode()).isEqualTo(section3.getRoomCode());
+        assertThat(room.getSections().get(1).getSectionName()).isEqualTo(section4.getSectionName());
         assertThat(room.getSections().get(1).getRoomCode()).isEqualTo(section4.getRoomCode());
     }
 
@@ -242,7 +294,7 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void getReservationsOfRoom_RoomDoesNotExists_ReturnsNull() throws NotFoundException
+    public void getReservationsOfRoom_RoomDoesNotExists_ThrowsNotFoundException() throws NotFoundException
     {
         assertThrows(NotFoundException.class, () -> roomService.getReservationsOfRoom("-1"));
     }
@@ -274,13 +326,13 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void getReservationsOfSection_SectionDoesNotExists_ReturnsNull() throws NotFoundException, SectionNotOfThisRoomException
+    public void getReservationsOfSection_SectionDoesNotExists_ThrowsNotFoundException() throws NotFoundException, SectionNotOfThisRoomException
     {
         assertThrows(NotFoundException.class, () -> roomService.getReservationsOfSection(room1.getRoomCode(), -1));
     }
 
     @Test
-    public void getReservationsOfSection_SectionIsNotOfThisRoom_ReturnsNull() throws NotFoundException, SectionNotOfThisRoomException
+    public void getReservationsOfSection_SectionIsNotOfThisRoom_ThrowsSectionNotOfThisRoomException() throws NotFoundException, SectionNotOfThisRoomException
     {
         assertThrows(SectionNotOfThisRoomException.class, () -> roomService.getReservationsOfSection(room2.getRoomCode(), section1.getSectionId()));
     }
@@ -291,14 +343,14 @@ public class RoomServiceTest {
         POSTSectionDTO sectionDTO = new POSTSectionDTO();
         sectionDTO.setRoomCode(room2.getRoomCode());
         sectionDTO.setSectionName("Section");
-        RoomDTO room = roomService.addSectionToRoom(sectionDTO);
+        GETRoomDTO room = roomService.addSectionToRoom(sectionDTO);
         assertNotNull(room);
         assertThat(room.getRoomCode()).isEqualTo(sectionDTO.getRoomCode());
         assertFalse(room.getSections().isEmpty());
     }
 
     @Test
-    public void addSectionToRoom_RoomDoeNotExist_ReturnsNull() throws NotFoundException, SectionNameInRoomAlreadyExistsException
+    public void addSectionToRoom_RoomDoeNotExist_ThrowsNotFoundException() throws NotFoundException, SectionNameInRoomAlreadyExistsException
     {
         POSTSectionDTO sectionDTO = new POSTSectionDTO();
         sectionDTO.setRoomCode("-1");
@@ -316,25 +368,87 @@ public class RoomServiceTest {
     @Test
     public void deleteSectionOfRoom_SectionIsDeleted_ReturnsTrue() throws NotFoundException, SectionNotOfThisRoomException
     {
+        Mockito.lenient()
+        .when(sectionRepository.getAllReservationIdsOfSection(section2.getSectionId()))
+        .thenReturn(null);
+
         boolean isDeleted = roomService.deleteSectionOfRoom(room1.getRoomCode(), section2.getSectionId());
         assertTrue(isDeleted);
     }
 
     @Test
-    public void deleteSectionOfRoom_SectionDoesNotExist_ReturnsFalse() throws NotFoundException, SectionNotOfThisRoomException
+    public void deleteSectionOfRoom_SectionDoesNotExist_ThrowsNotFoundException() throws NotFoundException, SectionNotOfThisRoomException
     {
         assertThrows(NotFoundException.class, () -> roomService.deleteSectionOfRoom(room1.getRoomCode(), -1));
     }
 
     @Test
-    public void deleteSectionOfRoom_RoomDoesNotExist_ReturnsFalse() throws NotFoundException, SectionNotOfThisRoomException
+    public void deleteSectionOfRoom_RoomDoesNotExist_ThrowsNotFoundException() throws NotFoundException, SectionNotOfThisRoomException
     {
         assertThrows(NotFoundException.class, () -> roomService.deleteSectionOfRoom("-1", section2.getSectionId()));
     }
 
     @Test
-    public void deleteSectionOfRoom_SectionIsNotOfThisRoom_ReturnsFalse() throws NotFoundException, SectionNotOfThisRoomException
+    public void deleteSectionOfRoom_SectionIsNotOfThisRoom_ThrowsSectionNotOfthisRoomException() throws NotFoundException, SectionNotOfThisRoomException
     {
         assertThrows(SectionNotOfThisRoomException.class, () -> roomService.deleteSectionOfRoom(room2.getRoomCode(), section2.getSectionId()));
+    }
+
+    @Test
+    public void getTopRooms_FindsAllTopRooms_ReturnsListOfRooms() {
+        int amountReservationsSection1 = (section1.getReservations() == null) ? 0 : section1.getReservations().size();
+        int amountReservationsSection2 = (section2.getReservations() == null) ? 0 : section2.getReservations().size();
+        Room roomA = section1.getRoom();
+        Room roomB = section2.getRoom();
+
+        if(roomA.getRoomCode().equals(roomB.getRoomCode())) {
+            if(room1.getRoomCode().equals(roomA.getRoomCode())) {
+                Mockito.lenient()
+                .when(roomRepository.getTopRooms())
+                .thenReturn(List.of(room1, room2));
+            } else {
+                Mockito.lenient()
+                .when(roomRepository.getTopRooms())
+                .thenReturn(List.of(room2, room1));
+            }
+        } else {
+            if(amountReservationsSection1 > amountReservationsSection2) {
+                Mockito.lenient()
+                .when(roomRepository.getTopRooms())
+                .thenReturn(List.of(roomA, roomB));
+            } else {
+                Mockito.lenient()
+                .when(roomRepository.getTopRooms())
+                .thenReturn(List.of(roomB, roomA));
+            }
+        }
+
+        List<GETRoomDTO> rooms = roomService.getTopRooms();
+        assertNotNull(rooms);
+        assertThat(rooms.get(0).getRoomCode()).isEqualTo(room1.getRoomCode());
+        assertThat(rooms.get(0).getSections().get(0).getSectionId()).isEqualTo(room1.getSections().get(0).getSectionId());
+        assertThat(rooms.get(0).getSections().get(1).getSectionId()).isEqualTo(room1.getSections().get(1).getSectionId());
+        assertThat(rooms.get(1).getRoomCode()).isEqualTo(room2.getRoomCode());
+    }
+
+    @Test
+    public void getTotalTimeBooked_RoomExists_ReturnsFloat() throws NotFoundException {
+        Long sum = 0L;
+        for(Section section : room1.getSections()) {
+            if(section.getReservations() != null) {
+                for(Reservation reservation : section.getReservations()) {
+                    long hours = Duration.between(reservation.getStartTime(), reservation.getEndTime()).toHours();
+                    sum += hours;
+                }
+            }
+        }
+
+        Mockito.lenient()
+        .when(roomRepository.getTotalHoursBooked(room1.getRoomCode()))
+        .thenReturn(Optional.of(sum));
+
+        Long totalTime = roomService.getTotalHoursBooked(room1.getRoomCode());
+        assertNotNull(totalTime);
+        assertEquals(sum, totalTime);
     }
 }

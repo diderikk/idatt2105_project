@@ -11,7 +11,7 @@
       color="white"
     ></pulse-loader>
     <p v-else :class="{ error: isError, success: isSuccess }">
-      {{ snackbar.title }}
+      {{ snackbar.content }}
     </p>
   </div>
 </template>
