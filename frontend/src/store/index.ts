@@ -32,11 +32,15 @@ export const store = createStore<State>({
   mutations: {
     setToken(state, token: string) {
       state.token = token;
-      localStorage.setItem("token", state.token);
+      state.token === ""
+        ? localStorage.removeItem("token")
+        : localStorage.setItem("token", state.token);
     },
     setUser(state, user) {
       state.user = JSON.stringify(user);
-      localStorage.setItem("user", state.user);
+      user === ""
+        ? localStorage.removeItem("user")
+        : localStorage.setItem("user", state.user);
     },
     setSnackbar(state, snackbar) {
       state.snackbar = snackbar;
@@ -67,7 +71,7 @@ export const store = createStore<State>({
       //Not letting users that aren't admins create users
       if (!getters.getUser.isAdmin) {
         commit("setSnackbar", {
-          title: "Only admins can create users",
+          content: "Only admins can create users",
           status: SnackbarStatus.ERROR,
         });
         return false;
@@ -76,13 +80,13 @@ export const store = createStore<State>({
       try {
         await backend.post("/users", user);
         commit("setSnackbar", {
-          title: `User with email: ${user.email} created`,
+          content: `User with email: ${user.email} created`,
           status: SnackbarStatus.SUCCESS,
         });
         return true;
       } catch (error) {
         commit("setSnackbar", {
-          title: "Could not create user",
+          content: "Could not create user",
           status: SnackbarStatus.ERROR,
         });
         return false;
@@ -103,7 +107,7 @@ export const store = createStore<State>({
         return true;
       } catch (error) {
         commit("setSnackbar", {
-          title: "Error could not log in",
+          content: "Error could not log in",
           status: SnackbarStatus.ERROR,
         });
         return false;
@@ -113,7 +117,7 @@ export const store = createStore<State>({
       //Not letting users that aren't admins delete other users
       if (!getters.getUser.isAdmin) {
         commit("setSnackbar", {
-          title: "Only admins can create users",
+          content: "Only admins can create users",
           status: SnackbarStatus.ERROR,
         });
         return false;
@@ -121,7 +125,7 @@ export const store = createStore<State>({
       //Not wanting to be able to delete other admins
       if (user.isAdmin) {
         commit("setSnackbar", {
-          title: "Cannot delete other admins",
+          content: "Cannot delete other admins",
           status: SnackbarStatus.ERROR,
         });
         return false;
@@ -130,13 +134,13 @@ export const store = createStore<State>({
       try {
         await backend.delete("/users", user);
         commit("setSnackbar", {
-          title: `User with email: ${user.email} created`,
+          content: `User with email: ${user.email} created`,
           status: SnackbarStatus.SUCCESS,
         });
         return true;
       } catch (error) {
         commit("setSnackbar", {
-          title: "Could not delete user",
+          content: "Could not delete user",
           status: SnackbarStatus.ERROR,
         });
         return false;
@@ -145,17 +149,9 @@ export const store = createStore<State>({
     logout({ commit }) {
       commit("setToken", "");
       commit("setUser", "");
+      delete backend.defaults.headers["Authorization"];
     },
-    async getUser({ commit, getters }, userId: number) {
-      const currentUser = getters.getUser;
-      //Not letting users that aren't admins delete other users
-      if (!currentUser.isAdmin && currentUser.userId !== userId) {
-        commit("setSnackbar", {
-          title: "Not access to get user",
-          status: SnackbarStatus.ERROR,
-        });
-        return null;
-      }
+    async getUser({ commit }, userId: number) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         const response = await backend.get(`/users/${userId}`);
@@ -163,9 +159,25 @@ export const store = createStore<State>({
         return response.data;
       } catch (error) {
         commit("setSnackbar", {
-          title: "Could not get user",
+          content: "Could not get user",
           status: SnackbarStatus.ERROR,
         });
+        return null;
+      }
+    },
+    async getUsers({ commit }) {
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        const response = await backend.get("/users");
+        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        return response.data;
+      } catch (error) {
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not get users",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
@@ -178,19 +190,19 @@ export const store = createStore<State>({
         );
 
         commit("setSnackbar", {
-          title: "Reservation created",
+          content: "Reservation created",
           status: SnackbarStatus.SUCCESS,
         });
         return true;
       } catch (error) {
         if (error.response.status === 400) {
           commit("setSnackbar", {
-            title: "Already occupied",
+            content: "Already occupied",
             status: SnackbarStatus.ERROR,
           });
         } else {
           commit("setSnackbar", {
-            title: "Could not create reservation",
+            content: "Could not create reservation",
             status: SnackbarStatus.ERROR,
           });
         }
@@ -202,13 +214,13 @@ export const store = createStore<State>({
       try {
         await backend.post(`/reservations/${reservation.id}`, reservation);
         commit("setSnackbar", {
-          title: "Reservation edited",
+          content: "Reservation edited",
           status: SnackbarStatus.SUCCESS,
         });
         return true;
       } catch (error) {
         commit("setSnackbar", {
-          title: "Reservation could not be edited",
+          content: "Reservation could not be edited",
           status: SnackbarStatus.ERROR,
         });
         return false;
@@ -219,13 +231,13 @@ export const store = createStore<State>({
       try {
         await backend.delete(`/reservations/${reservationId}`);
         commit("setSnackbar", {
-          title: "Reservation deleted",
+          content: "Reservation deleted",
           status: SnackbarStatus.SUCCESS,
         });
         return true;
       } catch (error) {
         commit("setSnackbar", {
-          title: "Reservation could not be deleted",
+          content: "Reservation could not be deleted",
           status: SnackbarStatus.ERROR,
         });
         return false;
@@ -239,7 +251,7 @@ export const store = createStore<State>({
         return response.data;
       } catch (error) {
         commit("setSnackbar", {
-          title: "Could not find a reservation",
+          content: "Could not find a reservation",
           status: SnackbarStatus.ERROR,
         });
         return null;
@@ -256,7 +268,7 @@ export const store = createStore<State>({
         return response.data;
       } catch (error) {
         commit("setSnackbar", {
-          title: "Could not find any reservations",
+          content: "Could not find any reservations",
           status: SnackbarStatus.ERROR,
         });
         return null;
@@ -270,7 +282,7 @@ export const store = createStore<State>({
         return response.data;
       } catch (error) {
         commit("setSnackbar", {
-          title: "Could not find any reservations",
+          content: "Could not find any reservations",
           status: SnackbarStatus.ERROR,
         });
         return null;
@@ -282,20 +294,19 @@ export const store = createStore<State>({
         await backend.post("/rooms", room);
 
         commit("setSnackbar", {
-          title: "Reservation created",
+          content: "Reservation created",
           status: SnackbarStatus.SUCCESS,
         });
         return true;
       } catch (error) {
-        if(error.response.status === 400){
+        if (error.response.status === 400) {
           commit("setSnackbar", {
-            title: "Room code is already occupied",
+            content: "Room code is already occupied",
             status: SnackbarStatus.ERROR,
           });
-        }
-        else{
+        } else {
           commit("setSnackbar", {
-            title: "Could not create room",
+            content: "Could not create room",
             status: SnackbarStatus.ERROR,
           });
         }

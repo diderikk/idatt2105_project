@@ -79,6 +79,15 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/LogIn.vue"),
   },
   {
+    path: "/users",
+    name: "UserFeed",
+    meta: {
+      title: "Users",
+      permission: "Admin",
+    },
+    component: () => import("../views/UserFeed.vue"),
+  },
+  {
     path: "/:catchAll(.*)",
     name: "NotFound",
     component: () => import("../views/PageNotFound.vue"),
