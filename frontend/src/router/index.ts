@@ -102,10 +102,10 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/LogIn.vue"),
   },
   {
-    path: "/reservation-feed",
+    path: "/reservations",
     name: "ReservationFeed",
     meta: {
-      title: "Reservation feed",
+      title: "Reservation Feed",
       parmission: "User",
     },
     component: () => import("../views/ReservationFeed.vue"),

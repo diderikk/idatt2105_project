@@ -4,22 +4,22 @@
       <h2 class="card-header-title">{{ reservation.roomCode }}</h2>
     </div>
     <div class="card-content">
+      <label class="label">Sections:</label>
+      <ul class="menu-list">
+        <li
+          v-for="(section, index) in sectionsSortedAlphabetically"
+          :key="index"
+        >
+          {{ section }}
+        </li>
+      </ul>
       <div class="content">
-        <label class="label">Sections:</label>
-        <ul>
-          <li
-            v-for="(section, index) in sectionsSortedAlphabetically"
-            :key="index"
-          >
-            {{ section }}
-          </li>
-        </ul>
         <label class="label">Description:</label>
         <p>
           {{
             reservation.reservationText.length > 0
               ? reservation.reservationText
-              : None
+              : "None"
           }}
         </p>
         <label class="label">Partcipants: </label>
@@ -116,4 +116,12 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.card {
+  margin: 25px 0;
+}
+
+li {
+  margin: 10px 10px;
+}
+</style>

@@ -4,7 +4,7 @@
       <p class="card-header-title">{{ room.roomCode }}</p>
     </div>
     <div class="card-content">
-      <p class="menu-label">Sections</p>
+      <label class="label">Sections:</label>
       <ul class="menu-list">
         <li v-for="(section, index) in room.sections" :key="index">
           {{ section.sectionName }}

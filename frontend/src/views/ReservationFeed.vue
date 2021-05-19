@@ -2,18 +2,21 @@
   <div>
     <input type="text" class="input" placeholder="Search" />
 
-    <div v-for="(reservation, index) in reservations" :key="index">
+    <div v-if="reservations.length === 0" class="box">No users available</div>
+    <span v-else>
       <reservation-card
+        v-for="(reservation, index) in reservations"
+        :key="index"
         :reservation="reservation"
-        @delete="deleteReservation($event, id)"
-        class="reservation-card"
-      ></reservation-card>
-    </div>
+        @reload="reload(false)"
+        >{{ reservation }}</reservation-card
+      >
+    </span>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import ReservationCard from "../components/ReservationCard.vue";
 import Reservation from "../interfaces/Reservation/Reservation.interface";
 import { useStore } from "../store";
@@ -25,16 +28,12 @@ export default defineComponent({
     const store = useStore();
     const reservations = ref([] as Reservation[]);
 
-    const deleteReservation = (id: number) => {
-      reservations.value.splice(
-        reservations.value.findIndex(
-          (reservation) => reservation.reservationId === id
-        ),
-        1
-      );
-    };
-    onBeforeMount(async () => {
-      const response = await store.dispatch("getReservations");
+    onMounted(async () => {
+      await reload(true);
+    });
+
+    const reload = async (editSnackBar: boolean) => {
+      const response = await store.dispatch("getReservations", editSnackBar);
       if (response !== null) {
         reservations.value = response.map((reservation: Reservation) => {
           return {
@@ -43,11 +42,11 @@ export default defineComponent({
           };
         });
       }
-    });
+    };
 
     return {
       reservations,
-      deleteReservation,
+      reload,
     };
   },
 });
