@@ -33,7 +33,6 @@ export default defineComponent({
     const store = useStore();
     const searchInput = ref("");
     const rooms = ref([] as Room[]);
-    const isAdmin : Ref<Boolean> = ref(store.getters.getUser.isAdmin);
 
     onMounted(async () => {
       await reload(true);
@@ -57,6 +56,8 @@ export default defineComponent({
         for(const section of room.sections) if(section.sectionName.toLowerCase().startsWith(searchInput.value.toLowerCase())) return true;
         return false;
     };
+
+    const isAdmin = computed(() => store.getters.getUser.isAdmin);
 
     return {
       searchInput,
