@@ -41,6 +41,7 @@ import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.POSTUserDTO;
+import idatt2105.backend.Model.DTO.UserStatisticsDTO;
 import idatt2105.backend.Model.DTO.GETUserDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -298,38 +299,6 @@ public class UserServiceTests {
     public void deleteUser_WrongId_ThrowsNotFoundException() throws NotFoundException{
         assertThrows(NotFoundException.class, () -> userService.deleteUser(0));
     }
-
-    @Test
-    public void getSumTimeInHoursOfAllUserReservations_UserExists_ReturnsFloatSum() throws NotFoundException {
-        Mockito.lenient()
-        .when(userRepository.getSumTimeInHoursOfAllUserReservations(user.getUserId()))
-        .thenReturn(Optional.of(Duration.between(reservation.getStartTime(), reservation.getEndTime()).toHours()));
-
-        Long sum = userService.getSumTimeInHoursOfAllUserReservations(user.getUserId());
-        assertNotNull(sum);
-        assertEquals(Duration.between(reservation.getStartTime(), reservation.getEndTime()).toHours(), sum);
-    }
-
-    @Test
-    public void getSumTimeInHoursOfAllUserReservations_UserDoesNotExists_ThrowsNotFoundException() throws NotFoundException {
-        assertThrows(NotFoundException.class, () -> userService.getSumTimeInHoursOfAllUserReservations(-1));
-    }
-
-    @Test
-    public void getReservationCountOfUser_UserExists_ReturnsIntegerCount() throws NotFoundException {
-        Mockito.lenient()
-        .when(userRepository.getResevationCountOfUser(user.getUserId()))
-        .thenReturn(Optional.of(user.getReservations().size()));
-
-        Integer count = userService.getResevationCountOfUser(user.getUserId());
-        assertNotNull(count);
-        assertEquals(user.getReservations().size(), count);
-    }
-
-    @Test
-    public void getReservationCountOfUser_UserDoesNotExists_ThrowsNotFoundException() throws NotFoundException {
-        assertThrows(NotFoundException.class, () -> userService.getResevationCountOfUser(-1));
-    }
     
     @Test
     public void getTopUsers_FindsTopUsers_ReturnsListOfUsers() {
@@ -346,40 +315,34 @@ public class UserServiceTests {
         assertEquals(user.getLastName(), users.get(0).getLastName());
     }
 
-
     @Test
-    public void getFavouriteRoomOfUser_UserExists_ReturnsRoom() throws NotFoundException {
+    public void getStatistics_UserExists_ReturnsUserStatisticsDTO() throws NotFoundException {
+        Mockito.lenient()
+        .when(userRepository.getSumTimeInHoursOfAllUserReservations(user.getUserId()))
+        .thenReturn(Optional.of(Duration.between(reservation.getStartTime(), reservation.getEndTime()).toHours()));
+        
+        Mockito.lenient()
+        .when(userRepository.getResevationCountOfUser(user.getUserId()))
+        .thenReturn(Optional.of(user.getReservations().size()));
+        
         Mockito.lenient()
         .when(userRepository.getFavouriteRoomOfUser(user.getUserId()))
         .thenReturn(Optional.of(room));
-
-        GETRoomDTO roomDTO = userService.getFavouriteRoomOfUser(user.getUserId());
-        assertNotNull(roomDTO);
-        assertEquals(room.getRoomCode(), roomDTO.getRoomCode());
-        assertEquals(room.getSections(), roomDTO.getSections());
-    }
-
-    @Test
-    public void getFavouriteRoomOfUser_UserDoesNotExists_ThrowsNotFoundException() throws NotFoundException {
-        assertThrows(NotFoundException.class, () -> userService.getFavouriteRoomOfUser(-1));
-    }
-
-    @Test
-    public void getFavouriteSectionOfUser_UserExists_ReturnsRoom() throws NotFoundException {
+        
         Mockito.lenient()
         .when(userRepository.getFavouriteSectionOfUser(user.getUserId()))
         .thenReturn(Optional.of(section));
 
-        GETSectionDTO sectionDTO = userService.getFavouriteSectionOfUser(user.getUserId());
-        assertNotNull(sectionDTO);
-        assertEquals(section.getSectionId(), sectionDTO.getSectionId());
-        assertEquals(section.getSectionName(), sectionDTO.getSectionName());
-        assertEquals(section.getRoom().getRoomCode(), sectionDTO.getRoomCode());
+        UserStatisticsDTO userStatisticsDTO = userService.getStatistics(user.getUserId());
+        assertNotNull(userStatisticsDTO);
+        assertEquals(Duration.between(reservation.getStartTime(), reservation.getEndTime()).toHours(), userStatisticsDTO.getTotalHoursOfReservations());
+        assertEquals(user.getReservations().size(), userStatisticsDTO.getTotalReservations());
+        assertEquals(room.getRoomCode(), userStatisticsDTO.getFavouriteRoom().getRoomCode());
+        assertEquals(section.getSectionId(), userStatisticsDTO.getFavouriteSection().getSectionId());
     }
 
     @Test
-    public void getFavouriteSectionOfUser_UserDoesNotExists_ThrowsNotFoundException() throws NotFoundException {
-        assertThrows(NotFoundException.class, () -> userService.getFavouriteSectionOfUser(-1));
+    public void getStatistics_UserDoesNotExists_ThrowsNotFoundException() throws NotFoundException {
+        assertThrows(NotFoundException.class, () -> userService.getStatistics(-1));
     }
-
 }

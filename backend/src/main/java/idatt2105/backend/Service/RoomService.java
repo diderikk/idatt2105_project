@@ -24,6 +24,7 @@ import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.POSTRoomDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.TimeIntervalDTO;
+import idatt2105.backend.Model.DTO.RoomStatisticsDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -356,19 +357,25 @@ public class RoomService {
     }
 
     /**
-     * Get total time (in hours) a room has been booked before.
-     * Room is determined by roomCode parameter.
+     * Get statistics about a room, given by room code.
+     * Statistics such as total hours room has been booked/reserved.
      * @param roomCode
-     * @return Long of total time in hours
-     * @throws NotFoundException if room was not found
+     * @return RoomStatisticsDTO
+     * @throws NotFoundException
      */
-    public Long getTotalHoursBooked(String roomCode) throws NotFoundException {
-        LOGGER.info("getTotalHoursBooked(String roomCode) called with roomCode: {}", roomCode);
-        Optional<Long> sumOptional = roomRepository.getTotalHoursBooked(roomCode);
-        if(!sumOptional.isPresent()) {
-            throw new NotFoundException("No room found with room code: " + roomCode);
+    public RoomStatisticsDTO getStatistics(String roomCode) throws NotFoundException {
+        LOGGER.info("getStatistics(String roomCode) called with roomCode: {}", roomCode);
+        if(!roomRepository.existsById(roomCode)) {
+            LOGGER.warn("Could not find room with code: {}. Throwing exception", roomCode);
+            throw new NotFoundException("No room found with code: " + roomCode);
         }
-        return sumOptional.get();
+
+        Optional<Long> totalHoursBooked = roomRepository.getTotalHoursBooked(roomCode);
+        if(!totalHoursBooked.isPresent()) {
+            LOGGER.warn("Could not find total time booked of a room with code: {}. Throwing exception", roomCode);
+            throw new NotFoundException("Could not find total hours of reservations of a room with code: " + roomCode);
+        }
+        return new RoomStatisticsDTO(totalHoursBooked.get());
     }
 
     /**

@@ -20,6 +20,7 @@ import idatt2105.backend.Exception.SectionNotOfThisRoomException;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.TimeIntervalDTO;
+import idatt2105.backend.Model.DTO.RoomStatisticsDTO;
 import idatt2105.backend.Model.DTO.GETRoomDTO;
 import idatt2105.backend.Model.DTO.POSTRoomDTO;
 import idatt2105.backend.Service.RoomService;
@@ -168,11 +169,11 @@ public class RoomController {
         return new ResponseEntity<>(roomService.getTopRooms(), HttpStatus.OK);
     }
 
-    @GetMapping("/{room_code}/statistics/reservations-total-time")
+    @GetMapping("/{room_code}/statistics")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Long> getTotalTimeBooked(@PathVariable("room_code") String roomCode){
+    public ResponseEntity<RoomStatisticsDTO> getStatistics(@PathVariable("room_code") String roomCode){
         try {
-            return new ResponseEntity<>(roomService.getTotalHoursBooked(roomCode), HttpStatus.OK);
+            return new ResponseEntity<>(roomService.getStatistics(roomCode), HttpStatus.OK);
         } catch (NotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

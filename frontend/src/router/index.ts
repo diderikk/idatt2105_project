@@ -120,6 +120,16 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/UserFeed.vue"),
   },
   {
+    path: "/users/:id",
+    name: "UserProfile",
+    meta: {
+      title: "User Profile",
+      permission: "Admin",
+    },
+    component: () => import("../views/UserProfile.vue"),
+    props: true,
+  },
+  {
     path: "/:catchAll(.*)",
     name: "NotFound",
     component: () => import("../views/PageNotFound.vue"),

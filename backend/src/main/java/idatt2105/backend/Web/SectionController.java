@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import idatt2105.backend.Model.DTO.GETSectionDTO;
+import idatt2105.backend.Model.DTO.SectionStatisticsDTO;
 import idatt2105.backend.Service.SectionService;
 import javassist.NotFoundException;
 
@@ -28,11 +29,11 @@ public class SectionController {
         return new ResponseEntity<>(sectionService.getTopSections(), HttpStatus.OK);
     }
 
-    @GetMapping("/{section_id}/statistics/reservations-total-time")
+    @GetMapping("/{section_id}/statistics")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Long> getTotalTimeBooked(@PathVariable("section_id") long sectionId){
+    public ResponseEntity<SectionStatisticsDTO> getStatistics(@PathVariable("section_id") long sectionId){
         try {
-            return new ResponseEntity<>(sectionService.getTotalHoursBooked(sectionId), HttpStatus.OK);
+            return new ResponseEntity<>(sectionService.getStatistics(sectionId), HttpStatus.OK);
         } catch (NotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
