@@ -34,7 +34,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
         
     // Find total time of all reservations user has had in the past
     @Query(value = "SELECT SUM(TIMESTAMPDIFF(HOUR, reservation.start_time, reservation.end_time)) AS SumTime FROM reservation WHERE reservation.user_id = ?1 AND reservation.end_time <= NOW()", nativeQuery = true)
-    Optional<Float> getSumTimeInHoursOfAllUserReservations(long userId);
+    Optional<Long> getSumTimeInHoursOfAllUserReservations(long userId);
 
     // Find total reservations done by a user
     @Query(value = "SELECT COUNT(*) FROM reservation WHERE reservation.user_id = ?1", nativeQuery = true)

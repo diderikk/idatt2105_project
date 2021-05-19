@@ -18,7 +18,6 @@ import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
-import idatt2105.backend.Model.DTO.GETRoomDTO;
 import idatt2105.backend.Model.DTO.POSTRoomDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;

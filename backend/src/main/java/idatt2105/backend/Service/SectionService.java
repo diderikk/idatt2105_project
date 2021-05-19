@@ -60,8 +60,8 @@ public class SectionService {
      * @return Float of total time in hours
      * @throws NotFoundException if section was not found
      */
-    public Long getTotalTimeBooked(long sectionId) throws NotFoundException {
-        LOGGER.info("getTotalTimeBooked(long sectionId) called with sectionId: {}", sectionId);
+    public Long getTotalHoursBooked(long sectionId) throws NotFoundException {
+        LOGGER.info("getTotalHoursBooked(long sectionId) called with sectionId: {}", sectionId);
         Optional<Long> sumOptional = sectionRepository.getTotalHoursBooked(sectionId);
         if(!sumOptional.isPresent()) {
             throw new NotFoundException("No section found with id: " + sectionId);

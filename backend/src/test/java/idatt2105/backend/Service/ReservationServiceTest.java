@@ -134,7 +134,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void getReservation_ReservationDoesNotExist_ReturnsNull() throws NotFoundException{
+    public void getReservation_ReservationDoesNotExist_ThrowsNotFoundException() throws NotFoundException{
         assertThrows(NotFoundException.class, () -> reservationService.getReservation(reservation.getReservationId()+2));
     }
 
@@ -158,7 +158,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void editReservation_UsedDoesNotExist_ReturnsNUll() throws NotFoundException{  
+    public void editReservation_UserDoesNotExist_ThrowsNotFoundException() throws NotFoundException{  
         assertThrows(NotFoundException.class, () -> reservationService.editReservation(-1,postReservationDTO));
     }
 
@@ -169,7 +169,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void deleteReservation_WrongInput_DoesNotDeleteReservation() throws NotFoundException{
+    public void deleteReservation_WrongInput_DoesNotDeleteReservationAndThrowsNotFoundException() throws NotFoundException{
         assertThrows(NotFoundException.class, () -> reservationService.deleteReservation(reservation.getReservationId()+1));
     }
 }

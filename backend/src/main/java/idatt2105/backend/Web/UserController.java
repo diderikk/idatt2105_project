@@ -157,7 +157,7 @@ public class UserController {
 
     @GetMapping("/{user_id}/statistics/reservations-total-time")
     @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Float> getSumTimeInHoursOfAllUserReservations(@PathVariable("user_id") long userId){
+    public ResponseEntity<Long> getSumTimeInHoursOfAllUserReservations(@PathVariable("user_id") long userId){
         try {
             return new ResponseEntity<>(userService.getSumTimeInHoursOfAllUserReservations(userId), HttpStatus.OK);
         } catch (NotFoundException e) {

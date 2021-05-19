@@ -105,6 +105,7 @@ public class UserService implements UserDetailsService {
         createdUser.setFirstName(inputUser.getFirstName());
         createdUser.setLastName(inputUser.getLastName());
         createdUser.setEmail(inputUser.getEmail());
+        createdUser.setPhoneNumber(inputUser.getPhoneNumber());
         createdUser.setExpirationDate(inputUser.getExpirationDate());
         createdUser.setAdmin(inputUser.isAdmin());
         createdUser.setHash(passwordEncoder.encode(randomPassword));
@@ -306,16 +307,16 @@ public class UserService implements UserDetailsService {
      * @return Float of hours
      * @throws NotFoundException if no user with id exists, or if no sum of reservations could be found
      */
-    public Float getSumTimeInHoursOfAllUserReservations(long userId) throws NotFoundException {
+    public Long getSumTimeInHoursOfAllUserReservations(long userId) throws NotFoundException {
         LOGGER.info("getSumTimeInHoursOfAllUserReservations(long userId) called with userId: {}", userId);
         if(!userRepository.existsById(userId)) {
             LOGGER.warn("Could not find user with id: {}. Throwing exception", userId);
             throw new NotFoundException("No user found with id: " + userId);
         }
-        Optional<Float> sum = userRepository.getSumTimeInHoursOfAllUserReservations(userId);
+        Optional<Long> sum = userRepository.getSumTimeInHoursOfAllUserReservations(userId);
         if(!sum.isPresent()) throw new NotFoundException("Sum of all reservations couldn't be found. User might not have any reservations");
-        if(sum.get() > 0f) return sum.get();
-        return 0f;
+        if(sum.get() > 0L) return sum.get();
+        return 0L;
     }
 
     /**
