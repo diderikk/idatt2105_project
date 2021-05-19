@@ -9,6 +9,7 @@ import Reservation from "@/interfaces/Reservation/Reservation.interface";
 import ReservationSorting from "@/interfaces/Reservation/ReservationSorting.interface";
 import Room from "@/interfaces/Room/Room.interface";
 import EditRoom from "@/interfaces/Room/EditRoom.interface";
+import TimeInterval from "@/interfaces/TimeInterval.interface";
 
 export interface State {
   user: string;
@@ -298,6 +299,22 @@ export const store: Store<State> = createStore<State>({
           status: SnackbarStatus.ERROR,
         });
         return null;
+      }
+    },
+    async getAvailableRooms({ commit }, times: TimeInterval){
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try{
+        const response = await backend.post("/rooms/available", times);
+        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        return response.data;
+      } catch(error) {
+        if(error !== null){
+          commit("setSnackbar", {
+            content: "Could not find any rooms",
+            status: SnackbarStatus.ERROR,
+          });
+          return null;
+        }
       }
     },
     async getRoom({ commit }, roomCode: string) {

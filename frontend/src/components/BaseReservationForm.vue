@@ -122,7 +122,11 @@
       >
         Remove all
       </button>
-      <div id="checkboxes" v-for="(section, index) in availableSections" :key="index">
+      <div
+        id="checkboxes"
+        v-for="(section, index) in availableSections"
+        :key="index"
+      >
         <label class="checkbox">
           <input
             @change="
@@ -275,12 +279,6 @@ export default defineComponent({
 
     //TODO get rooms and section based on the selected date and time
     const rooms: Ref<Array<Room>> = ref([]);
-    onBeforeMount(async () => {
-      const response = await store.dispatch("getRooms");
-      if (response !== null) {
-        rooms.value = response;
-      }
-    });
 
     /**
      * Sorts the rooms alphabetically based on the room code when the rooms change
@@ -612,6 +610,27 @@ export default defineComponent({
       );
     });
 
+    /**
+     * When start date/time and end date/time has been added
+     */
+    watch(
+      () => isDateAndTimeSelected.value,
+      async () => {
+        const startTime =
+          registerInformation.startDate + " " + registerInformation.startTime;
+        const endTime =
+          registerInformation.endDate + " " + registerInformation.endTime;
+        console.log(startTime);
+        const response = await store.dispatch("getAvailableRooms", {
+          startTime,
+          endTime,
+        });
+        if (response !== null) {
+          rooms.value = response;
+        }
+      }
+    );
+
     //Number of people
     const amountOfPeopleStatus = ref(InputFieldFeedbackStatus.NONE);
     const amountOfPeopleStatusIsNone = computed(
@@ -713,11 +732,11 @@ button {
   margin-right: 5px;
 }
 
-.checkbox{
+.checkbox {
   margin: 5px 10px;
 }
 
-#checkboxes{
+#checkboxes {
   margin-top: 1%;
 }
 </style>

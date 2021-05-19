@@ -52,7 +52,7 @@ public class RoomController {
         }
     }
 
-    @GetMapping("/available")
+    @PostMapping("/available")
     public ResponseEntity<List<GETRoomDTO>> getAvailableRooms(@RequestBody TimeIntervalDTO dto) {
         return new ResponseEntity<>(roomService.getAvailableRooms(dto), HttpStatus.OK);
     }
