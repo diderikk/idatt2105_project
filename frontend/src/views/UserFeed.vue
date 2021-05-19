@@ -3,9 +3,13 @@
     <input class="input" type="text" placeholder="Search" />
     <div v-if="users.length === 0" class="box">No users available</div>
     <span v-else
-      ><user-card v-for="(user, index) in users" :key="index" :user="user">{{
-        user
-      }}</user-card></span
+      ><user-card
+        v-for="(user, index) in users"
+        :key="index"
+        :user="user"
+        @reload="reload(false)"
+        >{{ user }}</user-card
+      ></span
     >
   </div>
 </template>
@@ -24,14 +28,19 @@ export default defineComponent({
     const store = useStore();
     const users = ref([] as User[]);
     onMounted(async () => {
-      const response = await store.dispatch("getUsers");
+      await reload(true);
+    });
+
+    const reload = async (editSnackbar: boolean) => {
+      const response = await store.dispatch("getUsers", editSnackbar);
       if (response !== null) {
         users.value = response;
       }
-    });
+    };
 
     return {
       users,
+      reload,
     };
   },
 });

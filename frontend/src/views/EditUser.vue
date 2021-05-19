@@ -69,8 +69,11 @@ export default defineComponent({
       }
     };
 
-    const deleteProfile = (registerInformation: UserForm, userId: number) => {
-      if (window.confirm("Are you sure you want do delete the user?")) {
+    const deleteProfile = async (
+      registerInformation: UserForm,
+      userId: number
+    ) => {
+      if (window.confirm("Are you sure you want to delete the user?")) {
         store.dispatch("deleteUser");
         //TODO Add async call
         console.log("User deleted: REMOVE ME");
