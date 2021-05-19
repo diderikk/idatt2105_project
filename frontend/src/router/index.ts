@@ -66,6 +66,15 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
   },
   {
+    path: "/rooms",
+    name: "RoomFeed",
+    meta: {
+      permisson: "User",
+      title: "Rooms",
+    },
+    component: () => import("../views/RoomFeed.vue"),
+  },
+  {
     path: "/create-room",
     name: "CreateRoom",
     meta: {
