@@ -27,8 +27,11 @@
             to="/create-reservation"
             >Make reservation</router-link
           >
-          <router-link class="navbar-item" to="/edit-reservation"
-            >Edit reservation</router-link
+          <router-link
+            v-if="isLoggedIn"
+            class="navbar-item"
+            to="/reservation-feed"
+            >Reservation feed</router-link
           >
           <router-link v-if="isAdmin" class="navbar-item" to="/create-user"
             >Create User</router-link

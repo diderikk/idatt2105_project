@@ -1,5 +1,6 @@
 package idatt2105.backend.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +22,9 @@ public interface RoomRepository extends JpaRepository<Room, String> {
     "JOIN section ON section.section_id = reservation_section.section_id " +
     "WHERE section.room_code = ?1 AND reservation.end_time <= NOW()", nativeQuery = true)
     Optional<Long> getTotalHoursBooked(String roomCode);
+
+    @Query(value = "SELECT room.* FROM room JOIN section ON (room.room_code = section.room_code) JOIN reservation_section"+
+    " ON (section.section_id = reservation_section.section_id) JOIN reservation"+
+    " ON (reservation_section.reservation_id = reservation.reservation_id AND (?1 >= reservation.end_time OR ?2 <= reservation.start_time )) GROUP BY room.roomCode", nativeQuery = true)
+    List<Room> getAvailabRooms(LocalDateTime startTime, LocalDateTime endTime);
 }

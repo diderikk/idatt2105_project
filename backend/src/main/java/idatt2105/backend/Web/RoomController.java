@@ -19,6 +19,7 @@ import idatt2105.backend.Exception.SectionNameInRoomAlreadyExistsException;
 import idatt2105.backend.Exception.SectionNotOfThisRoomException;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
+import idatt2105.backend.Model.DTO.TimeIntervalDTO;
 import idatt2105.backend.Model.DTO.RoomStatisticsDTO;
 import idatt2105.backend.Model.DTO.GETRoomDTO;
 import idatt2105.backend.Model.DTO.POSTRoomDTO;
@@ -50,6 +51,11 @@ public class RoomController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping("/available")
+    public ResponseEntity<List<GETRoomDTO>> getAvailableRooms(@RequestBody TimeIntervalDTO dto) {
+        return new ResponseEntity<>(roomService.getAvailableRooms(dto), HttpStatus.OK);
     }
 
     @PostMapping
