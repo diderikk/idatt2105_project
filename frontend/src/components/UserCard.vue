@@ -26,6 +26,7 @@
 import { defineComponent } from "vue";
 import { useRouter } from "vue-router";
 import User from "../interfaces/User/User.interface";
+import { useStore } from "../store";
 export default defineComponent({
   name: "UserCard",
   props: {
@@ -34,8 +35,23 @@ export default defineComponent({
       type: Object as () => User,
     },
   },
-  setup(props) {
+  setup(props, { emit }) {
     const router = useRouter();
+    const store = useStore();
+    const edit = () => {
+      router.push(`/users/${props.user.userId}`);
+    };
+    const deleteUser = async () => {
+      if (window.confirm("Are you sure you want do delete the user?")) {
+        if (await store.dispatch("deleteUser", props.user.userId)) {
+          emit("reload");
+        }
+      }
+    };
+
+    return {
+      deleteUser,
+    };
   },
 });
 </script>
