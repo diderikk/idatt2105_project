@@ -16,7 +16,7 @@ export const reservationFormToPOSTReservtion = (
   };
 };
 
-export const POSTReservationToResrevationForm = (
+export const POSTReservationToReservationForm = (
   reservation: POSTReservation
 ): ReservationForm => {
   const sections = reservation.sections.map((s) => {

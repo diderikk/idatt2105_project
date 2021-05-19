@@ -25,6 +25,7 @@ import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTUserDTO;
 import idatt2105.backend.Model.DTO.SortingDTO;
+import idatt2105.backend.Model.DTO.UserStatisticsDTO;
 import idatt2105.backend.Model.DTO.GETUserDTO;
 import idatt2105.backend.Service.UserService;
 import javassist.NotFoundException;
@@ -155,54 +156,21 @@ public class UserController {
         } 
     }
 
-    @GetMapping("/{user_id}/statistics/reservations-total-time")
-    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Long> getSumTimeInHoursOfAllUserReservations(@PathVariable("user_id") long userId){
-        try {
-            return new ResponseEntity<>(userService.getSumTimeInHoursOfAllUserReservations(userId), HttpStatus.OK);
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/{user_id}/statistics/reservations-count")
-    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Integer> getReservationCountOfUser(@PathVariable("user_id") long userId){
-        try {
-            return new ResponseEntity<>(userService.getResevationCountOfUser(userId), HttpStatus.OK);
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    // Only admin should be able to get this information
     @GetMapping("/statistics/top-users")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<GETUserDTO>> getTopUsers(){
         return new ResponseEntity<>(userService.getTopUsers(), HttpStatus.OK);
     }
 
-    @GetMapping("/{user_id}/statistics/favourite-room")
+    @GetMapping("/{user_id}/statistics")
     @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<GETRoomDTO> getFavouriteRoomOfUser(@PathVariable("user_id") long userId){
-        try {
-            return new ResponseEntity<>(userService.getFavouriteRoomOfUser(userId), HttpStatus.OK);
+    public ResponseEntity<UserStatisticsDTO> getStatistics(@PathVariable("user_id") long userId){
+        try{
+            UserStatisticsDTO userStatistics = userService.getStatistics(userId);
+            return new ResponseEntity<>(userStatistics, HttpStatus.OK);
         } catch (NotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/{user_id}/statistics/favourite-section")
-    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<GETSectionDTO> getFavouriteSectionOfUser(@PathVariable("user_id") long userId){
-        try {
-            return new ResponseEntity<>(userService.getFavouriteSectionOfUser(userId), HttpStatus.OK);
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        } 
     }
 }
