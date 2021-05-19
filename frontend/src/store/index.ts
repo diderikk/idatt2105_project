@@ -201,7 +201,7 @@ export const store = createStore<State>({
     async editReservation({ commit }, reservation: Reservation) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        await backend.post(`/reservations/${reservation.id}`, reservation);
+        await backend.post(`/reservations/${reservation.reservationId}`, reservation);
         commit("setSnackbar", {
           content: "Reservation edited",
           status: SnackbarStatus.SUCCESS,
