@@ -361,7 +361,6 @@ export default defineComponent({
      * @param section The section to be selected or deselected
      */
     const handleCheckBoxChange = (section: SectionForCheckBox) => {
-      console.log(rooms.value);
       section.selected = !section.selected;
       if (section.selected) {
         registerInformation.sections.push(section.sectionName);
@@ -620,7 +619,6 @@ export default defineComponent({
           registerInformation.startDate + " " + registerInformation.startTime;
         const endTime =
           registerInformation.endDate + " " + registerInformation.endTime;
-        console.log(startTime);
         const response = await store.dispatch("getAvailableRooms", {
           startTime,
           endTime,
