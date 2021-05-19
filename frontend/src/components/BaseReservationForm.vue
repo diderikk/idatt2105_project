@@ -47,7 +47,7 @@
     <base-form-field-input
       :config="{
         title: 'Start time and end time',
-        errorHelperMessage: 'Fill inn a start time and end time ',
+        errorHelperMessage: 'Fill in a start time and end time ',
         feedbackStatus: timeStatus,
       }"
     >
@@ -108,7 +108,7 @@
           checkSectionValidity();
         "
         :disabled="!isDateAndTimeSelected"
-        class="button is-primary"
+        class="button is-dark"
       >
         Select all
       </button>
@@ -122,13 +122,14 @@
       >
         Remove all
       </button>
-      <div v-for="(section, index) in availableSections" :key="index">
+      <div id="checkboxes" v-for="(section, index) in availableSections" :key="index">
         <label class="checkbox">
           <input
             @change="
               handleCheckBoxChange(section);
               checkSectionValidity();
             "
+            class="checkbox is-dark"
             :value="section.selected"
             :checked="section.selected"
             type="checkbox"
@@ -318,11 +319,8 @@ export default defineComponent({
      */
     const mapSections = () => {
       const sections: Section[] =
-        rooms.value.find((r) => {
-          console.log("Roomcodes");
-          console.log("r" + r.roomCode);
-          console.log("r" + registerInformation.roomCode);
-          r.roomCode === registerInformation.roomCode;
+        rooms.value.find((room) => {
+          return room.roomCode === registerInformation.roomCode;
         })?.sections ?? [];
       availableSections.value =
         sections?.map((s: Section) => {
@@ -365,6 +363,7 @@ export default defineComponent({
      * @param section The section to be selected or deselected
      */
     const handleCheckBoxChange = (section: SectionForCheckBox) => {
+      console.log(rooms.value);
       section.selected = !section.selected;
       if (section.selected) {
         registerInformation.sections.push(section.sectionName);
@@ -712,5 +711,13 @@ export default defineComponent({
 
 button {
   margin-right: 5px;
+}
+
+.checkbox{
+  margin: 5px 10px;
+}
+
+#checkboxes{
+  margin-top: 1%;
 }
 </style>
