@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,6 +52,7 @@ public class RoomController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<GETRoomDTO> createRoom(@RequestBody POSTRoomDTO roomDTO) {
         try{
             GETRoomDTO room = roomService.createRoom(roomDTO);
@@ -62,6 +64,7 @@ public class RoomController {
     }
 
     @PostMapping("/{room_code}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<GETRoomDTO> editRoom(@PathVariable("room_code") String roomCode, @RequestBody POSTRoomDTO roomDTO){
         try{
             GETRoomDTO room = roomService.editRoom(roomCode, roomDTO);
@@ -72,6 +75,7 @@ public class RoomController {
     }
 
     @GetMapping("/{room_code}/reservations")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<GETReservationDTO>> getReservationsOfRoom(@PathVariable("room_code") String roomCode) {
         try {
             List<GETReservationDTO> reservations = roomService.getReservationsOfRoom(roomCode);
@@ -83,6 +87,7 @@ public class RoomController {
     }
 
     @GetMapping("/{room_code}/sections/{section_id}/reservations")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<GETReservationDTO>> getReservationsOfSection(@PathVariable("room_code") String roomCode, @PathVariable("section_id") long sectionId) {
         try {
             List<GETReservationDTO> reservations = roomService.getReservationsOfSection(roomCode, sectionId);
@@ -97,6 +102,7 @@ public class RoomController {
     }
 
     @PostMapping("/{room_code}/sections")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<GETRoomDTO> addSectionToRoom(@PathVariable("room_code") String roomCode, @RequestBody POSTSectionDTO sectionDTO) {
         //Return HTTP 400 if roomCode does not match roomCode in sectionDTO
         if(!roomCode.equals(sectionDTO.getRoomCode())) {
@@ -116,6 +122,7 @@ public class RoomController {
     }
 
     @DeleteMapping("/{room_code}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<GETRoomDTO> deleteRoom(@PathVariable("room_code") String roomCode) {
         try {
             if (roomService.deleteRoom(roomCode)) {
@@ -130,6 +137,7 @@ public class RoomController {
     }
 
     @DeleteMapping("/{room_code}/sections/{section_id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<GETRoomDTO> deleteSectionOfRoom(@PathVariable("room_code") String roomCode, @PathVariable("section_id") long sectionId) {
         try {
             if (roomService.deleteSectionOfRoom(roomCode, sectionId)) {
@@ -147,11 +155,13 @@ public class RoomController {
     }
 
     @GetMapping("/statistics/top-rooms")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<GETRoomDTO>> getTopRooms(){
         return new ResponseEntity<>(roomService.getTopRooms(), HttpStatus.OK);
     }
 
     @GetMapping("/{room_code}/statistics/reservations-total-time")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Long> getTotalTimeBooked(@PathVariable("room_code") String roomCode){
         try {
             return new ResponseEntity<>(roomService.getTotalHoursBooked(roomCode), HttpStatus.OK);

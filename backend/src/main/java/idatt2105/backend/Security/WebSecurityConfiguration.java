@@ -51,7 +51,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .addFilterAfter(new JwtTokenFilter(), JwtUsernameAndPasswordAuthenticationFilter.class)
         .addFilterAfter(new ExceptionHandlerFilter(), JwtTokenFilter.class)
         .authorizeRequests()
-        .antMatchers("/api/v1/**").permitAll()
+        .antMatchers("/api/v1/reservations/**").hasRole("ADMIN")
+        .antMatchers("/api/v1/sections/**").hasRole("ADMIN")
+        .antMatchers("/api/v1/**").hasAnyRole("ADMIN","USER")
         .anyRequest().authenticated();
     }
 
