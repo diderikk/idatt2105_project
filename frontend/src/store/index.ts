@@ -114,36 +114,22 @@ export const store = createStore<State>({
         return false;
       }
     },
-    async deleteUser({ commit, getters }, user): Promise<boolean> {
-      //Not letting users that aren't admins delete other users
-      if (!getters.getUser.isAdmin) {
-        commit("setSnackbar", {
-          content: "Only admins can create users",
-          status: SnackbarStatus.ERROR,
-        });
-        return false;
-      }
-      //Not wanting to be able to delete other admins
-      if (user.isAdmin) {
-        commit("setSnackbar", {
-          content: "Cannot delete other admins",
-          status: SnackbarStatus.ERROR,
-        });
-        return false;
-      }
+    async deleteUser({ commit, getters }, userId: number): Promise<boolean> {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        await backend.delete("/users", user);
+        await backend.delete(`/users/${userId}`);
         commit("setSnackbar", {
-          content: `User with email: ${user.email} created`,
+          content: `User deleted`,
           status: SnackbarStatus.SUCCESS,
         });
         return true;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not delete user",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not delete user",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return false;
       }
     },
@@ -180,11 +166,13 @@ export const store = createStore<State>({
         return null;
       }
     },
-    async getUsers({ commit }) {
-      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+    async getUsers({ commit }, editSnackbar?: boolean) {
+      if (editSnackbar === undefined || editSnackbar === true)
+        commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         const response = await backend.get("/users");
-        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        if (editSnackbar === undefined || editSnackbar === true)
+          commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
         if (error !== null) {
@@ -243,7 +231,7 @@ export const store = createStore<State>({
     async editReservation({ commit }, reservation: Reservation) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        await backend.post(`/reservations/${reservation.id}`, reservation);
+        await backend.post(`/reservations/${reservation.reservationId}`, reservation);
         commit("setSnackbar", {
           content: "Reservation edited",
           status: SnackbarStatus.SUCCESS,
@@ -305,21 +293,23 @@ export const store = createStore<State>({
         return null;
       }
     },
-    async getRooms({ commit }) {
-      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+    async getRooms({ commit }, editSnackbar?: boolean) {
+      if (editSnackbar === undefined || editSnackbar === true)
+        commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         const response = await backend.get("/rooms");
-        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        if (editSnackbar === undefined || editSnackbar === true)
+          commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
         commit("setSnackbar", {
-          content: "Could not find any reservations",
+          content: "Could not find any rooms",
           status: SnackbarStatus.ERROR,
         });
         return null;
       }
     },
-    async getRoom({ commit }, roomCode: string){
+    async getRoom({ commit }, roomCode: string) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         const response = await backend.get(`/rooms/${roomCode}`);
@@ -327,7 +317,7 @@ export const store = createStore<State>({
         return response.data;
       } catch (error) {
         commit("setSnackbar", {
-          title: "Could not find a room",
+          content: "Could not find a room",
           status: SnackbarStatus.ERROR,
         });
         return null;
@@ -361,59 +351,59 @@ export const store = createStore<State>({
     async editRoom({ commit }, editRoom: EditRoom) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        await backend.post(`/rooms/${editRoom.originalRoomCode}`, {roomCode: editRoom.roomCode, sections: editRoom.sections} as Room);
+        await backend.post(`/rooms/${editRoom.originalRoomCode}`, {
+          roomCode: editRoom.roomCode,
+          sections: editRoom.sections,
+        } as Room);
 
         commit("setSnackbar", {
-          title: "Room edited",
+          content: "Room edited",
           status: SnackbarStatus.SUCCESS,
         });
         return true;
-      } catch(error){
-        if(error.response.status === 400){
+      } catch (error) {
+        if (error.response.status === 400) {
           commit("setSnackbar", {
-            title: "Room code is already occupied",
+            content: "Room code is already occupied",
             status: SnackbarStatus.ERROR,
           });
-        }
-        else if(error.response.status === 404){
+        } else if (error.response.status === 404) {
           commit("setSnackbar", {
-            title: "No room with the given room code exists",
+            content: "No room with the given room code exists",
             status: SnackbarStatus.ERROR,
           });
-        }
-        else{
+        } else {
           commit("setSnackbar", {
-            title: "Could not edit room",
+            content: "Could not edit room",
             status: SnackbarStatus.ERROR,
           });
         }
       }
     },
-    async deleteRoom({ commit }, roomCode: string){
+    async deleteRoom({ commit }, roomCode: string) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         await backend.delete(`/rooms/${roomCode}`);
 
         commit("setSnackbar", {
-          title: "Room deleted",
+          content: "Room deleted",
           status: SnackbarStatus.SUCCESS,
         });
         return true;
-      } catch(error){
-        if(error.response.status === 404){
+      } catch (error) {
+        if (error.response.status === 404) {
           commit("setSnackbar", {
-            title: "No room with the given room code exists",
+            content: "No room with the given room code exists",
             status: SnackbarStatus.ERROR,
           });
-        }
-        else{
+        } else {
           commit("setSnackbar", {
-            title: "Could not delete room",
+            content: "Could not delete room",
             status: SnackbarStatus.ERROR,
           });
         }
       }
-    }
+    },
   },
 });
 

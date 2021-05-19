@@ -129,7 +129,8 @@ public class UserService implements UserDetailsService {
     public GETUserDTO editUser(long userId, POSTUserDTO inputUser) throws NotFoundException, AlreadyExistsException{
         LOGGER.info("editUser(long userId, POSTUserDTO inputUser) was called with userId: {}", userId);
         Optional<User> optionalUser = userRepository.findById(userId);
-        if(userRepository.findUserByEmail(inputUser.getEmail()).isPresent()) 
+        Optional<User> tempUser = userRepository.findUserByEmail(inputUser.getEmail());
+        if(tempUser.isPresent() && tempUser.get().getUserId() != userId) 
             throw new AlreadyExistsException("Email " + inputUser.getEmail() + " already exists");
         if(optionalUser.isPresent()){
             User user = optionalUser.get();
@@ -138,6 +139,7 @@ public class UserService implements UserDetailsService {
             if(inputUser.getLastName() != null) user.setLastName(inputUser.getLastName());
             if(inputUser.getExpirationDate() != null) user.setExpirationDate(inputUser.getExpirationDate());
             if(inputUser.getPhoneNumber() != null) user.setPhoneNumber(inputUser.getPhoneNumber());
+            user.setAdmin(inputUser.isAdmin());
             user = userRepository.save(user);
             
             return new GETUserDTO(user);

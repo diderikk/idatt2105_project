@@ -1,17 +1,21 @@
 <template>
   <div>
-    <input class="input" type="text" placeholder="Search" />
+    <input v-model="searchInput" class="input" type="text" placeholder="Search" />
     <div v-if="users.length === 0" class="box">No users available</div>
     <span v-else
-      ><user-card v-for="(user, index) in users" :key="index" :user="user">{{
-        user
-      }}</user-card></span
+      ><user-card
+        v-for="(user, index) in availableUsers"
+        :key="index"
+        :user="user"
+        @reload="reload(false)"
+        >{{ user }}</user-card
+      ></span
     >
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import UserCard from "../components/UserCard.vue";
 import User from "../interfaces/User/User.interface";
 import { useStore } from "../store";
@@ -23,15 +27,35 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const users = ref([] as User[]);
+    const searchInput = ref("");
     onMounted(async () => {
-      const response = await store.dispatch("getUsers");
+      await reload(true);
+    });
+
+    const reload = async (editSnackbar: boolean) => {
+      const response = await store.dispatch("getUsers", editSnackbar);
       if (response !== null) {
         users.value = response;
       }
+    };
+
+    const availableUsers = computed(() => {
+      return users.value.filter(user => compareUserValues(user));
     });
 
+    const compareUserValues = (user: User) => {
+      const searchLowerCase = searchInput.value.toLowerCase();
+      return user.firstName.toLowerCase().startsWith(searchLowerCase) ||
+      user.lastName.toLowerCase().startsWith(searchLowerCase) ||
+      user.email.toLowerCase().startsWith(searchLowerCase) ||
+      user.phoneNumber.toLowerCase().startsWith(searchLowerCase);
+    }
+
     return {
+      searchInput,
       users,
+      reload,
+      availableUsers
     };
   },
 });
