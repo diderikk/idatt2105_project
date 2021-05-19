@@ -111,7 +111,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/UserFeed.vue"),
   },
   {
-    path: "/users/:id/statistics",
+    path: "/users/:id",
     name: "UserProfile",
     meta: {
       title: "User Profile",
