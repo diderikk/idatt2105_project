@@ -615,16 +615,18 @@ export default defineComponent({
     watch(
       () => isDateAndTimeSelected.value,
       async () => {
-        const startTime =
-          registerInformation.startDate + " " + registerInformation.startTime;
-        const endTime =
-          registerInformation.endDate + " " + registerInformation.endTime;
-        const response = await store.dispatch("getAvailableRooms", {
-          startTime,
-          endTime,
-        });
-        if (response !== null) {
-          rooms.value = response;
+        if (isDateAndTimeSelected.value) {
+          const startTime =
+            registerInformation.startDate + " " + registerInformation.startTime;
+          const endTime =
+            registerInformation.endDate + " " + registerInformation.endTime;
+          const response = await store.dispatch("getAvailableRooms", {
+            startTime,
+            endTime,
+          });
+          if (response !== null) {
+            rooms.value = response;
+          }
         }
       }
     );

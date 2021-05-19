@@ -23,8 +23,10 @@ public interface RoomRepository extends JpaRepository<Room, String> {
     "WHERE section.room_code = ?1 AND reservation.end_time <= NOW()", nativeQuery = true)
     Optional<Long> getTotalHoursBooked(String roomCode);
 
-    @Query(value = "SELECT room.* FROM room JOIN section ON (room.room_code = section.room_code) JOIN reservation_section"+
-    " ON (section.section_id = reservation_section.section_id) JOIN reservation"+
-    " ON (reservation_section.reservation_id = reservation.reservation_id AND (?1 >= reservation.end_time OR ?2 <= reservation.start_time )) GROUP BY room.room_code", nativeQuery = true)
-    List<Room> getAvailabRooms(LocalDateTime startTime, LocalDateTime endTime);
+    @Query(value = "SELECT room.* FROM room where room.room_code NOT IN "+
+    "(SELECT room.room_code FROM room JOIN section ON (room.room_code = section.room_code) JOIN reservation_section" +
+    " ON (section.section_id = reservation_section.section_id) JOIN reservation" +
+    " ON (reservation_section.reservation_id = reservation.reservation_id AND (?1 BETWEEN reservation.start_time AND reservation.end_time OR ?2 BETWEEN reservation.start_time AND reservation.end_time" +
+    " OR (?1 <= reservation.start_time AND ?2 >= reservation.end_time))) GROUP BY room.room_code)", nativeQuery = true)
+    List<Room> getAvailableRooms(LocalDateTime startTime, LocalDateTime endTime);
 }

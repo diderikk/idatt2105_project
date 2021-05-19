@@ -76,7 +76,7 @@ public class RoomService {
      * @return List of rooms that have available sections between start time and end time
      */
     public List<GETRoomDTO> getAvailableRooms(TimeIntervalDTO dto){
-        return roomRepository.getAvailabRooms(dto.getStartTime(), dto.getEndTime()).stream().map(room -> new GETRoomDTO(room)).collect(Collectors.toList());
+        return roomRepository.getAvailableRooms(dto.getStartTime(), dto.getEndTime()).stream().map(room -> new GETRoomDTO(room)).collect(Collectors.toList());
     }
 
     /**
