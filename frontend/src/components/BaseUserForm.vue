@@ -137,6 +137,8 @@ export default defineComponent({
     BaseFormFieldInput,
   },
   setup(props) {
+    // Defined from the RFC 5322
+    const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
     const registerInformation = reactive(
       //Need object assign to create a new object, to hinder mutating a prop
       Object.assign(
@@ -173,7 +175,8 @@ export default defineComponent({
       emailStatus.value =
         registerInformation.email.trim() !== "" &&
         registerInformation.email.includes("@") &&
-        registerInformation.email.includes(".")
+        registerInformation.email.includes(".") &&
+        emailRegex.test(registerInformation.email.trim())
           ? InputFieldFeedbackStatus.SUCCESS
           : InputFieldFeedbackStatus.ERROR;
     };
