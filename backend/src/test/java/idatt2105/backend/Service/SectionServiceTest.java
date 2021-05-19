@@ -25,6 +25,8 @@ import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.GETSectionDTO;
+import idatt2105.backend.Model.DTO.SectionStatisticsDTO;
+import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import javassist.NotFoundException;
 
@@ -93,6 +95,13 @@ public class SectionServiceTest {
         Mockito.lenient()
         .when(sectionRepository.getAllReservationIdsOfSection(section2.getSectionId()))
         .thenReturn(null);
+
+        Mockito.lenient()
+        .when(sectionRepository.existsById(section1.getSectionId()))
+        .thenReturn(true);
+        Mockito.lenient()
+        .when(sectionRepository.existsById(section2.getSectionId()))
+        .thenReturn(true);
     }
 
     @Test
@@ -143,7 +152,7 @@ public class SectionServiceTest {
     }
 
     @Test
-    public void getTotalTimeBooked_SectionExists_ReturnsFloat() throws NotFoundException {
+    public void getStatistics_SectionExists_ReturnsSectionStatisticsDTO() throws NotFoundException {
         Long sum = 0L;
         for(Reservation reservation : section1.getReservations()) {
             long hours = Duration.between(reservation.getStartTime(), reservation.getEndTime()).toHours();
@@ -154,8 +163,8 @@ public class SectionServiceTest {
         .when(sectionRepository.getTotalHoursBooked(section1.getSectionId()))
         .thenReturn(Optional.of(sum));
 
-        Long totalTime = sectionService.getTotalHoursBooked(section1.getSectionId());
-        assertNotNull(totalTime);
-        assertEquals(sum, totalTime);
+        SectionStatisticsDTO sectionStatisticsDTO = sectionService.getStatistics(section1.getSectionId());
+        assertNotNull(sectionStatisticsDTO);
+        assertEquals(sum, sectionStatisticsDTO.getTotalHoursOfReservations());
     }
 }

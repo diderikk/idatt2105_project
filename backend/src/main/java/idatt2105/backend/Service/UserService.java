@@ -35,6 +35,7 @@ import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.POSTUserDTO;
 import idatt2105.backend.Model.DTO.SortingDTO;
+import idatt2105.backend.Model.DTO.UserStatisticsDTO;
 import idatt2105.backend.Model.Enum.SortingTypeEnum;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -302,44 +303,6 @@ public class UserService implements UserDetailsService {
     }
 
     /**
-     * Gets sum (in hours) of all reservations user has done in the past.
-     * @param userId
-     * @return Float of hours
-     * @throws NotFoundException if no user with id exists, or if no sum of reservations could be found
-     */
-    public Long getSumTimeInHoursOfAllUserReservations(long userId) throws NotFoundException {
-        LOGGER.info("getSumTimeInHoursOfAllUserReservations(long userId) called with userId: {}", userId);
-        if(!userRepository.existsById(userId)) {
-            LOGGER.warn("Could not find user with id: {}. Throwing exception", userId);
-            throw new NotFoundException("No user found with id: " + userId);
-        }
-        Optional<Long> sum = userRepository.getSumTimeInHoursOfAllUserReservations(userId);
-        if(!sum.isPresent()) throw new NotFoundException("Sum of all reservations couldn't be found. User might not have any reservations");
-        if(sum.get() > 0L) return sum.get();
-        return 0L;
-    }
-
-    /**
-     * Get number of reservations user has in total, both past, present and future
-     * @param userId
-     * @return Integer, amount of reservations
-     * @throws NotFoundException if no user was found, or reservations couldn't be counted
-     */
-    public Integer getResevationCountOfUser(long userId) throws NotFoundException {
-        LOGGER.info("getResevationCountOfUser(long userId) called with userId: {}", userId);
-        if(!userRepository.existsById(userId)) {
-            LOGGER.warn("Could not find user with id: {}. Throwing exception", userId);
-            throw new NotFoundException("No user found with id: " + userId);
-        }
-        Optional<Integer> countOptional = userRepository.getResevationCountOfUser(userId);
-        if(!countOptional.isPresent()) {
-            LOGGER.warn("Could not find user reservation count. Throwing exception");
-            throw new NotFoundException("No user reservations count found");
-        }
-        return countOptional.get();
-    }
-
-    /**
      * Finds top 5 most users with most reservations.
      * @return List of users, empty list if no users were found
      */
@@ -354,43 +317,49 @@ public class UserService implements UserDetailsService {
     }
 
     /**
-     * Get favourite room of a user, given by userId
+     * Get statistics about a user, given by userId.
+     * Statistics such as total hours user has booked/reserved,
+     * total reservations done, favourite room and favourite section.
      * @param userId
-     * @return GETRoomDTO
-     * @throws NotFoundException if no user was found, or no favourite room found
+     * @return UserStatisticsDTO
+     * @throws NotFoundException if no user was found
      */
-    public GETRoomDTO getFavouriteRoomOfUser(long userId) throws NotFoundException {
-        LOGGER.info("getFavouriteRoomOfUser(long userId) called with userId: {}", userId);
+    public UserStatisticsDTO getStatistics(long userId) throws NotFoundException {
+        LOGGER.info("getStatistics(long userId) called with userId: {}", userId);
         if(!userRepository.existsById(userId)) {
             LOGGER.warn("Could not find user with id: {}. Throwing exception", userId);
             throw new NotFoundException("No user found with id: " + userId);
         }
-        Optional<Room> roomOptional = userRepository.getFavouriteRoomOfUser(userId);
-        if(!roomOptional.isPresent()) {
+
+        Optional<Long> totalHoursOfReservations = userRepository.getSumTimeInHoursOfAllUserReservations(userId);
+        if(!totalHoursOfReservations.isPresent()) {
+            LOGGER.warn("Could not find sum of reservations of user with id: {}. Throwing exception", userId);
+            throw new NotFoundException("Sum of all reservations couldn't be found. User might not have any reservations");
+        }
+
+        Optional<Integer> totalReservations = userRepository.getResevationCountOfUser(userId);
+        if(!totalReservations.isPresent()) {
+            LOGGER.warn("Could not find user reservation count. Throwing exception");
+            throw new NotFoundException("No user reservations count found with user id: " + userId);
+        }
+
+        Optional<Room> favouriteRoom = userRepository.getFavouriteRoomOfUser(userId);
+        if(!favouriteRoom.isPresent()) {
             LOGGER.warn("Could not find user's favourite room, throwing exception");
             throw new NotFoundException("No favourite room found of user with userId: " + userId);
         }
-        return new GETRoomDTO(roomOptional.get());
-    }
 
-    /**
-     * Get favourite section of a user, given by userId
-     * @param userId
-     * @return GETSectionDTO
-     * @throws NotFoundException if no user was found, or no favourite section found
-     */
-    public GETSectionDTO getFavouriteSectionOfUser(long userId) throws NotFoundException {
-        LOGGER.info("getFavouriteSectionOfUser(long userId) called with userId: {}", userId);
-        if(!userRepository.existsById(userId)) {
-            LOGGER.warn("Could not find user with id: {}. Throwing exception", userId);
-            throw new NotFoundException("No user found with id: " + userId);
-        }
-        Optional<Section> sectionOptional = userRepository.getFavouriteSectionOfUser(userId);
-        if(!sectionOptional.isPresent()) {
+        Optional<Section> favouriteSection = userRepository.getFavouriteSectionOfUser(userId);
+        if(!favouriteSection.isPresent()) {
             LOGGER.warn("Could not find user's favourite section, throwing exception");
             throw new NotFoundException("No favourite section found of user with userId: " + userId);
         }
-        return new GETSectionDTO(sectionOptional.get());
+
+        return new UserStatisticsDTO(
+            totalHoursOfReservations.get(), 
+            totalReservations.get(), 
+            new GETRoomDTO(favouriteRoom.get()), 
+            new GETSectionDTO(favouriteSection.get()));
     }
 
     /**

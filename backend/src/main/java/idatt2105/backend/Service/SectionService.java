@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.GETSectionDTO;
+import idatt2105.backend.Model.DTO.SectionStatisticsDTO;
 import idatt2105.backend.Repository.SectionRepository;
 import javassist.NotFoundException;
 
@@ -54,18 +55,24 @@ public class SectionService {
     }
 
     /**
-     * Get total time (in hours) a section has been booked before.
-     * Section is determined by sectionId parameter.
+     * Get statistics about a section, given by section id.
+     * Statistics such as total hours section has been booked/reserved.
      * @param sectionId
-     * @return Float of total time in hours
-     * @throws NotFoundException if section was not found
+     * @return SectionStatisticsDTO
+     * @throws NotFoundException
      */
-    public Long getTotalHoursBooked(long sectionId) throws NotFoundException {
-        LOGGER.info("getTotalHoursBooked(long sectionId) called with sectionId: {}", sectionId);
-        Optional<Long> sumOptional = sectionRepository.getTotalHoursBooked(sectionId);
-        if(!sumOptional.isPresent()) {
+    public SectionStatisticsDTO getStatistics(long sectionId) throws NotFoundException {
+        LOGGER.info("getStatistics(long sectionId) called with sectionId: {}", sectionId);
+        if(!sectionRepository.existsById(sectionId)) {
+            LOGGER.warn("Could not find section with id: {}. Throwing exception", sectionId);
             throw new NotFoundException("No section found with id: " + sectionId);
         }
-        return sumOptional.get();
+
+        Optional<Long> totalHoursBooked = sectionRepository.getTotalHoursBooked(sectionId);
+        if(!totalHoursBooked.isPresent()) {
+            LOGGER.warn("Could not find total time booked of a section with id: {}. Throwing exception", sectionId);
+            throw new NotFoundException("Could not find total hours of reservations of a section with id: " + sectionId);
+        }
+        return new SectionStatisticsDTO(totalHoursBooked.get());
     }
 }
