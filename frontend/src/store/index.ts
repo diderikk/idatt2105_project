@@ -152,6 +152,20 @@ export const store = createStore<State>({
         return null;
       }
     },
+    async getUserStatistics({ commit }, userId: number) {
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        const response = await backend.get(`/users/${userId}/statistics`);
+        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        return response.data;
+      } catch (error) {
+        commit("setSnackbar", {
+          content: "Could not get user statistics",
+          status: SnackbarStatus.ERROR,
+        });
+        return null;
+      }
+    },
     async getUsers({ commit }, editSnackbar?: boolean) {
       if (editSnackbar === undefined || editSnackbar === true)
         commit("setSnackbarStatus", SnackbarStatus.LOADING);
@@ -164,6 +178,22 @@ export const store = createStore<State>({
         if (error !== null) {
           commit("setSnackbar", {
             content: "Could not get users",
+            status: SnackbarStatus.ERROR,
+          });
+        }
+        return null;
+      }
+    },
+    async getTopUsers({ commit }) {
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        const response = await backend.get("/users/statistics/top-users");
+        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        return response.data;
+      } catch (error) {
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not get top users",
             status: SnackbarStatus.ERROR,
           });
         }

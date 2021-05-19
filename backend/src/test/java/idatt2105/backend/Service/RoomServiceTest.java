@@ -26,6 +26,7 @@ import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.POSTRoomDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
+import idatt2105.backend.Model.DTO.RoomStatisticsDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -127,6 +128,10 @@ public class RoomServiceTest {
         Mockito.lenient()
         .when(sectionRepository.getAllReservationIdsOfSection(section2.getSectionId()))
         .thenReturn(null);
+
+        Mockito.lenient()
+        .when(roomRepository.existsById(room1.getRoomCode()))
+        .thenReturn(true);
     }
 
     @Test
@@ -432,7 +437,7 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void getTotalTimeBooked_RoomExists_ReturnsFloat() throws NotFoundException {
+    public void getStatistics_RoomExists_ReturnsRoomStatisticsDTO() throws NotFoundException {
         Long sum = 0L;
         for(Section section : room1.getSections()) {
             if(section.getReservations() != null) {
@@ -447,8 +452,8 @@ public class RoomServiceTest {
         .when(roomRepository.getTotalHoursBooked(room1.getRoomCode()))
         .thenReturn(Optional.of(sum));
 
-        Long totalTime = roomService.getTotalHoursBooked(room1.getRoomCode());
-        assertNotNull(totalTime);
-        assertEquals(sum, totalTime);
+        RoomStatisticsDTO roomStatisticsDTO = roomService.getStatistics(room1.getRoomCode());
+        assertNotNull(roomStatisticsDTO);
+        assertEquals(sum, roomStatisticsDTO.getTotalHoursOfReservations());
     }
 }
