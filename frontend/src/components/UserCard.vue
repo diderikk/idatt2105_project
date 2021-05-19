@@ -39,7 +39,7 @@ export default defineComponent({
     const router = useRouter();
     const store = useStore();
     const edit = () => {
-      router.push(`/users/${props.user.userId}`);
+      router.push(`/edit-user/${props.user.userId}`);
     };
     const deleteUser = async () => {
       if (window.confirm("Are you sure you want do delete the user?")) {
@@ -50,6 +50,7 @@ export default defineComponent({
     };
 
     return {
+      edit,
       deleteUser,
     };
   },

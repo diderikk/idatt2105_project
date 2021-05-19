@@ -7,7 +7,7 @@
         v-for="(user, index) in users"
         :key="index"
         :user="user"
-        @reload="reload($event)"
+        @reload="reload(false)"
         >{{ user }}</user-card
       ></span
     >
@@ -28,12 +28,11 @@ export default defineComponent({
     const store = useStore();
     const users = ref([] as User[]);
     onMounted(async () => {
-      await reload();
+      await reload(true);
     });
 
-    const reload = async () => {
-      console.log("Emitted");
-      const response = await store.dispatch("getUsers");
+    const reload = async (editSnackbar: boolean) => {
+      const response = await store.dispatch("getUsers", editSnackbar);
       if (response !== null) {
         users.value = response;
       }

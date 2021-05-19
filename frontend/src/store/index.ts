@@ -152,11 +152,13 @@ export const store = createStore<State>({
         return null;
       }
     },
-    async getUsers({ commit }) {
-      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+    async getUsers({ commit }, editSnackbar?: boolean) {
+      if (editSnackbar === undefined || editSnackbar === true)
+        commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         const response = await backend.get("/users");
-        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        if (editSnackbar === undefined || editSnackbar === true)
+          commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
         if (error !== null) {
