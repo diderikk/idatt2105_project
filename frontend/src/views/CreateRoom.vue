@@ -25,6 +25,9 @@ export default defineComponent({
       }
     };
 
+    /**
+     * The config object to be sent to BaseRoomForm, containing title, and buttons
+     */
     const config = {
       title: "Create Room",
       buttons: [

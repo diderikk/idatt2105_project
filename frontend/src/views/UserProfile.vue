@@ -75,6 +75,9 @@ export default defineComponent({
       },
     });
 
+    /**
+     * Retrieves the user and it's stats
+     */
     onMounted(async () => {
       const response = await store.dispatch("getUser", props.id);
       if (response !== null) {
@@ -87,6 +90,9 @@ export default defineComponent({
       }
     });
 
+    /**
+     * Deletes the current user
+     */
     const deleteUser = async () => {
       if (window.confirm("Are you sure you want do delete the user?")) {
         if (await store.dispatch("deleteUser", user.value.userId)) {
