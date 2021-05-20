@@ -256,9 +256,9 @@ public class UserService implements UserDetailsService {
      * @return edited reservation
      * @throws NotFoundException
      */
-    public GETReservationDTO editUserReservation(long reservationId, POSTReservationDTO dto) throws NotFoundException {
+    public GETReservationDTO editUserReservation(long userId, long reservationId, POSTReservationDTO dto) throws NotFoundException {
         LOGGER.info("editUserReservation(long reservationId) called with reservationId: {}", reservationId);
-        Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
+        Optional<Reservation> optionalReservation = reservationRepository.findById(getUserReservation(userId, reservationId).getReservationId());
         if(!optionalReservation.isPresent()){
             throw new NotFoundException("No reservation found with id: " + reservationId);
         }
@@ -294,7 +294,7 @@ public class UserService implements UserDetailsService {
     public boolean deleteUserReservation(long userId, long reservationId) throws NotFoundException {
         LOGGER.info("deleteUserReservation(long userId, long reservationId) was called with userId: {}", userId);
         Optional<User> optionalUser = userRepository.findById(userId);
-        Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
+        Optional<Reservation> optionalReservation = reservationRepository.findById(getUserReservation(userId, reservationId).getReservationId());
         if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + userId);
         if(!optionalReservation.isPresent()) throw new NotFoundException("No reservation found with id: " + reservationId);
         Reservation reservation = optionalReservation.get();

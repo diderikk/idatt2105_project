@@ -145,7 +145,7 @@ public class UserController {
     @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<GETReservationDTO> editUserReservation(@PathVariable("user_id") long userId, @PathVariable("reservation_id") long reservationId, @RequestBody POSTReservationDTO dto){
         try{
-            GETReservationDTO newDto = userService.editUserReservation(reservationId, dto);
+            GETReservationDTO newDto = userService.editUserReservation(userId, reservationId, dto);
             return new ResponseEntity<>(newDto, HttpStatus.OK);
         }catch(NotFoundException ex){
             ex.printStackTrace();
