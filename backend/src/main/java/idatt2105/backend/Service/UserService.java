@@ -255,8 +255,9 @@ public class UserService implements UserDetailsService {
      * @param dto
      * @return edited reservation
      * @throws NotFoundException
+     * @throws SectionAlreadyBookedException
      */
-    public GETReservationDTO editUserReservation(long userId, long reservationId, POSTReservationDTO dto) throws NotFoundException {
+    public GETReservationDTO editUserReservation(long userId, long reservationId, POSTReservationDTO dto) throws NotFoundException, SectionAlreadyBookedException {
         LOGGER.info("editUserReservation(long reservationId) called with reservationId: {}", reservationId);
         Optional<Reservation> optionalReservation = reservationRepository.findById(getUserReservation(userId, reservationId).getReservationId());
         if(!optionalReservation.isPresent()){
@@ -264,13 +265,13 @@ public class UserService implements UserDetailsService {
         }
         Reservation reservation = optionalReservation.get();
         reservation.setAmountOfPeople(dto.getAmountOfPeople());
-        if(dto.getStartTime() != null) reservation.setStartTime(dto.getStartTime());
-        if(dto.getEndTime() != null) reservation.setEndTime(dto.getEndTime());
         if(dto.getReservationText() != null) reservation.setReservationText(dto.getReservationText());
         if(dto.getSections() != null && !dto.getSections().isEmpty()) {
+            reservation.setSections(new ArrayList<>());
             for(POSTSectionDTO sectionDTO : dto.getSections()){
                 Optional<Section> optionalSection = sectionRepository.findSectionBySectionNameAndRoomCode(sectionDTO.getSectionName(), sectionDTO.getRoomCode());
                 if(optionalSection.isPresent()){
+                    if(checkIfSectionIsBooked(sectionDTO, dto)) throw new SectionAlreadyBookedException("Section is already booked/reserved for the given time period");
                     reservation.getSections().add(optionalSection.get());
                 }
                 else {
@@ -280,6 +281,8 @@ public class UserService implements UserDetailsService {
                 }
             }
         }
+        if(dto.getStartTime() != null) reservation.setStartTime(dto.getStartTime());
+        if(dto.getEndTime() != null) reservation.setEndTime(dto.getEndTime());
         return new GETReservationDTO(reservationRepository.save(reservation));
     }
 

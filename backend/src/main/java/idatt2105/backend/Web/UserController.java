@@ -150,6 +150,9 @@ public class UserController {
         }catch(NotFoundException ex){
             ex.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch(SectionAlreadyBookedException ex ){
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 

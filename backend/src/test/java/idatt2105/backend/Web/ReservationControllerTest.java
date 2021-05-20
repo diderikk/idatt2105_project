@@ -105,7 +105,7 @@ public class ReservationControllerTest {
 
         user = userRepository.findById(user.getUserId()).get();
 
-        postReservationDTO = new POSTReservationDTO(null, null, "Edited", 20, 
+        postReservationDTO = new POSTReservationDTO(LocalDateTime.now().plusHours(10),LocalDateTime.now().plusDays(30), "Edited", 20, 
         List.of(new POSTSectionDTO(section.getSectionName(), section.getRoom().getRoomCode())));
     }
 
