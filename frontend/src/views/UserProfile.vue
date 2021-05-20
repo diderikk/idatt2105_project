@@ -18,14 +18,21 @@
       <div id="block">
         <div class="title">Statistics:</div>
         <p>Total reservations: {{ userStats.totalReservations }}</p>
-        <p>Hours booked: {{ userStats.hoursOfReservations }}</p>
+        <p v-if="userStats.totalHoursOfReservations !== null">Hours booked: {{ userStats.totalHoursOfReservations }}</p>
+        <p v-else>Hours booked: 0</p>
         <span v-if="userStats.favouriteRoom !== null"
           ><p>Favourite room: {{ userStats.favouriteRoom.roomCode }}</p>
+        </span>
+        <span v-else
+          ><p>Favourite room: none</p>
         </span>
         <span v-if="userStats.favouriteSection !== null"
           ><p>
             Favourite section: {{ userStats.favouriteSection.sectionName }}
           </p>
+        </span>
+        <span v-else
+          ><p>Favourite section: none</p>
         </span>
       </div>
     </div>
@@ -67,7 +74,7 @@ export default defineComponent({
       expirationDate: "",
     });
     const userStats: Ref<UserStats> = ref({
-      hoursOfReservations: 0,
+      totalHoursOfReservations: 0,
       totalReservations: 0,
       favouriteRoom: {
         roomCode: "",
