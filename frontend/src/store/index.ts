@@ -3,7 +3,6 @@ import { InjectionKey } from "vue";
 import { createStore, Store, useStore as vuexUseStore } from "vuex";
 import SnackbarStatus from "../enum/SnackbarStatus.enum";
 import backend from "../backend";
-import CreateUser from "@/interfaces/User/User.interface";
 import POSTReservation from "@/interfaces/Reservation/POSTReservation.interface";
 import Reservation from "@/interfaces/Reservation/Reservation.interface";
 import ReservationSorting from "@/interfaces/Reservation/ReservationSorting.interface";
@@ -12,6 +11,8 @@ import EditRoom from "@/interfaces/Room/EditRoom.interface";
 import { UserToUserForm } from "@/utils/userUtils";
 import TimeInterval from "@/interfaces/TimeInterval.interface";
 import State from "@/interfaces/State.interface";
+import UserForm from "@/interfaces/User/UserForm.interface";
+import UserStats from "@/interfaces/User/UserStats.interface";
 
 export const key: InjectionKey<Store<State>> = Symbol();
 
@@ -52,7 +53,6 @@ export const store: Store<State> = createStore<State>({
             firstname: "",
             lastname: "",
             email: "",
-            phoneNationalCode: "",
             phoneNumber: "",
             isAdmin: false,
             expirationDate: "",
@@ -62,7 +62,12 @@ export const store: Store<State> = createStore<State>({
     getSnackbar: (state) => state.snackbar,
   },
   actions: {
-    async createUser({ commit, getters }, user: CreateUser): Promise<boolean> {
+    /**
+     * Sends a call to backend at POST /users
+     * @param user
+     * @returns Promise<boolean>
+     */
+    async createUser({ commit, getters }, user: UserForm): Promise<boolean> {
       //Not letting users that aren't admins create users
       if (!getters.getUser.isAdmin) {
         commit("setSnackbar", {
@@ -96,6 +101,11 @@ export const store: Store<State> = createStore<State>({
         return false;
       }
     },
+    /**
+     * Sends to call to backend at POST /login
+     * @param user an object containing email as string and password as string
+     * @returns Promise<boolean>
+     */
     async login({ commit }, user: { email: string; password: string }) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
@@ -117,6 +127,11 @@ export const store: Store<State> = createStore<State>({
         return false;
       }
     },
+    /**
+     * Sends call to backend at POST /users/${user}
+     * @param user containing userId aswell as all attributes in UserForm interface
+     * @returns Promise<boolean>
+     */
     async editUser({ commit }, user: User) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
@@ -137,6 +152,11 @@ export const store: Store<State> = createStore<State>({
         return false;
       }
     },
+    /**
+     * Sends call to backend at DELETE /users/${userId}
+     * @param userId
+     * @returns Promise<boolean>
+     */
     async deleteUser({ commit }, userId: number): Promise<boolean> {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
@@ -156,12 +176,20 @@ export const store: Store<State> = createStore<State>({
         return false;
       }
     },
+    /**
+     * Removes token and user from state and localStorage, removes the Authorization header in the backend axios instance
+     */
     logout({ commit }) {
       commit("setToken", "");
       commit("setUser", "");
       delete backend.defaults.headers["Authorization"];
     },
-    async getUser({ commit }, userId: number) {
+    /**
+     * Sends call to backend at GET /users/${userId}
+     * @param userId
+     * @returns Promise<User | null> User if successful, and null if error
+     */
+    async getUser({ commit }, userId: number): Promise<User | null> {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         const response = await backend.get(`/users/${userId}`);
@@ -175,7 +203,15 @@ export const store: Store<State> = createStore<State>({
         return null;
       }
     },
-    async getUserStatistics({ commit }, userId: number) {
+    /**
+     * Sends call to backend at GET /users/${userId}/statistics
+     * @param userId
+     * @returns Promise<UserStats | null> UserStats if successful, and null if error
+     */
+    async getUserStatistics(
+      { commit },
+      userId: number
+    ): Promise<UserStats | null> {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         const response = await backend.get(`/users/${userId}/statistics`);
@@ -189,7 +225,12 @@ export const store: Store<State> = createStore<State>({
         return null;
       }
     },
-    async getUsers({ commit }, editSnackbar?: boolean) {
+    /**
+     * Calls backend at GET /users
+     * @param editSnackbar optional, if false, the snakcbar should only be edited when an error occurs
+     * @returns Promise<User[] | null>, User[] if successful, or null if error
+     */
+    async getUsers({ commit }, editSnackbar?: boolean): Promise<User[] | null> {
       if (editSnackbar === undefined || editSnackbar === true)
         commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
@@ -207,7 +248,11 @@ export const store: Store<State> = createStore<State>({
         return null;
       }
     },
-    async getTopUsers({ commit }) {
+    /**
+     * Calls backend at GET /users/statistics/top-users
+     * @returns Promise<User[] | null>, User[] if successful, or null if error
+     */
+    async getTopUsers({ commit }): Promise<User[] | null> {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         const response = await backend.get("/users/statistics/top-users");
@@ -223,6 +268,11 @@ export const store: Store<State> = createStore<State>({
         return null;
       }
     },
+    /**
+     * Calls backend at POST /users/${getters.getUser.userId}/reservations
+     * @param reservation, contains all necessary information about an reservation
+     * @returns Promise<boolean>
+     */
     async createReservation({ commit, getters }, reservation: POSTReservation) {
       try {
         commit("setSnackbarStatus", SnackbarStatus.LOADING);
@@ -251,6 +301,11 @@ export const store: Store<State> = createStore<State>({
         return false;
       }
     },
+    /**
+     * Calls backend at POST /users/${getters.getUser.userId}/reservations/${reservation.reservationId}
+     * @param reservation, just like POSTReservation but also includes reservationId
+     * @returns Promise<boolean>
+     */
     async editReservation({ commit }, reservation: Reservation) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
@@ -277,6 +332,11 @@ export const store: Store<State> = createStore<State>({
         return false;
       }
     },
+    /**
+     * Calls backend at DELETE /users/${getters.getUser.userId}/reservations/${reservation.reservationId}
+     * @param reservationId
+     * @returns Promise<boolean>
+     */
     async deleteReservation({ commit }, reservationId: number) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
