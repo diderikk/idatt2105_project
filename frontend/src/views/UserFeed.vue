@@ -7,13 +7,13 @@
     <div v-if="users.length === 0" class="box" id="placeholder">
       No users available
     </div>
-    <div v-else class="columns">
+    <div v-else class="columns is-multiline">
       <div
         v-for="(user, index) in availableUsers"
         :key="index"
         class="column is-half"
       >
-        <user-card :user="user" @reload="reload(false)">{{ user }}</user-card>
+        <user-card :user="user" @reload="reload(false)"></user-card>
       </div>
     </div>
   </div>
@@ -21,7 +21,6 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
 import BaseFeedHeader from "../components/BaseFeedHeader.vue";
 import UserCard from "../components/UserCard.vue";
 import User from "../interfaces/User/User.interface";
