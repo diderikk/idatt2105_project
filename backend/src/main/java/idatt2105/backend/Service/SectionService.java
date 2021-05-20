@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import idatt2105.backend.Model.Section;
-import idatt2105.backend.Model.DTO.GETReservationDTO;
-import idatt2105.backend.Model.DTO.GETSectionDTO;
-import idatt2105.backend.Model.DTO.SectionStatisticsDTO;
+import idatt2105.backend.Model.DTO.Reservation.GETReservationDTO;
+import idatt2105.backend.Model.DTO.Section.GETSectionDTO;
+import idatt2105.backend.Model.DTO.Section.SectionStatisticsDTO;
 import idatt2105.backend.Repository.SectionRepository;
 import javassist.NotFoundException;
 

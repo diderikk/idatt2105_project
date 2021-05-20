@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import idatt2105.backend.Exception.SectionAlreadyBookedException;
-import idatt2105.backend.Model.DTO.GETReservationDTO;
-import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.SortingDTO;
+import idatt2105.backend.Model.DTO.Reservation.GETReservationDTO;
+import idatt2105.backend.Model.DTO.Reservation.POSTReservationDTO;
 import idatt2105.backend.Service.ReservationService;
 import javassist.NotFoundException;
 

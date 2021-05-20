@@ -1,4 +1,4 @@
-package idatt2105.backend.Model.DTO;
+package idatt2105.backend.Model.DTO.Reservation;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import idatt2105.backend.Model.Reservation;
+import idatt2105.backend.Model.DTO.Section.GETSectionDTO;
+import idatt2105.backend.Model.DTO.User.GETUserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
