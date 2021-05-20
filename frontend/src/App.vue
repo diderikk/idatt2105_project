@@ -22,7 +22,6 @@
       >
         <!--Could not wrap the items in a span and use if-else on the isLoggedIn property since it broke Bulma -->
         <div class="navbar-start">
-          <router-link to="/about" class="navbar-item">About</router-link>
           <router-link
             v-if="isLoggedIn"
             class="navbar-item"
@@ -130,6 +129,7 @@ body {
     width: 95%;
     margin: auto;
     margin-top: 70px;
+    margin-bottom: 10px;
   }
 }
 

@@ -5,7 +5,7 @@ import { store } from "@/store";
 const baseTitle = "Book That Room";
 
 const routes: Array<RouteRecordRaw> = [
-  /*{
+  {
     path: "/",
     name: "Default",
     redirect: { path: "home" },
@@ -17,11 +17,6 @@ const routes: Array<RouteRecordRaw> = [
         component: Home,
       },
     ],
-  },*/
-  {
-    path: "/",
-    name: "Home",
-    component: Home,
   },
   {
     path: "/about",

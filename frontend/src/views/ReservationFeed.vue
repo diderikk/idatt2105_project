@@ -7,7 +7,7 @@
     <div v-if="reservations.length === 0" class="box" id="placeholder">
       No reservations available
     </div>
-    <div v-else class="columns">
+    <div v-else class="columns is-multiline">
       <div
         v-for="(reservation, index) in reservations"
         :key="index"

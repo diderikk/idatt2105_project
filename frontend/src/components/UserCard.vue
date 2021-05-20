@@ -39,16 +39,6 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const store = useStore();
-<<<<<<< HEAD
-
-=======
-    const view = () => {
-      router.push(`/users/${props.user.userId}`);
-    };
-    const edit = () => {
-      router.push(`/edit-user/${props.user.userId}`);
-    };
->>>>>>> dev
     const deleteUser = async () => {
       if (window.confirm("Are you sure you want do delete the user?")) {
         if (await store.dispatch("deleteUser", props.user.userId)) {
@@ -58,11 +48,6 @@ export default defineComponent({
     };
 
     return {
-<<<<<<< HEAD
-=======
-      view,
-      edit,
->>>>>>> dev
       deleteUser,
     };
   },
