@@ -14,16 +14,19 @@
       <p v-else>{{ user.expirationDate }}</p>
     </div>
     <div class="card-footer">
-      <a @click="view" href="#" class="card-footer-item">View</a>
-      <a @click="edit" href="#" class="card-footer-item">Edit</a>
-      <a @click="deleteUser" href="#" class="card-footer-item">Delete</a>
+      <router-link :to="`/users/${user.userId}`" class="card-footer-item"
+        >View</router-link
+      >
+      <router-link :to="`/edit-user/${user.userId}`" class="card-footer-item"
+        >Edit</router-link
+      >
+      <a @click="deleteUser" class="card-footer-item">Delete</a>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { useRouter } from "vue-router";
 import User from "../interfaces/User/User.interface";
 import { useStore } from "../store";
 export default defineComponent({
@@ -35,11 +38,8 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const router = useRouter();
     const store = useStore();
-    const edit = () => {
-      router.push(`/edit-user/${props.user.userId}`);
-    };
+
     const deleteUser = async () => {
       if (window.confirm("Are you sure you want do delete the user?")) {
         if (await store.dispatch("deleteUser", props.user.userId)) {
@@ -49,7 +49,6 @@ export default defineComponent({
     };
 
     return {
-      edit,
       deleteUser,
     };
   },

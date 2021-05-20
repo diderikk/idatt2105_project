@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a @click="goBack" href="#" class="link">&#8592;</a>
+    <a @click="goBack" class="link">&#8592;</a>
   </div>
 </template>
 
@@ -12,7 +12,7 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const goBack = () => {
-      router.back();
+      router.go(-1);
     };
 
     return {

@@ -2,7 +2,9 @@
   <div>
     <nav id="nav" class="navbar is-dark" role="navigation">
       <div class="navbar-brand">
-        <router-link to="/" class="navbar-item">Home</router-link>
+        <router-link to="/" class="navbar-item"
+          ><img alt="Book that room logo" src="./assets/logo.png"
+        /></router-link>
         <a
           :class="{ 'is-active': navBarIsActive }"
           @click="toggleNavBar"

@@ -29,8 +29,11 @@
       </div>
     </div>
     <div class="card-footer">
-      <a class="card-footer-item" @click="viewReservation">View</a>
-      <a class="card-footer-item" @click="editReservation">Edit</a>
+      <router-link
+        class="card-footer-item"
+        :to="`/edit-reservation/${reservation.reservationId}`"
+        >Edit</router-link
+      >
       <a class="card-footer-item" @click="deleteReservation">Delete</a>
     </div>
   </div>
@@ -51,7 +54,6 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const store = useStore();
-    const router = useRouter();
 
     const startTimeString = computed(() => {
       return calcTimeString(
@@ -84,14 +86,6 @@ export default defineComponent({
       return time === "00:00" ? date : `${date} ${time}`;
     };
 
-    const viewReservation = () => {
-      router.push(`/reservation/${props.reservation.reservationId}`);
-    };
-
-    const editReservation = () => {
-      router.push(`/edit-reservation/${props.reservation.reservationId}`);
-    };
-
     const deleteReservation = async (id: number) => {
       if (window.confirm("Are you sure you want to delete the reservation?")) {
         if (
@@ -108,8 +102,6 @@ export default defineComponent({
       startTimeString,
       endTimeString,
       sectionsSortedAlphabetically,
-      viewReservation,
-      editReservation,
       deleteReservation,
     };
   },
