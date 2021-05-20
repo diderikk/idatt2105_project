@@ -23,8 +23,7 @@
         class="column is-half"
       >
         <reservation-card @reload="reload(false)" :reservation="reservation">
-          {{ reservation }}</reservation-card
-        >
+        </reservation-card>
       </div>
     </div>
   </div>
