@@ -1,5 +1,6 @@
 <template>
   <div>
+    <back-button></back-button>
     <h1 class="title">{{ config.title }}</h1>
     <base-form-field-input
       :config="{
@@ -123,6 +124,7 @@ import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import BaseFormFieldInput from "../components/BaseFormFieldInput.vue";
 import { dateToString, removeTimeFromDate } from "../utils/date";
 import BaseFormConfig from "../interfaces/config/BaseFormConfig.interface";
+import BackButton from "../components/BackButton.vue";
 import UserForm from "../interfaces/User/UserForm.interface";
 export default defineComponent({
   name: "BaseUserForm",
@@ -142,6 +144,7 @@ export default defineComponent({
   },
   components: {
     BaseFormFieldInput,
+    BackButton,
   },
   setup(props) {
     const registerInformation = reactive(

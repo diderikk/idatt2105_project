@@ -4,7 +4,7 @@
       :createRoute="'/create-reservation'"
       @inputChange="changeInput($event, input)"
     ></base-feed-header>
-    <div v-if="reservations.length === 0" class="box">
+    <div v-if="reservations.length === 0" class="box" id="placeholder">
       No reservations available
     </div>
     <div v-else class="columns">
@@ -69,4 +69,8 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+#placeholder {
+  margin: 25px 0px;
+}
+</style>
