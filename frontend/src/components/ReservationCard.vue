@@ -15,13 +15,10 @@
           </li>
         </ul>
         <label class="label">Description:</label>
-        <p>
-          {{
-            reservation.reservationText.length > 0
-              ? reservation.reservationText
-              : None
-          }}
+        <p v-if="reservation.reservationText.length > 0">
+          {{ reservation.reservationText }}
         </p>
+        <p v-else>None</p>
         <label class="label">Partcipants: </label>
         <p>{{ reservation.amountOfPeople }}</p>
         <label class="label">Time:</label>
