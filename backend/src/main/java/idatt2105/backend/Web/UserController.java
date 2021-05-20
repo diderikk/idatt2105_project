@@ -111,7 +111,7 @@ public class UserController {
 
     @GetMapping("/{user_id}/reservations/{reservation_id}")
     @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<GETReservationDTO> editUserReservation(@PathVariable("user_id") long userId, @PathVariable("reservation_id") long reservationId){
+    public ResponseEntity<GETReservationDTO> getUserReservation(@PathVariable("user_id") long userId, @PathVariable("reservation_id") long reservationId){
         try{
             return new ResponseEntity<>(userService.getUserReservation(userId, reservationId), HttpStatus.OK);
         } catch (NotFoundException e) {
