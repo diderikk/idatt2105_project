@@ -1,5 +1,7 @@
-package idatt2105.backend.Model.DTO;
+package idatt2105.backend.Model.DTO.User;
 
+import idatt2105.backend.Model.DTO.Room.GETRoomDTO;
+import idatt2105.backend.Model.DTO.Section.GETSectionDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

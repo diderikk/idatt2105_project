@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import idatt2105.backend.Model.DTO.GETSectionDTO;
-import idatt2105.backend.Model.DTO.SectionStatisticsDTO;
+import idatt2105.backend.Model.DTO.Section.GETSectionDTO;
+import idatt2105.backend.Model.DTO.Section.SectionStatisticsDTO;
 import idatt2105.backend.Service.SectionService;
 import javassist.NotFoundException;
 

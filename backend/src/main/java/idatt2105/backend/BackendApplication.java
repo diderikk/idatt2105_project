@@ -6,8 +6,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import idatt2105.backend.Model.DTO.POSTSectionDTO;
-import idatt2105.backend.Model.DTO.POSTUserDTO;
+import idatt2105.backend.Model.DTO.Section.POSTSectionDTO;
+import idatt2105.backend.Model.DTO.User.POSTUserDTO;
 import idatt2105.backend.Service.RoomService;
 import idatt2105.backend.Service.UserService;
 
