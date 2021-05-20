@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, reactive, ref, Ref, watch } from "vue";
+import { defineComponent, onBeforeMount, ref, Ref } from "vue";
 import BaseReservationFormConfig from "../components/BaseReservationForm.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import POSTReservation from "../interfaces/Reservation/POSTReservation.interface";

@@ -207,7 +207,6 @@
 import {
   computed,
   defineComponent,
-  onBeforeMount,
   onMounted,
   reactive,
   Ref,
@@ -610,21 +609,39 @@ export default defineComponent({
     });
 
     /**
-     * When start date/time and end date/time has been added
+     * When start date/time and end date/time has been added or changed
      */
     watch(
-      () => isDateAndTimeSelected.value,
+      () =>
+        registerInformation.startDate +
+        registerInformation.endDate +
+        registerInformation.startTime +
+        registerInformation.endTime,
       async () => {
-        const startTime =
-          registerInformation.startDate + " " + registerInformation.startTime;
-        const endTime =
-          registerInformation.endDate + " " + registerInformation.endTime;
-        const response = await store.dispatch("getAvailableRooms", {
-          startTime,
-          endTime,
-        });
-        if (response !== null) {
-          rooms.value = response;
+        if (isDateAndTimeSelected.value) {
+          const startTime =
+            registerInformation.startDate + " " + registerInformation.startTime;
+          const endTime =
+            registerInformation.endDate + " " + registerInformation.endTime;
+          let response;
+          if (props.reservationId)
+            response = await store.dispatch("getAvailableRooms", {
+              times: {
+                startTime,
+                endTime,
+              },
+              reservationId: props.reservationId,
+            });
+          else
+            response = await store.dispatch("getAvailableRooms", {
+              times: {
+                startTime,
+                endTime,
+              },
+            });
+          if (response !== null) {
+            rooms.value = response;
+          }
         }
       }
     );

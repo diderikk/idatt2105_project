@@ -352,10 +352,13 @@ export const store: Store<State> = createStore<State>({
         return null;
       }
     },
-    async getAvailableRooms({ commit }, times: TimeInterval) {
+    async getAvailableRooms({ commit }, timeInterval: {times: TimeInterval, reservationId?: number}) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        const response = await backend.post("/rooms/available", times);
+        let response;
+        if(timeInterval.reservationId === undefined)
+          response = await backend.post("/rooms/available", timeInterval.times);
+        else response = await backend.post(`/rooms/available/${timeInterval.reservationId}`, timeInterval.times);
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
