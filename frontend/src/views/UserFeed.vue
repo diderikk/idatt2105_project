@@ -1,6 +1,11 @@
 <template>
   <div>
-    <input v-model="searchInput" class="input" type="text" placeholder="Search" />
+    <input
+      v-model="searchInput"
+      class="input"
+      type="text"
+      placeholder="Search"
+    />
     <div v-if="users.length === 0" class="box">No users available</div>
     <span v-else
       ><user-card
@@ -40,22 +45,24 @@ export default defineComponent({
     };
 
     const availableUsers = computed(() => {
-      return users.value.filter(user => compareUserValues(user));
+      return users.value.filter((user) => compareUserValues(user));
     });
 
     const compareUserValues = (user: User) => {
       const searchLowerCase = searchInput.value.toLowerCase();
-      return user.firstName.toLowerCase().startsWith(searchLowerCase) ||
-      user.lastName.toLowerCase().startsWith(searchLowerCase) ||
-      user.email.toLowerCase().startsWith(searchLowerCase) ||
-      user.phoneNumber.toLowerCase().startsWith(searchLowerCase);
-    }
+      return (
+        user.firstName.toLowerCase().startsWith(searchLowerCase) ||
+        user.lastName.toLowerCase().startsWith(searchLowerCase) ||
+        user.email.toLowerCase().startsWith(searchLowerCase) ||
+        user.phoneNumber.toLowerCase().startsWith(searchLowerCase)
+      );
+    };
 
     return {
       searchInput,
       users,
       reload,
-      availableUsers
+      availableUsers,
     };
   },
 });
