@@ -4,7 +4,7 @@
       <p class="card-header-title">{{ room.roomCode }}</p>
     </div>
     <div class="card-content">
-      <p class="menu-label">Sections</p>
+      <label class="label">Sections:</label>
       <ul class="menu-list">
         <li v-for="(section, index) in room.sections" :key="index">
           {{ section.sectionName }}
@@ -12,20 +12,22 @@
       </ul>
     </div>
     <div class="card-footer">
-      <a @click="joinChat" href="#" class="card-footer-item">Join Chat</a>
-      <a v-if="isAdmin" @click="editRoom" href="#" class="card-footer-item"
-        >Edit</a
+      <!--<router-link :to="chatroute" class="card-footer-item"
+        >Join Chat</router-link
+      >-->
+      <router-link
+        v-if="isAdmin"
+        :to="`/edit-room/${room.roomCode}`"
+        class="card-footer-item"
+        >Edit</router-link
       >
-      <a v-if="isAdmin" @click="deleteRoom" href="#" class="card-footer-item"
-        >Delete</a
-      >
+      <a v-if="isAdmin" @click="deleteRoom" class="card-footer-item">Delete</a>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { useRouter } from "vue-router";
 import Room from "../interfaces/Room/Room.interface";
 import { useStore } from "../store";
 
@@ -43,11 +45,6 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const store = useStore();
-    const router = useRouter();
-
-    const editRoom = () => {
-      router.push(`/edit-room/${props.room.roomCode}`);
-    };
 
     const deleteRoom = async () => {
       if (window.confirm("Are you sure you want do delete the room?")) {
@@ -58,7 +55,6 @@ export default defineComponent({
     };
 
     return {
-      editRoom,
       deleteRoom,
     };
   },

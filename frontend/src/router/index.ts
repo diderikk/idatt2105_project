@@ -102,10 +102,10 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/LogIn.vue"),
   },
   {
-    path: "/reservation-feed",
+    path: "/reservations",
     name: "ReservationFeed",
     meta: {
-      title: "Reservation feed",
+      title: "Reservation Feed",
       parmission: "User",
     },
     component: () => import("../views/ReservationFeed.vue"),
@@ -145,13 +145,12 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.permission == "Admin")) {
     if (store.getters.getUser.isAdmin) {
       next();
+
       return;
     }
     if (store.getters.isUserLoggedIn) {
       //In case the user is logged in we dont want to kick the user out
-      router.getRoutes().length === 0
-        ? router.replace("/log-in")
-        : router.back();
+      router.replace("/reservation-feed");
       return;
     }
     router.replace("/log-in");
@@ -163,6 +162,7 @@ router.beforeEach((to, from, next) => {
       return;
     }
     router.replace("/log-in");
+    return;
   }
   next();
 });

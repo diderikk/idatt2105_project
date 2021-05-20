@@ -114,9 +114,8 @@ public class UserService implements UserDetailsService {
         createdUser.setExpirationDate(inputUser.getExpirationDate());
         createdUser.setAdmin(inputUser.isAdmin());
         createdUser.setHash(passwordEncoder.encode(randomPassword));
-        createdUser = userRepository.save(createdUser);
-
         if(emailComponent != null) emailComponent.sendPassword(createdUser.getEmail(), randomPassword);
+        createdUser = userRepository.save(createdUser);
 
         return new GETUserDTO(createdUser);
     }
@@ -137,7 +136,7 @@ public class UserService implements UserDetailsService {
             throw new AlreadyExistsException("Email " + inputUser.getEmail() + " already exists");
         if(optionalUser.isPresent()){
             User user = optionalUser.get();
-            if(inputUser.getEmail() != null) user.setEmail(inputUser.getEmail());
+            if(!inputUser.getEmail().isEmpty() || inputUser.getEmail() != null) user.setEmail(inputUser.getEmail());
             if(inputUser.getFirstName() != null) user.setFirstName(inputUser.getFirstName());
             if(inputUser.getLastName() != null) user.setLastName(inputUser.getLastName());
             if(inputUser.getExpirationDate() != null) user.setExpirationDate(inputUser.getExpirationDate());
@@ -237,6 +236,40 @@ public class UserService implements UserDetailsService {
     }
 
     /**
+     * Changes a user reservation if it exists
+     * @param reservationId
+     * @param dto
+     * @return edited reservation
+     * @throws NotFoundException
+     */
+    public GETReservationDTO editUserReservation(long reservationId, POSTReservationDTO dto) throws NotFoundException {
+        LOGGER.info("editUserReservation(long reservationId) called with reservationId: {}", reservationId);
+        Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
+        if(!optionalReservation.isPresent()){
+            throw new NotFoundException("No reservation found with id: " + reservationId);
+        }
+        Reservation reservation = optionalReservation.get();
+        reservation.setAmountOfPeople(dto.getAmountOfPeople());
+        if(dto.getStartTime() != null) reservation.setStartTime(dto.getStartTime());
+        if(dto.getEndTime() != null) reservation.setEndTime(dto.getEndTime());
+        if(dto.getReservationText() != null) reservation.setReservationText(dto.getReservationText());
+        if(dto.getSections() != null && !dto.getSections().isEmpty()) {
+            for(POSTSectionDTO sectionDTO : dto.getSections()){
+                Optional<Section> optionalSection = sectionRepository.findSectionBySectionNameAndRoomCode(sectionDTO.getSectionName(), sectionDTO.getRoomCode());
+                if(optionalSection.isPresent()){
+                    reservation.getSections().add(optionalSection.get());
+                }
+                else {
+                    throw new NotFoundException("No section found with sectionName: " 
+                        + sectionDTO.getSectionName() + ", and roomCode: " 
+                        + sectionDTO.getRoomCode());
+                }
+            }
+        }
+        return new GETReservationDTO(reservationRepository.save(reservation));
+    }
+
+    /**
      * Removes an existing reservation from the user and the database.
      * Reservation specified bu reservationId.
      * @param userId
@@ -244,8 +277,8 @@ public class UserService implements UserDetailsService {
      * @return POSTReservationDTO of the reservation that was added
      * @throws NotFoundException if user not found
      */
-    public boolean removeUserReservation(long userId, long reservationId) throws NotFoundException {
-        LOGGER.info("removeUserReservation(long userId, long reservationId) was called with userId: {}", userId);
+    public boolean deleteUserReservation(long userId, long reservationId) throws NotFoundException {
+        LOGGER.info("deleteUserReservation(long userId, long reservationId) was called with userId: {}", userId);
         Optional<User> optionalUser = userRepository.findById(userId);
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
         if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + userId);
@@ -254,6 +287,13 @@ public class UserService implements UserDetailsService {
         reservation.getSections().clear();
         reservation = reservationRepository.save(reservation);
         reservationRepository.delete(reservation);
+
+        try{
+            if(emailComponent != null) emailComponent.sendReservationDeleted(reservation, reservation.getUser().getEmail());
+        }catch (Exception ex){
+            LOGGER.info("deleteReservation(long reservationId) called with bad email: {}",reservation.getUser().getEmail());
+        }
+
         return !reservationRepository.existsById(reservationId);
     }
 

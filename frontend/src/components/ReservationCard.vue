@@ -4,16 +4,16 @@
       <h2 class="card-header-title">{{ reservation.roomCode }}</h2>
     </div>
     <div class="card-content">
+      <label class="label">Sections:</label>
+      <ul class="menu-list">
+        <li
+          v-for="(section, index) in sectionsSortedAlphabetically"
+          :key="index"
+        >
+          {{ section }}
+        </li>
+      </ul>
       <div class="content">
-        <label class="label">Sections:</label>
-        <ul>
-          <li
-            v-for="(section, index) in sectionsSortedAlphabetically"
-            :key="index"
-          >
-            {{ section }}
-          </li>
-        </ul>
         <label class="label">Description:</label>
         <p v-if="reservation.reservationText.length > 0">
           {{ reservation.reservationText }}
@@ -29,8 +29,11 @@
       </div>
     </div>
     <div class="card-footer">
-      <a class="card-footer-item" @click="viewReservation">View</a>
-      <a class="card-footer-item" @click="editReservation">Edit</a>
+      <router-link
+        class="card-footer-item"
+        :to="`/edit-reservation/${reservation.reservationId}`"
+        >Edit</router-link
+      >
       <a class="card-footer-item" @click="deleteReservation">Delete</a>
     </div>
   </div>
@@ -38,7 +41,6 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref } from "vue";
-import { useRouter } from "vue-router";
 import ReservationCard from "../interfaces/Reservation/ReservationCard.interface";
 import { useStore } from "../store";
 export default defineComponent({
@@ -51,7 +53,6 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const store = useStore();
-    const router = useRouter();
 
     const startTimeString = computed(() => {
       return calcTimeString(
@@ -68,7 +69,7 @@ export default defineComponent({
 
     const sectionsSortedAlphabetically = ref([] as string[]);
     props.reservation.sections.forEach((section) => {
-      sectionsSortedAlphabetically.value.push(section);
+      sectionsSortedAlphabetically.value.push(section.sectionName);
     });
     sectionsSortedAlphabetically.value.sort((a, b) => {
       if (a.toLowerCase() < b.toLowerCase()) {
@@ -82,14 +83,6 @@ export default defineComponent({
 
     const calcTimeString = (date: string, time: string) => {
       return time === "00:00" ? date : `${date} ${time}`;
-    };
-
-    const viewReservation = () => {
-      router.push(`/reservation/${props.reservation.reservationId}`);
-    };
-
-    const editReservation = () => {
-      router.push(`/edit-reservation/${props.reservation.reservationId}`);
     };
 
     const deleteReservation = async (id: number) => {
@@ -108,12 +101,14 @@ export default defineComponent({
       startTimeString,
       endTimeString,
       sectionsSortedAlphabetically,
-      viewReservation,
-      editReservation,
       deleteReservation,
     };
   },
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+li {
+  margin: 10px 10px;
+}
+</style>

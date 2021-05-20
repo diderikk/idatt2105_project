@@ -7,7 +7,7 @@
     <div v-if="rooms.length === 0" class="box" id="placeholder">
       No rooms available
     </div>
-    <div v-else class="columns">
+    <div v-else class="columns is-multiline">
       <div
         v-for="(room, index) in availableRooms"
         :key="index"
@@ -58,11 +58,11 @@ export default defineComponent({
           room.roomCode
             .toLowerCase()
             .startsWith(searchInput.value.toLowerCase()) ||
-          sectionContainsSeach(room)
+          sectionContainsSearch(room)
       )
     );
 
-    const sectionContainsSeach = (room: Room): boolean => {
+    const sectionContainsSearch = (room: Room): boolean => {
       for (const section of room.sections)
         if (
           section.sectionName

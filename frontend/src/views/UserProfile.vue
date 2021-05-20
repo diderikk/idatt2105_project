@@ -29,10 +29,12 @@
         </span>
       </div>
     </div>
-    <footer class="card-footer">
-      <a @click="edit" href="#" class="card-footer-item">Edit</a>
-      <a @click="deleteUser" href="#" class="card-footer-item">Delete</a>
-    </footer>
+    <div class="card-footer">
+      <router-link :to="`/edit-user/${user.userId}`" class="card-footer-item"
+        >Edit</router-link
+      >
+      <a @click="deleteUser" class="card-footer-item">Delete</a>
+    </div>
   </div>
 </template>
 
@@ -88,10 +90,6 @@ export default defineComponent({
       }
     });
 
-    const edit = () => {
-      router.push(`/edit-user/${user.value.userId}`);
-    };
-
     const deleteUser = async () => {
       if (window.confirm("Are you sure you want do delete the user?")) {
         if (await store.dispatch("deleteUser", user.value.userId)) {
@@ -103,7 +101,6 @@ export default defineComponent({
     return {
       user,
       userStats,
-      edit,
       deleteUser,
     };
   },
