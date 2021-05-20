@@ -262,10 +262,13 @@ export const store: Store<State> = createStore<State>({
     async editReservation({ commit }, reservation: Reservation) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        await backend.post(
-          `/reservations/${reservation.reservationId}`,
-          reservation
-        );
+        if(!store.getters.getUser.isAdmin)
+          await backend.post(`/users/${store.getters.getUser.userId}/reservations/${reservation.reservationId}`, reservation)
+        else
+          await backend.post(
+            `/reservations/${reservation.reservationId}`,
+            reservation
+          );
         commit("setSnackbar", {
           content: "Reservation edited",
           status: SnackbarStatus.SUCCESS,
@@ -282,7 +285,11 @@ export const store: Store<State> = createStore<State>({
     async deleteReservation({ commit }, reservationId: number) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        await backend.delete(`/reservations/${reservationId}`);
+        if(!store.getters.getUser.isAdmin)
+          await backend.delete(`/users/${store.getters.getUser.userId}/reservations/${reservationId}`)
+        else
+          await backend.delete(`/reservations/${reservationId}`);
+        
         commit("setSnackbar", {
           content: "Reservation deleted",
           status: SnackbarStatus.SUCCESS,
@@ -310,8 +317,9 @@ export const store: Store<State> = createStore<State>({
         return null;
       }
     },
-    async getReservations({ commit }, sortingConfig?: ReservationSorting) {
-      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+    async getReservations({ commit }, editSnackbar: boolean, sortingConfig?: ReservationSorting) {
+      if (editSnackbar === undefined || editSnackbar === true)
+        commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         let response;
         const currentUser = store.getters.getUser;
@@ -335,7 +343,8 @@ export const store: Store<State> = createStore<State>({
           }
         }
 
-        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        if (editSnackbar === undefined || editSnackbar === true)
+          commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
         commit("setSnackbar", {

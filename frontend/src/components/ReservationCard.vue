@@ -4,16 +4,16 @@
       <h2 class="card-header-title">{{ reservation.roomCode }}</h2>
     </div>
     <div class="card-content">
+      <label class="label">Sections:</label>
+      <ul class="menu-list">
+        <li
+          v-for="(section, index) in sectionsSortedAlphabetically"
+          :key="index"
+        >
+          {{ section }}
+        </li>
+      </ul>
       <div class="content">
-        <label class="label">Sections:</label>
-        <ul>
-          <li
-            v-for="(section, index) in sectionsSortedAlphabetically"
-            :key="index"
-          >
-            {{ section }}
-          </li>
-        </ul>
         <label class="label">Description:</label>
         <p v-if="reservation.reservationText.length > 0">
           {{ reservation.reservationText }}
@@ -41,7 +41,6 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref } from "vue";
-import { useRouter } from "vue-router";
 import ReservationCard from "../interfaces/Reservation/ReservationCard.interface";
 import { useStore } from "../store";
 export default defineComponent({
@@ -108,4 +107,8 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+li {
+  margin: 10px 10px;
+}
+</style>

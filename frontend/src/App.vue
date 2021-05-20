@@ -25,7 +25,7 @@
           <router-link
             v-if="isLoggedIn"
             class="navbar-item"
-            to="/reservation-feed"
+            to="/reservations"
             >Reservations</router-link
           >
           <router-link v-if="isAdmin" class="navbar-item" to="/users"

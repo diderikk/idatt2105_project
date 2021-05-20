@@ -269,7 +269,7 @@ public class UserServiceTests {
     @Test
     public void removeUserReservation_WrongUserId_ThrowsNotFoundException() throws NotFoundException
     {
-        assertThrows(NotFoundException.class, () -> userService.removeUserReservation(0, 1));
+        assertThrows(NotFoundException.class, () -> userService.deleteUserReservation(0, 1));
     }
 
     @Test

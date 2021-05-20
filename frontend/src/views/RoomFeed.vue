@@ -58,11 +58,11 @@ export default defineComponent({
           room.roomCode
             .toLowerCase()
             .startsWith(searchInput.value.toLowerCase()) ||
-          sectionContainsSeach(room)
+          sectionContainsSearch(room)
       )
     );
 
-    const sectionContainsSeach = (room: Room): boolean => {
+    const sectionContainsSearch = (room: Room): boolean => {
       for (const section of room.sections)
         if (
           section.sectionName
