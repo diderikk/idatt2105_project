@@ -17,7 +17,7 @@
         <h2 class="title is-4">About us</h2>
         <p class="subtitle is-5">
           <strong>Book That Room</strong> is a solution striving to make
-          reservaring rooms as easy as possible. Lorem ipsum dolor sit amet
+          reserving rooms as easy as possible. Lorem ipsum dolor sit amet
           consectetur adipisicing elit. Pariatur aliquam, odit rerum impedit
           voluptatem a delectus nihil veritatis facere ullam aspernatur ducimus
           magni dignissimos ea nostrum dolores saepe, ipsum odio rem nam veniam

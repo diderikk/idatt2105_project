@@ -30,8 +30,7 @@ export default defineComponent({
     const router = useRouter();
 
     const logIn = async () => {
-      if (await store.dispatch("login", userInfo))
-        router.push("/reservation-feed");
+      if (await store.dispatch("login", userInfo)) router.push("/reservations");
     };
 
     return {
