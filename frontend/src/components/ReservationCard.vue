@@ -71,7 +71,7 @@ export default defineComponent({
 
     const sectionsSortedAlphabetically = ref([] as string[]);
     props.reservation.sections.forEach((section) => {
-      sectionsSortedAlphabetically.value.push(section);
+      sectionsSortedAlphabetically.value.push(section.sectionName);
     });
     sectionsSortedAlphabetically.value.sort((a, b) => {
       if (a.toLowerCase() < b.toLowerCase()) {

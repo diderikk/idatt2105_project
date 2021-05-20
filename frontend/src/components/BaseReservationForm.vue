@@ -218,11 +218,13 @@ import BaseFormFieldInput from "../components/BaseFormFieldInput.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import { dateToString, removeTimeFromDate } from "../utils/date";
 import SectionForCheckBox from "../interfaces/Section/SectionForCheckBox.interface";
-import Room from "../interfaces/Room/RoomForm.interface";
+import AvailableRoom from "../interfaces/Room/AvailableRoom.interface";
 import BaseFormConfig from "../interfaces/config/BaseFormConfig.interface";
 import Section from "../interfaces/Section/Section.interface";
 import ReservationForm from "../interfaces/Reservation/ReservationForm.interface";
 import { useStore } from "../store";
+import SectionWithDisable from "../interfaces/Section/SectionWithDisable.interface";
+import { AvailableRoomsToReservationForm } from "../utils/reservationUtils";
 export default defineComponent({
   name: "BaseReservationForm",
   components: { BaseFormFieldInput },
@@ -249,7 +251,7 @@ export default defineComponent({
         {},
         props.baseReservation ?? {
           roomCode: "",
-          sections: [] as Array<string>,
+          sections: [] as Array<SectionWithDisable>,
           reservationText: "",
           startDate: dateToString(removeTimeFromDate(new Date())),
           startTime: "",
@@ -277,7 +279,7 @@ export default defineComponent({
     };
 
     //TODO get rooms and section based on the selected date and time
-    const rooms: Ref<Array<Room>> = ref([]);
+    const rooms: Ref<Array<AvailableRoom>> = ref([]);
 
     /**
      * Sorts the rooms alphabetically based on the room code when the rooms change
@@ -340,12 +342,16 @@ export default defineComponent({
      * runs mapSection
      * If there are passed selected sections to the config object, then make them selected
      */
-    onMounted(() => {
+    onMounted(async () => {
+      if(props.baseReservation !== undefined){
+        getAvailableRooms();
+      }
+
       mapSections();
       if (registerInformation.sections.length !== 0) {
         availableSections.value.forEach((section) => {
           const index = registerInformation.sections.findIndex(
-            (s) => s === section.sectionName
+            (s) => s.sectionName === section.sectionName
           );
           if (index >= 0) {
             availableSections.value[index].selected = true;
@@ -362,11 +368,11 @@ export default defineComponent({
     const handleCheckBoxChange = (section: SectionForCheckBox) => {
       section.selected = !section.selected;
       if (section.selected) {
-        registerInformation.sections.push(section.sectionName);
+        registerInformation.sections.push({sectionName: section.sectionName, isDisabled: false});
       } else {
         registerInformation.sections.splice(
           registerInformation.sections.findIndex(
-            (s) => s === section.sectionName
+            (s) => s.sectionName === section.sectionName
           ),
           1
         );
@@ -382,10 +388,10 @@ export default defineComponent({
         sectionForCheckBox.selected = true;
         if (
           !registerInformation.sections.some(
-            (sectionName) => sectionName === sectionForCheckBox.sectionName
+            (section) => section.sectionName === sectionForCheckBox.sectionName
           )
         )
-          registerInformation.sections.push(sectionForCheckBox.sectionName);
+          registerInformation.sections.push({sectionName: sectionForCheckBox.sectionName, isDisabled:false});
       });
     };
 
@@ -608,17 +614,8 @@ export default defineComponent({
       );
     });
 
-    /**
-     * When start date/time and end date/time has been added or changed
-     */
-    watch(
-      () =>
-        registerInformation.startDate +
-        registerInformation.endDate +
-        registerInformation.startTime +
-        registerInformation.endTime,
-      async () => {
-        if (isDateAndTimeSelected.value) {
+    const getAvailableRooms = async () => {
+      if (isDateAndTimeSelected.value) {
           const startTime =
             registerInformation.startDate + " " + registerInformation.startTime;
           const endTime =
@@ -640,9 +637,23 @@ export default defineComponent({
               },
             });
           if (response !== null) {
-            rooms.value = response;
+            rooms.value = AvailableRoomsToReservationForm(response) ;
+            mapSections();
           }
         }
+    }
+
+    /**
+     * When start date/time and end date/time has been added or changed
+     */
+    watch(
+      () =>
+        registerInformation.startDate +
+        registerInformation.endDate +
+        registerInformation.startTime +
+        registerInformation.endTime,
+      async () => {
+        await getAvailableRooms();
       }
     );
 

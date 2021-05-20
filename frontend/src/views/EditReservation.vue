@@ -49,7 +49,6 @@ export default defineComponent({
       );
       if (response !== null) {
         reservation.value = POSTReservationToReservationForm(response);
-        console.log(reservation.value);
         isDoneLoading.value = true;
       }
     });
@@ -74,7 +73,6 @@ export default defineComponent({
       reservationId: number
     ) => {
       if (checksBeforeAsyncCall(checks, statuses)) {
-        console.log(reservationId);
         store.dispatch("editReservation", {
           id: reservationId,
           ...reservationFormToPOSTReservtion(registerInformation),
