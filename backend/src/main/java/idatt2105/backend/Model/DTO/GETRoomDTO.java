@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import idatt2105.backend.Model.Room;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
