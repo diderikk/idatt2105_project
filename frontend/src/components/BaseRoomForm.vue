@@ -1,5 +1,6 @@
 <template>
   <div>
+    <back-button></back-button>
     <h1 class="title">{{ config.title }}</h1>
     <base-form-field-input
       :config="{
@@ -23,18 +24,22 @@
       }"
     >
       <span @blur="addSectionHandler" id="sectionInput">
-        
         <input
           v-model="sectionInput"
           type="text"
           placeholder="Section"
           class="input"
         />
-        <button class="button is-success form" @click="addSectionHandler">+</button>
+        <button class="button is-success form" @click="addSectionHandler">
+          +
+        </button>
       </span>
       <div class="box" v-for="(section, index) in sections" :key="index">
         {{ section.sectionName }}
-        <button class="button is-danger form" @click="removeSectionHandler(index)">
+        <button
+          class="button is-danger form"
+          @click="removeSectionHandler(index)"
+        >
           -
         </button>
       </div>
@@ -66,9 +71,10 @@ import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import BaseFormConfig from "../interfaces/config/BaseFormConfig.interface";
 import Section from "../interfaces/Section/Section.interface";
 import RoomForm from "../interfaces/Room/RoomForm.interface";
+import BackButton from "./BackButton.vue";
 export default defineComponent({
   name: "CreateRoom",
-  components: { BaseFormFieldInput },
+  components: { BaseFormFieldInput, BackButton },
   props: {
     config: {
       required: true,
@@ -96,15 +102,16 @@ export default defineComponent({
 
     const roomCodeStatus = ref(InputFieldFeedbackStatus.NONE);
     const checkRoomCodeValidity = () => {
-      if(registerInformation.roomCode.trim() === ""){
+      if (registerInformation.roomCode.trim() === "") {
         roomCodeInputError.value = "Enter a room code";
         roomCodeStatus.value = InputFieldFeedbackStatus.ERROR;
-      }
-      else if(!(/^[A-Za-z0-9-_æøåÆØÅ]{4,}$/i).test(registerInformation.roomCode.trim())){
-        roomCodeInputError.value = "Syntax error: Use only alfabet, numbers, -, _, no spaces and length must be grater than 3"
+      } else if (
+        !/^[A-Za-z0-9-_æøåÆØÅ]{4,}$/i.test(registerInformation.roomCode.trim())
+      ) {
+        roomCodeInputError.value =
+          "Syntax error: Use only alfabet, numbers, -, _, no spaces and length must be grater than 3";
         roomCodeStatus.value = InputFieldFeedbackStatus.ERROR;
-      }
-      else roomCodeStatus.value = InputFieldFeedbackStatus.SUCCESS;
+      } else roomCodeStatus.value = InputFieldFeedbackStatus.SUCCESS;
     };
 
     const sectionsStatus = ref(InputFieldFeedbackStatus.NONE);
@@ -181,7 +188,7 @@ ul {
   height: 2.5em;
 }
 
-.margin-left{
-    margin-left: 5px;
+.margin-left {
+  margin-left: 5px;
 }
 </style>
