@@ -36,14 +36,13 @@ import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.UserSecurityDetails;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
-import idatt2105.backend.Model.DTO.GETRoomDTO;
-import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.POSTUserDTO;
 import idatt2105.backend.Model.DTO.UserStatisticsDTO;
 import idatt2105.backend.Model.DTO.GETUserDTO;
 import idatt2105.backend.Repository.ReservationRepository;
+import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
 import idatt2105.backend.Repository.UserRepository;
 import javassist.NotFoundException;
@@ -60,6 +59,9 @@ public class UserServiceTests {
 
     @Mock
     private SectionRepository sectionRepository;
+
+    @Mock
+    private RoomRepository roomRepository;
 
     @Mock
     private ReservationRepository reservationRepository;
@@ -131,6 +133,10 @@ public class UserServiceTests {
         Mockito.lenient()
         .when(sectionRepository.findById(1L))
         .thenReturn(Optional.of(section));
+
+        Mockito.lenient()
+        .when(roomRepository.findById(room.getRoomCode()))
+        .thenReturn(Optional.of(room));
 
         Mockito.lenient()
         .when(reservationRepository.save(any()))
@@ -327,11 +333,11 @@ public class UserServiceTests {
         
         Mockito.lenient()
         .when(userRepository.getFavouriteRoomOfUser(user.getUserId()))
-        .thenReturn(Optional.of(room));
+        .thenReturn(Optional.of(room.getRoomCode()));
         
         Mockito.lenient()
         .when(userRepository.getFavouriteSectionOfUser(user.getUserId()))
-        .thenReturn(Optional.of(section));
+        .thenReturn(Optional.of(section.getSectionId()));
 
         UserStatisticsDTO userStatisticsDTO = userService.getStatistics(user.getUserId());
         assertNotNull(userStatisticsDTO);
