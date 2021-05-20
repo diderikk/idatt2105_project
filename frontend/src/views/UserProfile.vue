@@ -13,7 +13,9 @@
         </div>
         <p class="title" v-else>*No name*</p>
       </div>
-
+      <div class="columns is-centered has-text-centered">
+        <span v-if="user.isAdmin" class="tag is-dark is-medium">Admin</span>
+      </div>
       <nav class="level">
         <div class="level-item has-text-centered">
           <div>
@@ -167,7 +169,7 @@ export default defineComponent({
 .level-item {
   margin-bottom: 10px;
 }
-.title {
+.tag {
   margin-bottom: 50px;
 }
 </style>
