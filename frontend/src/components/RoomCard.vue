@@ -28,7 +28,6 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { useRouter } from "vue-router";
 import Room from "../interfaces/Room/Room.interface";
 import { useStore } from "../store";
 

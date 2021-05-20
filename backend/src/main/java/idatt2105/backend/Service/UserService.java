@@ -286,7 +286,11 @@ public class UserService implements UserDetailsService {
         reservation = reservationRepository.save(reservation);
         reservationRepository.delete(reservation);
 
-        if(emailComponent != null) emailComponent.sendReservationDeleted(reservation, reservation.getUser().getEmail());
+        try{
+            if(emailComponent != null) emailComponent.sendReservationDeleted(reservation, reservation.getUser().getEmail());
+        }catch (Exception ex){
+            LOGGER.info("deleteReservation(long reservationId) called with bad email: {}",reservation.getUser().getEmail());
+        }
 
         return !reservationRepository.existsById(reservationId);
     }
