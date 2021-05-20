@@ -262,7 +262,7 @@ export const store: Store<State> = createStore<State>({
     async editReservation({ commit }, reservation: Reservation) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        if(store.getters.getUser.isAdmin)
+        if(!store.getters.getUser.isAdmin)
           await backend.post(`/users/${store.getters.getUser.userId}/reservations/${reservation.reservationId}`, reservation)
         else
           await backend.post(
@@ -285,7 +285,7 @@ export const store: Store<State> = createStore<State>({
     async deleteReservation({ commit }, reservationId: number) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        if(store.getters.getUser.isAdmin)
+        if(!store.getters.getUser.isAdmin)
           await backend.delete(`/users/${store.getters.getUser.userId}/reservations/${reservationId}`)
         else
           await backend.delete(`/reservations/${reservationId}`);
