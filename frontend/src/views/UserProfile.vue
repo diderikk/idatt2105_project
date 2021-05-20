@@ -8,14 +8,17 @@
         <p>Name: {{ user.firstName }} {{ user.lastName }}</p>
         <p>Email: {{ user.email }}</p>
         <p>Phone number: {{ user.phoneNationalCode }}{{ user.phoneNumber }}</p>
+        <span v-if="user.expirationDate !== null"
+          ><p>Expiration date: {{ user.expirationDate }}</p>
+        </span>
+        <span v-else
+          ><p>Expiration date: none</p>
+        </span>
       </div>
       <div id="block">
         <div class="title">Statistics:</div>
         <p>Total reservations: {{ userStats.totalReservations }}</p>
         <p>Hours booked: {{ userStats.hoursOfReservations }}</p>
-        <span v-if="user.expirationDate !== null"
-          ><p>Expiration date: {{ user.expirationDate }}</p>
-        </span>
         <span v-if="userStats.favouriteRoom !== null"
           ><p>Favourite room: {{ userStats.favouriteRoom.roomCode }}</p>
         </span>
@@ -81,7 +84,7 @@ export default defineComponent({
 
       const statistics = await store.dispatch("getUserStatistics", props.id);
       if (statistics !== null) {
-        userStats.value = statistics.data;
+        userStats.value = statistics;
       }
     });
 
