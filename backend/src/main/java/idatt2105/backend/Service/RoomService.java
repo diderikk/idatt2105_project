@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionNameInRoomAlreadyExistsException;
 import idatt2105.backend.Exception.SectionNotOfThisRoomException;
+import idatt2105.backend.Model.Message;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
@@ -27,6 +28,7 @@ import idatt2105.backend.Model.DTO.POSTRoomDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.TimeIntervalDTO;
 import idatt2105.backend.Model.DTO.RoomStatisticsDTO;
+import idatt2105.backend.Repository.MessageRepository;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -43,6 +45,8 @@ public class RoomService {
     private SectionRepository sectionRepository;
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private MessageRepository messageRepository;
 
     /**
      * Returns room based on roomCode stored in the database
@@ -323,6 +327,9 @@ public class RoomService {
                 }
                 sectionRepository.delete(section);
             }
+        }
+        if(room.get().getMessages() != null){
+            messageRepository.deleteAll(room.get().getMessages());
         }
         roomRepository.deleteById(roomCode);
         return !roomRepository.existsById(roomCode);

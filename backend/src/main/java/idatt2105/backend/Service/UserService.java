@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import idatt2105.backend.Component.EmailComponent;
 import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionAlreadyBookedException;
+import idatt2105.backend.Model.Message;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
@@ -38,6 +39,7 @@ import idatt2105.backend.Model.DTO.POSTUserDTO;
 import idatt2105.backend.Model.DTO.SortingDTO;
 import idatt2105.backend.Model.DTO.UserStatisticsDTO;
 import idatt2105.backend.Model.Enum.SortingTypeEnum;
+import idatt2105.backend.Repository.MessageRepository;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -63,6 +65,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private MessageRepository messageRepository;
 
     @Autowired(required = false)
     private EmailComponent emailComponent;
@@ -336,6 +341,12 @@ public class UserService implements UserDetailsService {
         reservationRepository.saveAll(user.getReservations());
         reservationRepository.deleteAll(user.getReservations());
         user.getReservations().clear();
+
+        if(user.getMessages() != null){
+            for(Message message: user.getMessages()) message.setUser(null);
+            messageRepository.saveAll(user.getMessages());
+        }
+
         user = userRepository.save(user);
         userRepository.delete(user);
         return true;
