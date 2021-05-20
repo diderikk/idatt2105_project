@@ -119,7 +119,7 @@ body {
 #application-wrapper {
   width: 60%;
   margin: auto;
-  margin-top: 80px;
+  margin-top: 70px;
   margin-bottom: 10px;
 }
 
@@ -127,7 +127,7 @@ body {
   #application-wrapper {
     width: 95%;
     margin: auto;
-    margin-top: 80px;
+    margin-top: 70px;
   }
 }
 
