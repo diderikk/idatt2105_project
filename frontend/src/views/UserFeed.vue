@@ -1,26 +1,26 @@
 <template>
   <div>
-    <input
-      v-model="searchInput"
-      class="input"
-      type="text"
-      placeholder="Search"
-    />
+    <base-feed-header
+      :createRoute="'/create-user'"
+      @inputChange="changeInput($event, input)"
+    ></base-feed-header>
     <div v-if="users.length === 0" class="box">No users available</div>
-    <span v-else
-      ><user-card
+    <div v-else class="columns">
+      <div
         v-for="(user, index) in availableUsers"
         :key="index"
-        :user="user"
-        @reload="reload(false)"
-        >{{ user }}</user-card
-      ></span
-    >
+        class="column is-half"
+      >
+        <user-card :user="user" @reload="reload(false)">{{ user }}</user-card>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import BaseFeedHeader from "../components/BaseFeedHeader.vue";
 import UserCard from "../components/UserCard.vue";
 import User from "../interfaces/User/User.interface";
 import { useStore } from "../store";
@@ -28,11 +28,16 @@ export default defineComponent({
   name: "UserFeed",
   components: {
     UserCard,
+    BaseFeedHeader,
   },
   setup() {
     const store = useStore();
     const users = ref([] as User[]);
     const searchInput = ref("");
+    const changeInput = (input: string) => {
+      searchInput.value = input;
+    };
+
     onMounted(async () => {
       await reload(true);
     });
@@ -60,6 +65,7 @@ export default defineComponent({
 
     return {
       searchInput,
+      changeInput,
       users,
       reload,
       availableUsers,
@@ -68,8 +74,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-div {
-  margin: 20px 0px;
-}
-</style>
+<style scoped></style>

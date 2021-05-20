@@ -1,30 +1,45 @@
 <template>
   <div>
-    <input type="text" class="input" placeholder="Search" />
-
-    <div v-for="(reservation, index) in reservations" :key="index">
-      <reservation-card
-        :reservation="reservation"
-        @delete="deleteReservation($event, id)"
-        class="reservation-card"
-      ></reservation-card>
+    <base-feed-header
+      :createRoute="'/create-reservation'"
+      @inputChange="changeInput($event, input)"
+    ></base-feed-header>
+    <div v-if="reservations.length === 0" class="box">
+      No reservations available
+    </div>
+    <div v-else class="columns">
+      <div
+        v-for="(reservation, index) in reservations"
+        :key="index"
+        class="column is-half"
+      >
+        <reservation-card
+          :reservation="reservation"
+          @reload="deleteReservation($event, id)"
+        ></reservation-card>
+      </div>
     </div>
   </div>
 </template>
-
 <script lang="ts">
-import { defineComponent, onBeforeMount, ref } from "vue";
+import { defineComponent, onBeforeMount, onMounted, ref } from "vue";
 import ReservationCard from "../components/ReservationCard.vue";
+import BaseFeedHeader from "../components/BaseFeedHeader.vue";
 import Reservation from "../interfaces/Reservation/Reservation.interface";
 import { useStore } from "../store";
 import { POSTReservationToReservationForm } from "../utils/reservationUtils";
 export default defineComponent({
   name: "ReservationFeed",
-  components: { ReservationCard },
+  components: { ReservationCard, BaseFeedHeader },
   setup() {
     const store = useStore();
+    const searchInput = ref("");
+    const changeInput = (input: string) => {
+      searchInput.value = input;
+    };
     const reservations = ref([] as Reservation[]);
 
+    //TODO change to reload method as shown in the other feeds
     const deleteReservation = (id: number) => {
       reservations.value.splice(
         reservations.value.findIndex(
@@ -33,7 +48,7 @@ export default defineComponent({
         1
       );
     };
-    onBeforeMount(async () => {
+    onMounted(async () => {
       const response = await store.dispatch("getReservations");
       if (response !== null) {
         reservations.value = response.map((reservation: Reservation) => {
@@ -46,6 +61,7 @@ export default defineComponent({
     });
 
     return {
+      changeInput,
       reservations,
       deleteReservation,
     };
@@ -53,8 +69,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-.reservation-card {
-  margin: 25px 0px;
-}
-</style>
+<style scoped></style>

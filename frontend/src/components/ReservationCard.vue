@@ -15,13 +15,10 @@
           </li>
         </ul>
         <label class="label">Description:</label>
-        <p>
-          {{
-            reservation.reservationText.length > 0
-              ? reservation.reservationText
-              : None
-          }}
+        <p v-if="reservation.reservationText.length > 0">
+          {{ reservation.reservationText }}
         </p>
+        <p v-else>None</p>
         <label class="label">Partcipants: </label>
         <p>{{ reservation.amountOfPeople }}</p>
         <label class="label">Time:</label>
@@ -95,10 +92,13 @@ export default defineComponent({
       router.push(`/edit-reservation/${props.reservation.reservationId}`);
     };
 
-    const deleteReservation = (id: number) => {
+    const deleteReservation = async (id: number) => {
       if (window.confirm("Are you sure you want to delete the reservation?")) {
         if (
-          store.dispatch("deleteReservation", props.reservation.reservationId)
+          await store.dispatch(
+            "deleteReservation",
+            props.reservation.reservationId
+          )
         ) {
           emit("reload", id);
         }
