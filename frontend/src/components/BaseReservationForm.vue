@@ -59,6 +59,7 @@
             @blur="checkTimeValidity"
             :disabled="disableTimePickers"
             type="time"
+            class="input"
           />
         </div>
         <div class="column is-half">
@@ -67,6 +68,7 @@
             @blur="checkTimeValidity"
             :disabled="disableTimePickers"
             type="time"
+            class="input"
           />
         </div>
       </div>
