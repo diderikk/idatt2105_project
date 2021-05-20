@@ -11,15 +11,7 @@ import Room from "@/interfaces/Room/Room.interface";
 import EditRoom from "@/interfaces/Room/EditRoom.interface";
 import { UserToUserForm } from "@/utils/userUtils";
 import TimeInterval from "@/interfaces/TimeInterval.interface";
-
-export interface State {
-  user: string;
-  token: string;
-  snackbar: {
-    content: string;
-    status: SnackbarStatus;
-  };
-}
+import State from "@/interfaces/State.interface";
 
 export const key: InjectionKey<Store<State>> = Symbol();
 
@@ -262,8 +254,11 @@ export const store: Store<State> = createStore<State>({
     async editReservation({ commit }, reservation: Reservation) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        if(!store.getters.getUser.isAdmin)
-          await backend.post(`/users/${store.getters.getUser.userId}/reservations/${reservation.reservationId}`, reservation)
+        if (!store.getters.getUser.isAdmin)
+          await backend.post(
+            `/users/${store.getters.getUser.userId}/reservations/${reservation.reservationId}`,
+            reservation
+          );
         else
           await backend.post(
             `/reservations/${reservation.reservationId}`,
@@ -285,11 +280,12 @@ export const store: Store<State> = createStore<State>({
     async deleteReservation({ commit }, reservationId: number) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        if(!store.getters.getUser.isAdmin)
-          await backend.delete(`/users/${store.getters.getUser.userId}/reservations/${reservationId}`)
-        else
-          await backend.delete(`/reservations/${reservationId}`);
-        
+        if (!store.getters.getUser.isAdmin)
+          await backend.delete(
+            `/users/${store.getters.getUser.userId}/reservations/${reservationId}`
+          );
+        else await backend.delete(`/reservations/${reservationId}`);
+
         commit("setSnackbar", {
           content: "Reservation deleted",
           status: SnackbarStatus.SUCCESS,
@@ -307,10 +303,11 @@ export const store: Store<State> = createStore<State>({
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         let response;
-        if(!store.getters.getUser.isAdmin)
-          response = await backend.get(`/users/${store.getters.getUser.userId}/reservations/${reservationId}`)
-        else
-          response = await backend.get(`/reservations/${reservationId}`);
+        if (!store.getters.getUser.isAdmin)
+          response = await backend.get(
+            `/users/${store.getters.getUser.userId}/reservations/${reservationId}`
+          );
+        else response = await backend.get(`/reservations/${reservationId}`);
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
@@ -321,7 +318,11 @@ export const store: Store<State> = createStore<State>({
         return null;
       }
     },
-    async getReservations({ commit }, editSnackbar: boolean, sortingConfig?: ReservationSorting) {
+    async getReservations(
+      { commit },
+      editSnackbar: boolean,
+      sortingConfig?: ReservationSorting
+    ) {
       if (editSnackbar === undefined || editSnackbar === true)
         commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
