@@ -37,6 +37,9 @@ export default defineComponent({
   setup(props, { emit }) {
     const router = useRouter();
     const store = useStore();
+    const view = () => {
+      router.push(`/users/${props.user.userId}`);
+    };
     const edit = () => {
       router.push(`/edit-user/${props.user.userId}`);
     };
@@ -49,6 +52,7 @@ export default defineComponent({
     };
 
     return {
+      view,
       edit,
       deleteUser,
     };
