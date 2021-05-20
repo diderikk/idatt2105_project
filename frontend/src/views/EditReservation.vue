@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, ref, Ref } from "vue";
+import { defineComponent, onMounted, ref, Ref } from "vue";
 import BaseReservationFormConfig from "../components/BaseReservationForm.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import POSTReservation from "../interfaces/Reservation/POSTReservation.interface";
@@ -27,6 +27,8 @@ import {
   POSTReservationToReservationForm,
   reservationFormToPOSTReservtion,
 } from "../utils/reservationUtils";
+import { useRouter } from "vue-router";
+
 
 export default defineComponent({
   name: "EditReservation",
@@ -41,8 +43,9 @@ export default defineComponent({
   },
   setup(props) {
     const store = useStore();
+    const router = useRouter();
 
-    onBeforeMount(async () => {
+    onMounted(async () => {
       const response: POSTReservation = await store.dispatch(
         "getReservation",
         props.id
@@ -74,15 +77,17 @@ export default defineComponent({
     ) => {
       if (checksBeforeAsyncCall(checks, statuses)) {
         store.dispatch("editReservation", {
-          id: reservationId,
+          reservationId: reservationId,
           ...reservationFormToPOSTReservtion(registerInformation),
         });
       }
     };
 
-    const deleteReservation = (reservationId: number) => {
+    const deleteReservation = async (reservationId: number) => {
       if (window.confirm("Are you sure you want to delete the reservation?")) {
-        store.dispatch("deleteReservation", reservationId);
+        if(await store.dispatch("deleteReservation", reservationId)){
+          router.push("/reservations");
+        }
       }
     };
 

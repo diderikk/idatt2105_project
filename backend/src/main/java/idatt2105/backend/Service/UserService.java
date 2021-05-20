@@ -182,6 +182,22 @@ public class UserService implements UserDetailsService {
     }
 
     /**
+     * Gets one userReservation if it exists in their reservations
+     * @param userId
+     * @param reservationId
+     * @return
+     * @throws NotFoundException
+     */
+    public GETReservationDTO getUserReservation(long userId, long reservationId) throws NotFoundException {
+        LOGGER.info("getUserReservations(long userId) was called with userId: {}, reservationId: {}", userId, reservationId);
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + userId);
+        Optional<Reservation> optionalReservation = optionalUser.get().getReservations().stream().filter(reservation -> reservation.getReservationId() == reservationId).findAny();
+        if(optionalReservation.isPresent()) return new GETReservationDTO(optionalReservation.get());
+        throw new NotFoundException("No reservation found with id: " + reservationId);
+    }
+
+    /**
      * Finds and returns all filtered reservations sorted, that this user has made;
      * @param userId
      * @param dto
