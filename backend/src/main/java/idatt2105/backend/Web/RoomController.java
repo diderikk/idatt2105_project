@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionNameInRoomAlreadyExistsException;
 import idatt2105.backend.Exception.SectionNotOfThisRoomException;
+import idatt2105.backend.Model.DTO.AvailableSectionsDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.TimeIntervalDTO;
@@ -54,8 +55,13 @@ public class RoomController {
     }
 
     @PostMapping("/available")
-    public ResponseEntity<List<GETRoomDTO>> getAvailableRooms(@RequestBody TimeIntervalDTO dto) {
+    public ResponseEntity<AvailableSectionsDTO> getAvailableRooms(@RequestBody TimeIntervalDTO dto) {
         return new ResponseEntity<>(roomService.getAvailableRooms(dto), HttpStatus.OK);
+    }
+
+    @PostMapping("/available/{reservation_id}")
+    public ResponseEntity<AvailableSectionsDTO> getAvailableRooms(@PathVariable("reservation_id") long reservationId,@RequestBody TimeIntervalDTO dto) {
+        return new ResponseEntity<>(roomService.getAvailableRooms(dto, reservationId), HttpStatus.OK);
     }
 
     @PostMapping

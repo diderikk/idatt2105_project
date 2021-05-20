@@ -130,11 +130,23 @@ public class UserController {
         }
     }
 
+    @PostMapping("/{user_id}/reservations/{reservation_id}")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<GETReservationDTO> editUserReservation(@PathVariable("user_id") long userId, @PathVariable("reservation_id") long reservationId, @RequestBody POSTReservationDTO dto){
+        try{
+            GETReservationDTO newDto = userService.editUserReservation(reservationId, dto);
+            return new ResponseEntity<>(newDto, HttpStatus.OK);
+        }catch(NotFoundException ex){
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @DeleteMapping("/{user_id}/reservations/{reservation_id}")
     @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<String> removeUserReservation(@PathVariable("user_id") long userId, @PathVariable("reservation_id") long reservationId){
+    public ResponseEntity<String> deleteUserReservation(@PathVariable("user_id") long userId, @PathVariable("reservation_id") long reservationId){
         try {
-            boolean successful = userService.removeUserReservation(userId, reservationId);
+            boolean successful = userService.deleteUserReservation(userId, reservationId);
             if(successful) return new ResponseEntity<>(HttpStatus.OK);
             else return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (NotFoundException e) {

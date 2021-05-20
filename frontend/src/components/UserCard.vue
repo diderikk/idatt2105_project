@@ -9,10 +9,9 @@
       <p>{{ user.email }}</p>
       <label class="label">Phone number</label>
       <p>{{ user.phoneNumber }}</p>
-      <span v-if="user.expirationDate !== null"
-        ><label class="label">Expiration date</label>
-        <p>{{ user.expirationDate }}</p></span
-      >
+      <label class="label">Expiration date</label>
+      <p v-if="user.expirationDate === null">None</p>
+      <p v-else>{{ user.expirationDate }}</p>
     </div>
     <div class="card-footer">
       <a @click="view" href="#" class="card-footer-item">View</a>
@@ -38,6 +37,9 @@ export default defineComponent({
   setup(props, { emit }) {
     const router = useRouter();
     const store = useStore();
+    const view = () => {
+      router.push(`/users/${props.user.userId}`);
+    };
     const edit = () => {
       router.push(`/edit-user/${props.user.userId}`);
     };
@@ -50,6 +52,7 @@ export default defineComponent({
     };
 
     return {
+      view,
       edit,
       deleteUser,
     };

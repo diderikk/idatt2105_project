@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, reactive, ref, Ref, watch } from "vue";
+import { defineComponent, onBeforeMount, ref, Ref } from "vue";
 import BaseReservationFormConfig from "../components/BaseReservationForm.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import POSTReservation from "../interfaces/Reservation/POSTReservation.interface";
@@ -49,7 +49,6 @@ export default defineComponent({
       );
       if (response !== null) {
         reservation.value = POSTReservationToReservationForm(response);
-        console.log(reservation.value);
         isDoneLoading.value = true;
       }
     });
@@ -74,7 +73,6 @@ export default defineComponent({
       reservationId: number
     ) => {
       if (checksBeforeAsyncCall(checks, statuses)) {
-        console.log(reservationId);
         store.dispatch("editReservation", {
           id: reservationId,
           ...reservationFormToPOSTReservtion(registerInformation),

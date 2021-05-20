@@ -18,6 +18,8 @@ import idatt2105.backend.Exception.SectionNotOfThisRoomException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
+import idatt2105.backend.Model.DTO.AvailableSectionDTO;
+import idatt2105.backend.Model.DTO.AvailableSectionsDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.GETRoomDTO;
 import idatt2105.backend.Model.DTO.GETSectionDTO;
@@ -75,8 +77,23 @@ public class RoomService {
      * @param endTime
      * @return List of rooms that have available sections between start time and end time
      */
-    public List<GETRoomDTO> getAvailableRooms(TimeIntervalDTO dto){
-        return roomRepository.getAvailabRooms(dto.getStartTime(), dto.getEndTime()).stream().map(room -> new GETRoomDTO(room)).collect(Collectors.toList());
+    public AvailableSectionsDTO getAvailableRooms(TimeIntervalDTO dto){
+        List<AvailableSectionDTO> availableSections = sectionRepository.getAvailableSections(dto.getStartTime(), dto.getEndTime())
+        .stream().map(section -> new AvailableSectionDTO(section.getSectionId())).collect(Collectors.toList());
+        return new AvailableSectionsDTO(getRooms(), availableSections);
+    }
+
+    /**
+     * Finds room that are available with input start time and end time
+     * @param startTime
+     * @param endTime
+     * @return List of rooms that have available sections between start time and end time
+     */
+    public AvailableSectionsDTO getAvailableRooms(TimeIntervalDTO dto, long reservationId){
+        List<AvailableSectionDTO> availableSections = sectionRepository.getAvailableSections(dto.getStartTime(), dto.getEndTime(), reservationId)
+        .stream().map(section -> new AvailableSectionDTO(section.getSectionId())).collect(Collectors.toList());
+        return new AvailableSectionsDTO(getRooms(), availableSections);
+
     }
 
     /**
