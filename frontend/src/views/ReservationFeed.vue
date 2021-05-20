@@ -16,15 +16,17 @@
     </div>
 
     <div v-if="reservations.length === 0" class="box">No users available</div>
-    <span v-else>
-      <reservation-card
+    <div v-else class="columns is-multiline">
+      <div
         v-for="(reservation, index) in availableReservations"
         :key="index"
-        :reservation="reservation"
-        @reload="reload(false)"
-        >{{ reservation }}</reservation-card
+        class="column is-half"
       >
-    </span>
+        <reservation-card @reload="reload(false)" :reservation="reservation">
+          {{ reservation }}</reservation-card
+        >
+      </div>
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -65,25 +67,29 @@ export default defineComponent({
 
     const availableReservations = computed(() => {
       let reservationsTemp = reservations.value;
-      if(sortingType.value === "2"){
+      if (sortingType.value === "2") {
         reservationsTemp.sort((reservation1, reservation2) => {
-          const startDate1 = new Date(reservation1.startDate+" "+reservation1.startTime);
-          const startDate2 = new Date(reservation2.startDate+" "+reservation1.startTime);
-          if(startDate1 >= startDate2) return 1;
+          const startDate1 = new Date(
+            reservation1.startDate + " " + reservation1.startTime
+          );
+          const startDate2 = new Date(
+            reservation2.startDate + " " + reservation1.startTime
+          );
+          if (startDate1 >= startDate2) return 1;
           else return -1;
-        })
-      }
-      else if(sortingType.value === "3"){
+        });
+      } else if (sortingType.value === "3") {
         reservationsTemp.sort((reservation1, reservation2) => {
-          if(reservation1.amountOfPeople >= reservation2.amountOfPeople) return 1;
+          if (reservation1.amountOfPeople >= reservation2.amountOfPeople)
+            return 1;
           else return -1;
-        })
-      }
-      else if(sortingType.value === "4"){
+        });
+      } else if (sortingType.value === "4") {
         reservationsTemp.sort((reservation1, reservation2) => {
-          if(reservation1.amountOfPeople <=  reservation2.amountOfPeople) return 1;
+          if (reservation1.amountOfPeople <= reservation2.amountOfPeople)
+            return 1;
           else return -1;
-        })
+        });
       }
 
       return reservationsTemp.filter((reservation) => {
@@ -93,7 +99,7 @@ export default defineComponent({
             .startsWith(searchInput.value.toLowerCase()) ||
           sectionContainsSearch(reservation)
         );
-      })
+      });
     });
 
     const sectionContainsSearch = (reservation: ReservationForm): boolean => {
@@ -123,7 +129,7 @@ export default defineComponent({
   margin: 25px 0px;
 }
 
-#select{
+#select {
   margin-top: 10px;
 }
 </style>

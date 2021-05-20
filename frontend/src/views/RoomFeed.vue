@@ -7,7 +7,7 @@
     <div v-if="rooms.length === 0" class="box" id="placeholder">
       No rooms available
     </div>
-    <div v-else class="columns">
+    <div v-else class="columns is-multiline">
       <div
         v-for="(room, index) in availableRooms"
         :key="index"

@@ -88,10 +88,19 @@ export const store: Store<State> = createStore<State>({
         });
         return true;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not create user",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          if (error.response.status === 500) {
+            commit("setSnackbar", {
+              content: "Email is not valid",
+              status: SnackbarStatus.ERROR,
+            });
+          } else {
+            commit("setSnackbar", {
+              content: "Could not create user",
+              status: SnackbarStatus.ERROR,
+            });
+          }
+        }
         return false;
       }
     },
@@ -361,13 +370,20 @@ export const store: Store<State> = createStore<State>({
         return null;
       }
     },
-    async getAvailableRooms({ commit }, timeInterval: {times: TimeInterval, reservationId?: number}) {
+    async getAvailableRooms(
+      { commit },
+      timeInterval: { times: TimeInterval; reservationId?: number }
+    ) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         let response;
-        if(timeInterval.reservationId === undefined)
+        if (timeInterval.reservationId === undefined)
           response = await backend.post("/rooms/available", timeInterval.times);
-        else response = await backend.post(`/rooms/available/${timeInterval.reservationId}`, timeInterval.times);
+        else
+          response = await backend.post(
+            `/rooms/available/${timeInterval.reservationId}`,
+            timeInterval.times
+          );
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {

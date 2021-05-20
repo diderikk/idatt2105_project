@@ -138,9 +138,10 @@
             :value="section.selected"
             :checked="section.selected"
             type="checkbox"
-            :disabled="!isDateAndTimeSelected"
+            :disabled="!isDateAndTimeSelected || section.isDisabled"
           />
-          {{ section.sectionName }}</label
+          {{ section.sectionName
+          }}<span v-if="section.isDisabled"> (Occupied)</span></label
         >
       </div>
     </base-form-field-input>
@@ -319,12 +320,12 @@ export default defineComponent({
      * Need a watcher since computed object cannot be mutated
      */
     const mapSections = () => {
-      const sections: Section[] =
+      const sections: SectionWithDisable[] =
         rooms.value.find((room) => {
           return room.roomCode === registerInformation.roomCode;
         })?.sections ?? [];
       availableSections.value =
-        sections?.map((s: Section) => {
+        sections?.map((s: SectionWithDisable) => {
           return { ...s, selected: false };
         }) ?? [];
     };
@@ -345,7 +346,7 @@ export default defineComponent({
      * If there are passed selected sections to the config object, then make them selected
      */
     onMounted(async () => {
-      if(props.baseReservation !== undefined){
+      if (props.baseReservation !== undefined) {
         getAvailableRooms();
       }
 
@@ -370,7 +371,10 @@ export default defineComponent({
     const handleCheckBoxChange = (section: SectionForCheckBox) => {
       section.selected = !section.selected;
       if (section.selected) {
-        registerInformation.sections.push({sectionName: section.sectionName, isDisabled: false});
+        registerInformation.sections.push({
+          sectionName: section.sectionName,
+          isDisabled: false,
+        });
       } else {
         registerInformation.sections.splice(
           registerInformation.sections.findIndex(
@@ -387,13 +391,18 @@ export default defineComponent({
      */
     const selectAll = () => {
       availableSections.value.forEach((sectionForCheckBox) => {
+        if (sectionForCheckBox.isDisabled) return;
+
         sectionForCheckBox.selected = true;
         if (
           !registerInformation.sections.some(
             (section) => section.sectionName === sectionForCheckBox.sectionName
           )
         )
-          registerInformation.sections.push({sectionName: sectionForCheckBox.sectionName, isDisabled:false});
+          registerInformation.sections.push({
+            sectionName: sectionForCheckBox.sectionName,
+            isDisabled: false,
+          });
       });
     };
 
@@ -618,32 +627,32 @@ export default defineComponent({
 
     const getAvailableRooms = async () => {
       if (isDateAndTimeSelected.value) {
-          const startTime =
-            registerInformation.startDate + " " + registerInformation.startTime;
-          const endTime =
-            registerInformation.endDate + " " + registerInformation.endTime;
-          let response;
-          if (props.reservationId)
-            response = await store.dispatch("getAvailableRooms", {
-              times: {
-                startTime,
-                endTime,
-              },
-              reservationId: props.reservationId,
-            });
-          else
-            response = await store.dispatch("getAvailableRooms", {
-              times: {
-                startTime,
-                endTime,
-              },
-            });
-          if (response !== null) {
-            rooms.value = AvailableRoomsToReservationForm(response) ;
-            mapSections();
-          }
+        const startTime =
+          registerInformation.startDate + " " + registerInformation.startTime;
+        const endTime =
+          registerInformation.endDate + " " + registerInformation.endTime;
+        let response;
+        if (props.reservationId)
+          response = await store.dispatch("getAvailableRooms", {
+            times: {
+              startTime,
+              endTime,
+            },
+            reservationId: props.reservationId,
+          });
+        else
+          response = await store.dispatch("getAvailableRooms", {
+            times: {
+              startTime,
+              endTime,
+            },
+          });
+        if (response !== null) {
+          rooms.value = AvailableRoomsToReservationForm(response);
+          mapSections();
         }
-    }
+      }
+    };
 
     /**
      * When start date/time and end date/time has been added or changed
