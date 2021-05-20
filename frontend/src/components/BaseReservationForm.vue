@@ -1,5 +1,6 @@
 <template>
   <div>
+    <back-button></back-button>
     <h1 class="title">{{ config.title }}</h1>
     <base-form-field-input
       :config="{
@@ -223,9 +224,10 @@ import BaseFormConfig from "../interfaces/config/BaseFormConfig.interface";
 import Section from "../interfaces/Section/Section.interface";
 import ReservationForm from "../interfaces/Reservation/ReservationForm.interface";
 import { useStore } from "../store";
+import BackButton from "./BackButton.vue";
 export default defineComponent({
   name: "BaseReservationForm",
-  components: { BaseFormFieldInput },
+  components: { BaseFormFieldInput, BackButton },
   props: {
     config: {
       required: true,

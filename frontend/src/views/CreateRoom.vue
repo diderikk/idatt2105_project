@@ -8,7 +8,7 @@ import checksBeforeAsyncCall from "../utils/checksBeforeAsyncCall";
 import BaseRoomFormConfig from "../components/BaseRoomForm.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import { useStore } from "../store";
-import { RoomFormToRoom } from "../utils/roomUtils"
+import { RoomFormToRoom } from "../utils/roomUtils";
 import RoomForm from "../interfaces/Room/RoomForm.interface";
 export default defineComponent({
   name: "CreateRoom",

@@ -4,7 +4,9 @@
       :createRoute="'/create-user'"
       @inputChange="changeInput($event, input)"
     ></base-feed-header>
-    <div v-if="users.length === 0" class="box">No users available</div>
+    <div v-if="users.length === 0" class="box" id="placeholder">
+      No users available
+    </div>
     <div v-else class="columns">
       <div
         v-for="(user, index) in availableUsers"
@@ -74,4 +76,8 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+#placeholder {
+  margin: 25px 0px;
+}
+</style>

@@ -31,7 +31,9 @@
             >Users</router-link
           >
 
-          <router-link class="navbar-item" to="/rooms">Rooms</router-link>
+          <router-link v-if="isLoggedIn" class="navbar-item" to="/rooms"
+            >Rooms</router-link
+          >
         </div>
         <div class="navbar-end">
           <router-link

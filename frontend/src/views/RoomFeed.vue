@@ -4,7 +4,9 @@
       :createRoute="'/create-room'"
       @inputChange="changeInput($event, input)"
     ></base-feed-header>
-    <div v-if="rooms.length === 0" class="box">No rooms available</div>
+    <div v-if="rooms.length === 0" class="box" id="placeholder">
+      No rooms available
+    </div>
     <div v-else class="columns">
       <div
         v-for="(room, index) in availableRooms"
@@ -85,4 +87,8 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+#placeholder {
+  margin: 25px 0px;
+}
+</style>
