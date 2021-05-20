@@ -69,14 +69,14 @@ export default defineComponent({
 
     const isDoneLoading = ref(false);
 
-    const editReservation = (
+    const editReservation = async (
       checks: Array<() => void>,
       statuses: Array<Ref<InputFieldFeedbackStatus>>,
       registerInformation: ReservationForm,
       reservationId: number
     ) => {
       if (checksBeforeAsyncCall(checks, statuses)) {
-        store.dispatch("editReservation", {
+        await store.dispatch("editReservation", {
           reservationId: reservationId,
           ...reservationFormToPOSTReservtion(registerInformation),
         });
