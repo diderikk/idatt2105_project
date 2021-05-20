@@ -9,10 +9,9 @@
       <p>{{ user.email }}</p>
       <label class="label">Phone number</label>
       <p>{{ user.phoneNumber }}</p>
-      <span v-if="user.expirationDate !== null"
-        ><label class="label">Expiration date</label>
-        <p>{{ user.expirationDate }}</p></span
-      >
+      <label class="label">Expiration date</label>
+      <p v-if="user.expirationDate === null">None</p>
+      <p v-else>{{ user.expirationDate }}</p>
     </div>
     <div class="card-footer">
       <a @click="view" href="#" class="card-footer-item">View</a>
