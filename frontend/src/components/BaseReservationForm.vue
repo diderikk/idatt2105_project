@@ -761,10 +761,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-#left-time-input {
-  margin-right: 2%;
-}
-
 button {
   margin-right: 5px;
 }
