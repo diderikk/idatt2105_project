@@ -138,9 +138,9 @@
             :value="section.selected"
             :checked="section.selected"
             type="checkbox"
-            :disabled="!isDateAndTimeSelected"
+            :disabled="!isDateAndTimeSelected || section.isDisabled"
           />
-          {{ section.sectionName }}</label
+          {{ section.sectionName }}<span v-if="section.isDisabled">{{ " (Occupied)" }}</span></label
         >
       </div>
     </base-form-field-input>
@@ -319,12 +319,12 @@ export default defineComponent({
      * Need a watcher since computed object cannot be mutated
      */
     const mapSections = () => {
-      const sections: Section[] =
+      const sections: SectionWithDisable[] =
         rooms.value.find((room) => {
           return room.roomCode === registerInformation.roomCode;
         })?.sections ?? [];
       availableSections.value =
-        sections?.map((s: Section) => {
+        sections?.map((s: SectionWithDisable) => {
           return { ...s, selected: false };
         }) ?? [];
     };
@@ -387,6 +387,9 @@ export default defineComponent({
      */
     const selectAll = () => {
       availableSections.value.forEach((sectionForCheckBox) => {
+        if(sectionForCheckBox.isDisabled)
+          return;
+        
         sectionForCheckBox.selected = true;
         if (
           !registerInformation.sections.some(
