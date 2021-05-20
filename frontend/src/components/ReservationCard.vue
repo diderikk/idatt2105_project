@@ -41,7 +41,6 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref } from "vue";
-import { useRouter } from "vue-router";
 import ReservationCard from "../interfaces/Reservation/ReservationCard.interface";
 import { useStore } from "../store";
 export default defineComponent({
@@ -109,10 +108,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.card {
-  margin: 25px 0;
-}
-
 li {
   margin: 10px 10px;
 }
