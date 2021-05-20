@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -71,6 +72,7 @@ public class ReservationServiceTest {
         reservation.setReservationText("reservationText");
         reservation.setAmountOfPeople(1);
         reservation.setUser(user);
+        reservation.setStartTime(LocalDateTime.now().plusHours(10));
 
         user.setReservations(List.of(reservation));
 
@@ -92,7 +94,7 @@ public class ReservationServiceTest {
         sections.add(section);
         reservation.setSections(sections);
 
-        postReservationDTO = new POSTReservationDTO(null, null, "Edited", 20, List.of(new POSTSectionDTO(section.getSectionName(), section.getRoom().getRoomCode())));
+        postReservationDTO = new POSTReservationDTO(LocalDateTime.now().plusHours(10),LocalDateTime.now().plusDays(1), "Edited", 20, List.of(new POSTSectionDTO(section.getSectionName(), section.getRoom().getRoomCode())));
 
         Mockito.lenient()
         .when(sectionRepository.findById(1L))

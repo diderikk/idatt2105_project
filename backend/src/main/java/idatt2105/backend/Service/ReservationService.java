@@ -1,5 +1,6 @@
 package idatt2105.backend.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,7 +43,8 @@ public class ReservationService {
      */
     public List<GETReservationDTO> getReservations(){
         LOGGER.info("getReservations() called");
-        return reservationRepository.findAll().stream().map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
+        return reservationRepository.findAll().stream().filter(reservation -> reservation.getStartTime().isAfter(LocalDateTime.now()))
+        .map(reservation -> new GETReservationDTO(reservation)).collect(Collectors.toList());
     }
 
     /**
@@ -111,7 +113,8 @@ public class ReservationService {
                 }
             }
         }
-        if(dto.getStartTime() != null) reservation.setStartTime(dto.getStartTime());
+        if(dto.getStartTime() != null && dto.getStartTime().isBefore(dto.getEndTime())) reservation.setStartTime(dto.getStartTime());
+        else throw new IllegalArgumentException("Start time must be before endTime");
         if(dto.getEndTime() != null) reservation.setEndTime(dto.getEndTime());
         return new GETReservationDTO(reservationRepository.save(reservation));
     }

@@ -1,6 +1,7 @@
 package idatt2105.backend.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -181,7 +182,7 @@ public class UserService implements UserDetailsService {
         Optional<User> optionalUser = userRepository.findById(userId);
         if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + userId);
         User user = optionalUser.get();
-        return user.getReservations().stream().map(reservation -> new GETReservationDTO(reservation))
+        return user.getReservations().stream().filter(reservation -> reservation.getStartTime().isAfter(LocalDateTime.now())).map(reservation -> new GETReservationDTO(reservation))
                 .collect(Collectors.toList());
     }
 
@@ -233,7 +234,8 @@ public class UserService implements UserDetailsService {
         if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + userId);
         User user = optionalUser.get();
         Reservation reservation = new Reservation();
-        reservation.setStartTime(dto.getStartTime());
+        if(dto.getStartTime() != null && dto.getStartTime().isBefore(dto.getEndTime())) reservation.setStartTime(dto.getStartTime());
+        else throw new IllegalArgumentException("Start time must be before endTime");
         reservation.setEndTime(dto.getEndTime());
         reservation.setReservationText(dto.getReservationText());
         reservation.setAmountOfPeople(dto.getAmountOfPeople());
@@ -285,7 +287,8 @@ public class UserService implements UserDetailsService {
                 }
             }
         }
-        if(dto.getStartTime() != null) reservation.setStartTime(dto.getStartTime());
+        if(dto.getStartTime() != null && dto.getStartTime().isBefore(dto.getEndTime())) reservation.setStartTime(dto.getStartTime());
+        else throw new IllegalArgumentException("Start time must be before endTime");
         if(dto.getEndTime() != null) reservation.setEndTime(dto.getEndTime());
         return new GETReservationDTO(reservationRepository.save(reservation));
     }
