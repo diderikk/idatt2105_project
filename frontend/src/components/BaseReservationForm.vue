@@ -52,21 +52,24 @@
         feedbackStatus: timeStatus,
       }"
     >
-      <input
-        v-model="startTime"
-        @blur="checkTimeValidity"
-        :disabled="disableTimePickers"
-        type="time"
-        class="input time"
-        id="left-time-input"
-      />
-      <input
-        v-model="endTime"
-        @blur="checkTimeValidity"
-        :disabled="disableTimePickers"
-        type="time"
-        class="input time"
-      />
+      <div class="columns is-multiline">
+        <div class="column is-half">
+          <input
+            v-model="startTime"
+            @blur="checkTimeValidity"
+            :disabled="disableTimePickers"
+            type="time"
+          />
+        </div>
+        <div class="column is-half">
+          <input
+            v-model="endTime"
+            @blur="checkTimeValidity"
+            :disabled="disableTimePickers"
+            type="time"
+          />
+        </div>
+      </div>
     </base-form-field-input>
     <base-form-field-input
       :config="{
@@ -756,11 +759,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.time {
-  display: inline;
-  width: 49%;
-}
-
 #left-time-input {
   margin-right: 2%;
 }
