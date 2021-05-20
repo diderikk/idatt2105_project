@@ -8,23 +8,37 @@
         <p>Name: {{ user.firstName }} {{ user.lastName }}</p>
         <p>Email: {{ user.email }}</p>
         <p>Phone number: {{ user.phoneNationalCode }}{{ user.phoneNumber }}</p>
+        <p v-if="user.expirationDate !== null">Expiration date: {{ user.expirationDate }}</p>
+        <p v-else>Expiration date: none</p>
       </div>
-      <div id="block">
+
+      <nav class="level">
         <div class="title">Statistics:</div>
-        <p>Total reservations: {{ userStats.totalReservations }}</p>
-        <p>Hours booked: {{ userStats.hoursOfReservations }}</p>
-        <span v-if="user.expirationDate !== null"
-          ><p>Expiration date: {{ user.expirationDate }}</p>
-        </span>
-        <span v-if="userStats.favouriteRoom !== null"
-          ><p>Favourite room: {{ userStats.favouriteRoom.roomCode }}</p>
-        </span>
-        <span v-if="userStats.favouriteSection !== null"
-          ><p>
-            Favourite section: {{ userStats.favouriteSection.sectionName }}
-          </p>
-        </span>
-      </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Total reservations</p>
+            <p class="title">{{ userStats.totalReservations }}</p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Hours booked</p>
+            <p class="title">{{ userStats.hoursOfReservations }}</p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Favourite room</p>
+            <p class="title">{{ userStats.favouriteRoom.roomCode }}</p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Favourite section</p>
+            <p class="title">{{ userStats.favouriteSection.sectionName }}</p>
+          </div>
+        </div>
+      </nav>
     </div>
     <div class="card-footer">
       <router-link :to="`/edit-user/${user.userId}`" class="card-footer-item"
