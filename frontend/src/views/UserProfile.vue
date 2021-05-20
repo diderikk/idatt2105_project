@@ -1,41 +1,87 @@
 <template>
   <div class="card">
     <div class="card-content">
-      <back-button></back-button>
-      <div id="block">
-        <div class="title">Information:</div>
-        <span v-if="user.isAdmin" class="tag is-dark is-medium">Admin</span>
-        <p>Name: {{ user.firstName }} {{ user.lastName }}</p>
-        <p>Email: {{ user.email }}</p>
-        <p>Phone number: {{ user.phoneNationalCode }}{{ user.phoneNumber }}</p>
-        <p v-if="user.expirationDate !== null">Expiration date: {{ user.expirationDate }}</p>
-        <p v-else>Expiration date: none</p>
+      <div class="columns is-centered">
+        <div class="column"><back-button></back-button></div>
+      </div>
+      <div class="columns is-centered has-text-centered">
+        <div
+          class="title"
+          v-if="user.firstName !== null || user.lastName !== null"
+        >
+          {{ user.firstName }} {{ user.lastName }}
+        </div>
+        <p class="title" v-else>*No name*</p>
       </div>
 
       <nav class="level">
-        <div class="title">Statistics:</div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Email</p>
+            <p class="title" v-if="user.email !== null">{{ user.email }}</p>
+            <p class="title" v-else>...</p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Phone number</p>
+            <p
+              class="title"
+              v-if="
+                user.phoneNationalCode !== null || user.phoneNumber !== null
+              "
+            >
+              {{ user.phoneNationalCode }}{{ user.phoneNumber }}
+            </p>
+            <p class="title" v-else>...</p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Expiration date</p>
+            <p class="title" v-if="user.expirationDate !== null">
+              {{ user.expirationDate }}
+            </p>
+            <p class="title" v-else>...</p>
+          </div>
+        </div>
+      </nav>
+
+      <nav class="level">
         <div class="level-item has-text-centered">
           <div>
             <p class="heading">Total reservations</p>
-            <p class="title">{{ userStats.totalReservations }}</p>
+            <p class="title" v-if="userStats.totalReservations !== null">
+              {{ userStats.totalReservations }}
+            </p>
+            <p class="title" v-else>0</p>
           </div>
         </div>
         <div class="level-item has-text-centered">
           <div>
             <p class="heading">Hours booked</p>
-            <p class="title">{{ userStats.hoursOfReservations }}</p>
+            <p class="title" v-if="userStats.totalHoursOfReservations !== null">
+              {{ userStats.totalHoursOfReservations }}
+            </p>
+            <p class="title" v-else>0</p>
           </div>
         </div>
         <div class="level-item has-text-centered">
           <div>
             <p class="heading">Favourite room</p>
-            <p class="title">{{ userStats.favouriteRoom.roomCode }}</p>
+            <p class="title" v-if="userStats.favouriteRoom !== null">
+              {{ userStats.favouriteRoom.roomCode }}
+            </p>
+            <p class="title" v-else>...</p>
           </div>
         </div>
         <div class="level-item has-text-centered">
           <div>
             <p class="heading">Favourite section</p>
-            <p class="title">{{ userStats.favouriteSection.sectionName }}</p>
+            <p class="title" v-if="userStats.favouriteSection !== null">
+              {{ userStats.favouriteSection.sectionName }}
+            </p>
+            <p class="title" v-else>...</p>
           </div>
         </div>
       </nav>
@@ -118,11 +164,10 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-span {
-  margin-bottom: 20px;
+.level-item {
+  margin-bottom: 10px;
 }
-
-#block {
-  margin-bottom: 20px;
+.title {
+  margin-bottom: 50px;
 }
 </style>
