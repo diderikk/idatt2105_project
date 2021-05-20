@@ -78,7 +78,7 @@ export default defineComponent({
       expirationDate: "",
     });
     const userStats: Ref<UserStats> = ref({
-      hoursOfReservations: 0,
+      totalHoursOfReservations: 0,
       totalReservations: 0,
       favouriteRoom: {
         roomCode: "",
@@ -97,7 +97,7 @@ export default defineComponent({
 
       const statistics = await store.dispatch("getUserStatistics", props.id);
       if (statistics !== null) {
-        userStats.value = statistics.data;
+        userStats.value = statistics;
       }
     });
 
