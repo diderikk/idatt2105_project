@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, reactive, ref, Ref, watch } from "vue";
+import { defineComponent, onBeforeMount, ref, Ref } from "vue";
 import BaseReservationFormConfig from "../components/BaseReservationForm.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import POSTReservation from "../interfaces/Reservation/POSTReservation.interface";
@@ -24,7 +24,7 @@ import checksBeforeAsyncCall from "../utils/checksBeforeAsyncCall";
 import ReservationForm from "../interfaces/Reservation/ReservationForm.interface";
 import { useStore } from "../store";
 import {
-  POSTReservationToResrevationForm,
+  POSTReservationToReservationForm,
   reservationFormToPOSTReservtion,
 } from "../utils/reservationUtils";
 
@@ -48,7 +48,8 @@ export default defineComponent({
         props.id
       );
       if (response !== null) {
-        reservation.value = POSTReservationToResrevationForm(response);
+        reservation.value = POSTReservationToReservationForm(response);
+        console.log(reservation.value);
         isDoneLoading.value = true;
       }
     });

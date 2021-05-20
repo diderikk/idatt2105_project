@@ -1,37 +1,44 @@
 <template>
   <div>
-    <input
-      v-model="searchInput"
-      class="input"
-      type="text"
-      placeholder="Search"
-    />
-    <div v-if="rooms.length === 0" class="box">No users available</div>
-    <span v-else>
-      <room-card
+    <base-feed-header
+      :createRoute="'/create-room'"
+      @inputChange="changeInput($event, input)"
+    ></base-feed-header>
+    <div v-if="rooms.length === 0" class="box" id="placeholder">
+      No rooms available
+    </div>
+    <div v-else class="columns">
+      <div
         v-for="(room, index) in availableRooms"
         :key="index"
-        :room="room"
-        :isAdmin="isAdmin"
-        @reload="reload(false)"
-        >{{ room }}</room-card
+        class="column is-half"
       >
-    </span>
+        <room-card
+          :room="room"
+          :isAdmin="isAdmin"
+          @reload="reload(false)"
+        ></room-card>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, Ref, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useStore } from "../store";
+import BaseFeedHeader from "../components/BaseFeedHeader.vue";
 import Room from "../interfaces/Room/Room.interface";
 import RoomCard from "../components/RoomCard.vue";
 
 export default defineComponent({
   name: "RoomFeed",
-  components: { RoomCard },
+  components: { RoomCard, BaseFeedHeader },
   setup() {
     const store = useStore();
     const searchInput = ref("");
+    const changeInput = (input: string) => {
+      searchInput.value = input;
+    };
     const rooms = ref([] as Room[]);
 
     onMounted(async () => {
@@ -45,22 +52,32 @@ export default defineComponent({
       }
     };
 
-    const availableRooms = computed(
-      () =>
-        (rooms.value.filter((room) =>
-          room.roomCode.toLowerCase().startsWith(searchInput.value.toLowerCase()) || sectionContainsSeach(room)
-        ))
+    const availableRooms = computed(() =>
+      rooms.value.filter(
+        (room) =>
+          room.roomCode
+            .toLowerCase()
+            .startsWith(searchInput.value.toLowerCase()) ||
+          sectionContainsSeach(room)
+      )
     );
 
     const sectionContainsSeach = (room: Room): boolean => {
-        for(const section of room.sections) if(section.sectionName.toLowerCase().startsWith(searchInput.value.toLowerCase())) return true;
-        return false;
+      for (const section of room.sections)
+        if (
+          section.sectionName
+            .toLowerCase()
+            .startsWith(searchInput.value.toLowerCase())
+        )
+          return true;
+      return false;
     };
 
     const isAdmin = computed(() => store.getters.getUser.isAdmin);
 
     return {
       searchInput,
+      changeInput,
       isAdmin,
       rooms,
       reload,
@@ -70,4 +87,8 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+#placeholder {
+  margin: 25px 0px;
+}
+</style>

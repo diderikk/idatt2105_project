@@ -24,22 +24,14 @@
           <router-link
             v-if="isLoggedIn"
             class="navbar-item"
-            to="/create-reservation"
-            >Make reservation</router-link
-          >
-          <router-link class="navbar-item" to="/edit-reservation"
-            >Edit reservation</router-link
-          >
-          <router-link v-if="isAdmin" class="navbar-item" to="/create-user"
-            >Create User</router-link
+            to="/reservation-feed"
+            >Reservations</router-link
           >
           <router-link v-if="isAdmin" class="navbar-item" to="/users"
             >Users</router-link
           >
-          <router-link v-if="isAdmin" class="navbar-item" to="/create-room"
-            >Create Room</router-link
-          >
-          <router-link class="navbar-item" to="/rooms"
+
+          <router-link v-if="isLoggedIn" class="navbar-item" to="/rooms"
             >Rooms</router-link
           >
         </div>
@@ -127,14 +119,15 @@ body {
 #application-wrapper {
   width: 60%;
   margin: auto;
-  margin-top: 80px;
+  margin-top: 70px;
+  margin-bottom: 10px;
 }
 
 @media only screen and (max-width: 1020px) {
   #application-wrapper {
     width: 95%;
     margin: auto;
-    margin-top: 80px;
+    margin-top: 70px;
   }
 }
 

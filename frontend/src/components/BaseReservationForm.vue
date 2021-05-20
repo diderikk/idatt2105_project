@@ -1,5 +1,6 @@
 <template>
   <div>
+    <back-button></back-button>
     <h1 class="title">{{ config.title }}</h1>
     <base-form-field-input
       :config="{
@@ -47,7 +48,7 @@
     <base-form-field-input
       :config="{
         title: 'Start time and end time',
-        errorHelperMessage: 'Fill inn a start time and end time ',
+        errorHelperMessage: 'Fill in a start time and end time ',
         feedbackStatus: timeStatus,
       }"
     >
@@ -108,7 +109,7 @@
           checkSectionValidity();
         "
         :disabled="!isDateAndTimeSelected"
-        class="button is-primary"
+        class="button is-dark"
       >
         Select all
       </button>
@@ -122,13 +123,18 @@
       >
         Remove all
       </button>
-      <div v-for="(section, index) in availableSections" :key="index">
+      <div
+        id="checkboxes"
+        v-for="(section, index) in availableSections"
+        :key="index"
+      >
         <label class="checkbox">
           <input
             @change="
               handleCheckBoxChange(section);
               checkSectionValidity();
             "
+            class="checkbox is-dark"
             :value="section.selected"
             :checked="section.selected"
             type="checkbox"
@@ -202,7 +208,6 @@
 import {
   computed,
   defineComponent,
-  onBeforeMount,
   onMounted,
   reactive,
   Ref,
@@ -219,9 +224,10 @@ import BaseFormConfig from "../interfaces/config/BaseFormConfig.interface";
 import Section from "../interfaces/Section/Section.interface";
 import ReservationForm from "../interfaces/Reservation/ReservationForm.interface";
 import { useStore } from "../store";
+import BackButton from "./BackButton.vue";
 export default defineComponent({
   name: "BaseReservationForm",
-  components: { BaseFormFieldInput },
+  components: { BaseFormFieldInput, BackButton },
   props: {
     config: {
       required: true,
@@ -274,12 +280,6 @@ export default defineComponent({
 
     //TODO get rooms and section based on the selected date and time
     const rooms: Ref<Array<Room>> = ref([]);
-    onBeforeMount(async () => {
-      const response = await store.dispatch("getRooms");
-      if (response !== null) {
-        rooms.value = response;
-      }
-    });
 
     /**
      * Sorts the rooms alphabetically based on the room code when the rooms change
@@ -318,8 +318,9 @@ export default defineComponent({
      */
     const mapSections = () => {
       const sections: Section[] =
-        rooms.value.find((r) => r.roomCode === registerInformation.roomCode)
-          ?.sections ?? [];
+        rooms.value.find((room) => {
+          return room.roomCode === registerInformation.roomCode;
+        })?.sections ?? [];
       availableSections.value =
         sections?.map((s: Section) => {
           return { ...s, selected: false };
@@ -343,7 +344,6 @@ export default defineComponent({
      */
     onMounted(() => {
       mapSections();
-
       if (registerInformation.sections.length !== 0) {
         availableSections.value.forEach((section) => {
           const index = registerInformation.sections.findIndex(
@@ -610,6 +610,44 @@ export default defineComponent({
       );
     });
 
+    /**
+     * When start date/time and end date/time has been added or changed
+     */
+    watch(
+      () =>
+        registerInformation.startDate +
+        registerInformation.endDate +
+        registerInformation.startTime +
+        registerInformation.endTime,
+      async () => {
+        if (isDateAndTimeSelected.value) {
+          const startTime =
+            registerInformation.startDate + " " + registerInformation.startTime;
+          const endTime =
+            registerInformation.endDate + " " + registerInformation.endTime;
+          let response;
+          if (props.reservationId)
+            response = await store.dispatch("getAvailableRooms", {
+              times: {
+                startTime,
+                endTime,
+              },
+              reservationId: props.reservationId,
+            });
+          else
+            response = await store.dispatch("getAvailableRooms", {
+              times: {
+                startTime,
+                endTime,
+              },
+            });
+          if (response !== null) {
+            rooms.value = response;
+          }
+        }
+      }
+    );
+
     //Number of people
     const amountOfPeopleStatus = ref(InputFieldFeedbackStatus.NONE);
     const amountOfPeopleStatusIsNone = computed(
@@ -709,5 +747,13 @@ export default defineComponent({
 
 button {
   margin-right: 5px;
+}
+
+.checkbox {
+  margin: 5px 10px;
+}
+
+#checkboxes {
+  margin-top: 1%;
 }
 </style>

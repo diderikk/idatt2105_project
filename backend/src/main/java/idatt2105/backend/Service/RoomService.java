@@ -1,5 +1,6 @@
 package idatt2105.backend.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,7 @@ import idatt2105.backend.Model.DTO.GETRoomDTO;
 import idatt2105.backend.Model.DTO.GETSectionDTO;
 import idatt2105.backend.Model.DTO.POSTRoomDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
+import idatt2105.backend.Model.DTO.TimeIntervalDTO;
 import idatt2105.backend.Model.DTO.RoomStatisticsDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
@@ -65,6 +67,20 @@ public class RoomService {
         LOGGER.info("getRooms() called");
         List<Room> rooms = roomRepository.findAll();
         return rooms.stream().map(room -> new GETRoomDTO(room)).collect(Collectors.toList());
+    }
+
+    /**
+     * Finds room that are available
+     * @param startTime
+     * @param endTime
+     * @return List of rooms that have available sections between start time and end time
+     */
+    public List<GETRoomDTO> getAvailableRooms(TimeIntervalDTO dto){
+        return roomRepository.getAvailableRooms(dto.getStartTime(), dto.getEndTime()).stream().map(room -> new GETRoomDTO(room)).collect(Collectors.toList());
+    }
+
+    public List<GETRoomDTO> getAvailableRooms(TimeIntervalDTO dto, long reservationId){
+        return roomRepository.getAvailableRooms(dto.getStartTime(), dto.getEndTime(), reservationId).stream().map(room -> new GETRoomDTO(room)).collect(Collectors.toList());
     }
 
     /**

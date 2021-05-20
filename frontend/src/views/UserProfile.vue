@@ -1,6 +1,7 @@
 <template>
   <div class="card">
     <div class="card-content">
+      <back-button></back-button>
       <div id="block">
         <div class="title">Information:</div>
         <span v-if="user.isAdmin" class="tag is-dark is-medium">Admin</span>
@@ -26,8 +27,8 @@
       </div>
     </div>
     <footer class="card-footer">
-      <a href="#" class="card-footer-item">Edit</a>
-      <a href="#" class="card-footer-item">Delete</a>
+      <a @click="edit" href="#" class="card-footer-item">Edit</a>
+      <a @click="deleteUser" href="#" class="card-footer-item">Delete</a>
     </footer>
   </div>
 </template>
@@ -35,12 +36,14 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref, Ref } from "vue";
 import POSTSection from "../interfaces/Section/POSTSection.interface";
+import BackButton from "../components/BackButton.vue";
+import { useRouter } from "vue-router";
 import User from "../interfaces/User/User.interface";
 import UserStats from "../interfaces/User/UserStats.interface";
 import { store } from "../store";
 export default defineComponent({
   name: "UserProfile",
-  components: {},
+  components: { BackButton },
   props: {
     id: {
       required: true,
@@ -48,12 +51,12 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const router = useRouter();
     const user: Ref<User> = ref({
       userId: -1,
       firstName: "",
       lastName: "",
       email: "",
-      phoneNationalCode: "",
       phoneNumber: "",
       isAdmin: false,
       expirationDate: "",
@@ -82,9 +85,23 @@ export default defineComponent({
       }
     });
 
+    const edit = () => {
+      router.push(`/edit-user/${user.value.userId}`);
+    };
+
+    const deleteUser = async () => {
+      if (window.confirm("Are you sure you want do delete the user?")) {
+        if (await store.dispatch("deleteUser", user.value.userId)) {
+          router.push(`/users`);
+        }
+      }
+    };
+
     return {
       user,
       userStats,
+      edit,
+      deleteUser,
     };
   },
 });

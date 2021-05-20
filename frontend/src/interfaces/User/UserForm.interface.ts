@@ -3,6 +3,6 @@ export default interface UserForm {
   lastName: string;
   email: string;
   phoneNumber: string;
-  phoneNationalCode: string;
+  isAdmin: boolean;
   expirationDate: string;
 }
