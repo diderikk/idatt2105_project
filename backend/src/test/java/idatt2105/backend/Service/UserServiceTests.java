@@ -92,8 +92,8 @@ public class UserServiceTests {
         reservation.setReservationId(1);
         reservation.setReservationText("reservationText");
         reservation.setAmountOfPeople(1);
-        reservation.setStartTime(LocalDateTime.of(2001, 1, 1, 1, 1, 1));
-        reservation.setEndTime(LocalDateTime.of(2001, 1, 1, 3, 1, 1));
+        reservation.setStartTime(LocalDateTime.of(2022, 1, 1, 1, 1, 1));
+        reservation.setEndTime(LocalDateTime.of(2022, 1, 1, 3, 1, 1));
         reservation.setUser(user);
         ArrayList<Reservation> reservations = new ArrayList<>();
         reservations.add(reservation);
@@ -240,7 +240,7 @@ public class UserServiceTests {
     {
         user.setReservations(new ArrayList<>());
         List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO(section.getSectionName(),room.getRoomCode()));
-        POSTReservationDTO dto = new POSTReservationDTO(null, null, "reservationText", 100, tempSections);
+        POSTReservationDTO dto = new POSTReservationDTO(LocalDateTime.now().plusHours(10), LocalDateTime.now().plusDays(1), "reservationText", 100, tempSections);
         dto = userService.addUserReservation(1, dto);
 
         assertNotNull(dto);
@@ -251,7 +251,7 @@ public class UserServiceTests {
     {
         user.setReservations(new ArrayList<>());
         List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO("fake", room.getRoomCode()));
-        POSTReservationDTO dto = new POSTReservationDTO(null, null, "reservationText", 100, tempSections);
+        POSTReservationDTO dto = new POSTReservationDTO(LocalDateTime.now().plusHours(10), LocalDateTime.now().plusHours(12), "reservationText", 100, tempSections);
 
         assertThrows(NotFoundException.class, () -> userService.addUserReservation(1, dto));
     }
