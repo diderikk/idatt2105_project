@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import idatt2105.backend.Component.EmailComponent;
+import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
@@ -84,8 +85,9 @@ public class ReservationService {
      * @param dto
      * @return GETReservationDTO
      * @throws NotFoundException if no reservation or specified section found
+     * @throws SectionAlreadyBookedException
      */
-    public GETReservationDTO editReservation(long reservationId, POSTReservationDTO dto) throws NotFoundException {
+    public GETReservationDTO editReservation(long reservationId, POSTReservationDTO dto) throws NotFoundException, SectionAlreadyBookedException {
         LOGGER.info("editReservation(long reservationId) called with reservationId: {}", reservationId);
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
         if(!optionalReservation.isPresent()){
@@ -93,13 +95,13 @@ public class ReservationService {
         }
         Reservation reservation = optionalReservation.get();
         reservation.setAmountOfPeople(dto.getAmountOfPeople());
-        if(dto.getStartTime() != null) reservation.setStartTime(dto.getStartTime());
-        if(dto.getEndTime() != null) reservation.setEndTime(dto.getEndTime());
+        
         if(dto.getReservationText() != null) reservation.setReservationText(dto.getReservationText());
         if(dto.getSections() != null && !dto.getSections().isEmpty()) {
             for(POSTSectionDTO sectionDTO : dto.getSections()){
                 Optional<Section> optionalSection = sectionRepository.findSectionBySectionNameAndRoomCode(sectionDTO.getSectionName(), sectionDTO.getRoomCode());
                 if(optionalSection.isPresent()){
+                    if(checkIfSectionIsBooked(sectionDTO, dto)) throw new SectionAlreadyBookedException("Section is already booked/reserved for the given time period");
                     reservation.getSections().add(optionalSection.get());
                 }
                 else {
@@ -109,6 +111,8 @@ public class ReservationService {
                 }
             }
         }
+        if(dto.getStartTime() != null) reservation.setStartTime(dto.getStartTime());
+        if(dto.getEndTime() != null) reservation.setEndTime(dto.getEndTime());
         return new GETReservationDTO(reservationRepository.save(reservation));
     }
 
@@ -135,5 +139,31 @@ public class ReservationService {
         }
 
         return !reservationRepository.existsById(reservationId);
+    }
+
+
+    /**
+     * Checks if section is already reserved.
+     * n² complexity.
+     * @param sectionDTO
+     * @param reservationDTO
+     * @return true if reservation already exists during specified times
+     * @throws NotFoundException
+     */
+    private boolean checkIfSectionIsBooked(POSTSectionDTO sectionDTO, POSTReservationDTO reservationDTO) throws NotFoundException {
+        Optional<Section> sectionOptional = sectionRepository.findSectionBySectionNameAndRoomCode(sectionDTO.getSectionName(), sectionDTO.getRoomCode());
+        if(!sectionOptional.isPresent()) throw new NotFoundException("Section not found with name " + sectionDTO.getSectionName());
+        Section section = sectionOptional.get();
+        if(section.getReservations() == null) throw new NullPointerException("Section tries to access reservation list that is null");
+        for (Reservation reservation : section.getReservations()) {
+            if((reservationDTO.getStartTime().isEqual(reservation.getStartTime()))
+                || (reservationDTO.getEndTime().isEqual(reservation.getEndTime()))
+                || (reservationDTO.getStartTime().isAfter(reservation.getStartTime()) && reservationDTO.getStartTime().isBefore(reservation.getEndTime()))
+                || (reservationDTO.getEndTime().isAfter(reservation.getStartTime()) && reservationDTO.getEndTime().isBefore(reservation.getEndTime()))
+                || (reservationDTO.getStartTime().isBefore(reservation.getStartTime()) && reservationDTO.getEndTime().isAfter(reservation.getEndTime()))) {
+                return true;
+            }
+        }
+        return false;
     }
 }

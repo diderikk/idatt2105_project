@@ -306,7 +306,11 @@ export const store: Store<State> = createStore<State>({
     async getReservation({ commit }, reservationId: number) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        const response = await backend.get(`/reservations/${reservationId}`);
+        let response;
+        if(!store.getters.getUser.isAdmin)
+          response = await backend.get(`/users/${store.getters.getUser.userId}/reservations/${reservationId}`)
+        else
+          response = await backend.get(`/reservations/${reservationId}`);
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {

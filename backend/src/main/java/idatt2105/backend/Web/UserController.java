@@ -109,6 +109,17 @@ public class UserController {
         }
     }
 
+    @GetMapping("/{user_id}/reservations/{reservation_id}")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<GETReservationDTO> getUserReservation(@PathVariable("user_id") long userId, @PathVariable("reservation_id") long reservationId){
+        try{
+            return new ResponseEntity<>(userService.getUserReservation(userId, reservationId), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @PostMapping("/{user_id}/reservations/sort")
     @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<GETReservationDTO>> getSortedAndFilteredUserReservations(@PathVariable("user_id") long userId, @RequestBody SortingDTO dto){
@@ -134,11 +145,14 @@ public class UserController {
     @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<GETReservationDTO> editUserReservation(@PathVariable("user_id") long userId, @PathVariable("reservation_id") long reservationId, @RequestBody POSTReservationDTO dto){
         try{
-            GETReservationDTO newDto = userService.editUserReservation(reservationId, dto);
+            GETReservationDTO newDto = userService.editUserReservation(userId, reservationId, dto);
             return new ResponseEntity<>(newDto, HttpStatus.OK);
         }catch(NotFoundException ex){
             ex.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch(SectionAlreadyBookedException ex ){
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 

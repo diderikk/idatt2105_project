@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
@@ -147,7 +148,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void editReservation_CorrectInput_ReturnsEditedReservation() throws NotFoundException{
+    public void editReservation_CorrectInput_ReturnsEditedReservation() throws NotFoundException, SectionAlreadyBookedException{
         reservation.setSections(new ArrayList<>());
         GETReservationDTO returnDto = reservationService.editReservation(reservation.getReservationId(),postReservationDTO);
 

@@ -27,7 +27,7 @@ export default defineComponent({
       registerInformation: ReservationForm
     ) => {
       if (checksBeforeAsyncCall(checks, statuses)) {
-        store.dispatch(
+        await store.dispatch(
           "createReservation",
           reservationFormToPOSTReservtion(registerInformation)
         );
