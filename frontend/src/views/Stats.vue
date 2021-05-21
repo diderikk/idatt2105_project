@@ -10,7 +10,7 @@
     </div>
     <div class="card">
     <div class="card-content">
-      <nav class="level">
+      <div class="level">
         <div class="level-item has-text-centered">
           <div>
             <p class="heading">Users with most reservations:</p>
@@ -24,12 +24,12 @@
             <p v-else>...</p>
           </div>
         </div>
-      </nav>
+      </div>
     </div>
     </div>
     <div class="card">
     <div class="card-content">
-      <nav class="level">
+      <div class="level">
         <div class="level-item has-text-centered">
           <div>
             <p class="heading">Most popular rooms:</p>
@@ -43,12 +43,12 @@
             <p v-else>...</p>
           </div>
         </div>
-      </nav>
+      </div>
     </div>
     </div>
     <div class="card">
     <div class="card-content">
-      <nav class="level">
+      <div class="level">
         <div class="level-item has-text-centered">
           <div>
             <p class="heading">Most popular sections:</p>
@@ -62,7 +62,7 @@
             <p v-else>...</p>
           </div>
         </div>
-      </nav>
+      </div>
     </div>
     </div>
 </div>

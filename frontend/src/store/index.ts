@@ -713,10 +713,12 @@ export const store: Store<State> = createStore<State>({
           commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not find top rooms",
-          status: SnackbarStatus.ERROR,
-        });
+        if(error !== null) {
+          commit("setSnackbar", {
+            content: "Could not find top rooms",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
@@ -737,10 +739,12 @@ export const store: Store<State> = createStore<State>({
           commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not find top sections",
-          status: SnackbarStatus.ERROR,
-        });
+        if(error !== null) {
+          commit("setSnackbar", {
+            content: "Could not find top sections",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
@@ -761,10 +765,12 @@ export const store: Store<State> = createStore<State>({
           commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not find top users",
-          status: SnackbarStatus.ERROR,
-        });
+        if(error !== null) {
+          commit("setSnackbar", {
+            content: "Could not find top users",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
