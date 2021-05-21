@@ -6,13 +6,15 @@
     ></base-feed-header>
     <div id="select">
       <label class="label">Sorting Type:</label>
-      <select v-model="sortingType" class="select">
-        <option value="0" selected disabled>Select sorting type</option>
-        <option value="1">None</option>
-        <option value="2">Date/Time</option>
-        <option value="3">Participants (Least-Most)</option>
-        <option value="4">Participants (Most-Least)</option>
-      </select>
+      <div class="select">
+        <select v-model="sortingType" class="select">
+          <option value="0" selected disabled>Select sorting type</option>
+          <option value="1">None</option>
+          <option value="2">Date/Time</option>
+          <option value="3">Participants (Least-Most)</option>
+          <option value="4">Participants (Most-Least)</option>
+        </select>
+      </div>
     </div>
 
     <div v-if="reservations.length === 0" class="box">No users available</div>
@@ -129,6 +131,6 @@ export default defineComponent({
 }
 
 #select {
-  margin-top: 10px;
+  margin: 10px 0px;
 }
 </style>
