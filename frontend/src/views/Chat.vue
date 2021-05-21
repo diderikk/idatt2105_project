@@ -1,11 +1,13 @@
 <template>
-  <div>
-    <input
-      type="text"
-      v-model="messageInput"
-      placeholder="Write a message..."
-    />
-    <button @click="sendMessage">Click Me</button>
+  
+  <div class="container">
+    <div id="chat" class="">
+      <message-component v-for="(message, index) in sortedMessages" :key="index" :message="message"/>
+    </div>
+    <div class="field has-text-centered has-addons">
+       <input type="text" v-model="messageInput" placeholder="Write a message..." class="input">
+      <button class="button is-dark" @click="sendMessage">Send</button>
+    </div>
   </div>
 </template>
 
@@ -18,9 +20,13 @@ import SockJS from "sockjs-client";
 import User from "../interfaces/User/User.interface";
 import { dateTimeToString } from "../utils/date";
 import { URL } from "../backend";
+import MessageComponent from "../components/Message.vue";
 
 export default defineComponent({
   name: "Chat",
+  components: {
+    MessageComponent
+  },
   props: {
     roomCode: {
       required: true,
@@ -37,11 +43,7 @@ export default defineComponent({
     const messages = ref([] as Message[]);
 
     onMounted(async () => {
-      const response = await store.dispatch("getRoomMessages", props.roomCode);
-      messages.value = response;
-
-      console.log(messages.value);
-
+      messages.value = await store.dispatch("getRoomMessages", props.roomCode);
 
       const sockJs = new SockJS(`${URL}/websocket`);
       stompClient = Stomp.over(sockJs);
@@ -61,6 +63,7 @@ export default defineComponent({
         {},
         JSON.stringify(getMessage.value)
       );
+      messageInput.value = "";
     };
 
     const getMessage = computed(() => {
@@ -74,38 +77,35 @@ export default defineComponent({
     });
 
     const connectWebSocket = async () => {
-      await stompClient.connect(
-        {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        () => {
-          stompClient.subscribe(
-            `/api/v1/chat/${props.roomCode}/messages`,
-            (message) => {
-              console.log(message);
-
-            }
-          );
-        },
-        (err) => {
-          //TODO: Change this
-          console.log(err);
-        }
-      );
+      await store.dispatch("connectChat", {roomCode: props.roomCode, stompClient: stompClient, messages: messages.value});
     };
 
     const sortedMessages = computed(() => {
       const tempMessages = messages.value;
-      return tempMessages.sort();
+      return tempMessages.sort((message1, message2) => {
+          const sentDate1 = new Date(message1.timeSent);
+          const sentDate2 = new Date(message2.timeSent);
+          if(sentDate1 <= sentDate2) return 1;
+          return -1;
+      });
     })
 
     return {
       sendMessage,
       messageInput,
-      sortedMessages
+      sortedMessages,
+      messages
     };
   },
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+#chat{
+    height: 80vh;
+    display: flex;
+    flex-direction: column-reverse;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+</style>

@@ -16,6 +16,7 @@ import UserStats from "@/interfaces/User/UserStats.interface";
 import GETReservation from "@/interfaces/Reservation/GETReservation.interface";
 import GETRoom from "@/interfaces/Room/GETRoom.interface";
 import Message from "@/interfaces/Message.interface";
+import Stomp from "stompjs";
 import GETAvailableSections from "@/interfaces/Section/GETAvailableSections.interface";
 
 export const key: InjectionKey<Store<State>> = Symbol();
@@ -533,7 +534,44 @@ export const store: Store<State> = createStore<State>({
       }
     },
     /**
-     * Calls backend at POST /rooms
+     * Connects to the chat room
+     * @param connectInfo roomCode and
+     * @return Promise<boolean>
+     */
+    async connectChat(
+      { commit },
+      connectInfo: {
+        roomCode: string;
+        stompClient: Stomp.Client;
+        messages: Message[];
+      }
+    ): Promise<boolean> {
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      await connectInfo.stompClient.connect(
+        {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        () => {
+          connectInfo.stompClient.subscribe(
+            `/api/v1/chat/${connectInfo.roomCode}/messages`,
+            (message) => {
+              connectInfo.messages.push(JSON.parse(message.body));
+            }
+          );
+          commit("setSnackbarStatus", SnackbarStatus.NONE);
+          return true;
+        },
+        () => {
+          commit("setSnackbar", {
+            content: "Could not connect to room chat",
+            status: SnackbarStatus.ERROR,
+          });
+          return false;
+        }
+      );
+      return false;
+    },
+    /** Calls backend at POST /rooms
      * @param room
      * @returns Promise<boolean>
      */
