@@ -10,18 +10,18 @@ Last run CI/CD: [Github Actions](https://github.com/diderikk/idatt2105_project/a
 3. [ER-diagram](#er-diagram)
 4. [REST-API](#rest-api)
 5. [Security](#security)
-6. [CI/CD](#ci/cd)
+6. [CI/CD](#cicd)
 7. [Dependencies](#dependencies)
-8. [Future work](#future work)
-9. [Installation manual](#installation manual)
-10. [Running tests](#running tests)
+8. [Future work](#future-work)
+9. [Installation manual](#installation-manual)
+10. [Running tests](#running-tests)
 
 ## Introduction
-Book That Room is an web application made for booking rooms. Users are able to reserver rooms or parts of rooms as an individual. Users and rooms are created by an admins, that have full access to all information on the website. When a user is created, an email with login credentials is sent to the user's email.
+Book That Room is an web application made for booking rooms. Users are able to reserve rooms or individual parts of rooms as sections. Users, rooms and sections are created by admins, that have full access to all information on the website. When a user is created, an email with login credentials is sent to the user's email.
 
 
 
-The application is made with Vue 3 as frontend framework which is one of the popular frameworks. To write Vue, we used TypeScript instead of JavaScript. This is because it has types, which makes code easier to understand and write. Additionally, it uses a compiler that gives clearer errors than JavaScript. To avoid writing entirely CSS, the team chose to implement a CSS-framework called Bulma. It has predefined classes to simply create well proportions components that fits both mobile and desktop. For backend Spring Boot with Java and Maven was used to create a REST-API server, that frontend clients can send requests to. Both backend and frontend is deployed/hosted: Backend is deployed on a virtual server hosted by Azure, whilst frontend is deployed on Vercel.
+The application is made with Vue 3 as frontend framework which is one of the popular frameworks. To write Vue, we used TypeScript instead of JavaScript. This is because it has types, which makes code easier to understand and write. Additionally, it uses a compiler that gives clearer errors than JavaScript. To avoid writing entirely CSS, the team chose to implement a CSS-framework called Bulma. It has predefined classes to simply create well proportions components that fits both mobile and desktop. For backend, Spring Boot with Java and Maven was used to create a REST-API server, that frontend clients can send requests to. Both backend and frontend are deployed/hosted: Backend is deployed on a virtual server hosted by Azure, whilst frontend is deployed on Vercel.
 
 ## Functionality
 ### User
@@ -31,6 +31,7 @@ The application is made with Vue 3 as frontend framework which is one of the pop
 - Administer user's reservations
 - View all rooms
 - Join room chat
+- View profile information
 
 ### Admin
 - Log in
@@ -48,44 +49,46 @@ The application is made with Vue 3 as frontend framework which is one of the pop
 Link to REST-API page: [Book That Room API](https://bookthatroomserver.northeurope.cloudapp.azure.com:8443/swagger-ui/)
 
 ## Security
-Book That Room has security on both both frontend and backend. This is to ensure that users can not access information og make changes that their not allowed to do. In backend we use Spring Security and JWT to achieve these goals. JWT are tokens that contains encrypted user information, and are sent between the server and clients after logging in. For each request sent to the backend server, the token is validated before returning a response. Additionally, Spring Security has good implemntations on role authentication, because it is simple to define roles and their permissions. It also uses filters, these are layers of security that a request are sent through to get authenticated. Each layer passes on the request trying to authenticate until it reaches the endpoint destination.
+Book That Room has security on both frontend and backend. This is to ensure that users can not access information and make changes that they are not allowed to make. In backend we use Spring Security and JWT to achieve these goals. JWT are tokens that contains encrypted user information, and are sent between the server and clients after logging in. For each request sent to the backend server, the token is validated before returning a response. Additionally, Spring Security has good implementations on role authentication, because it is simple to define roles and their permissions. It also uses filters. These are layers of security that a request is sent through to get authenticated. Each layer passes on the request trying to authenticate until it reaches the endpoint destination.
 
 ## CI/CD
 ### CI
-Continuos Integration is done on Github when creating or updating an open pull request. We currently have only implemented CI for backend because we did not see any use in implementing it. For CI backend, it runs alle tests defined under the test folder:  [Backend CI](https://github.com/diderikk/idatt2105_project/blob/dev/.github/workflows/backend.yml)
+Continuos Integration is done on Github when creating or updating an open pull request. We currently have only implemented CI for backend because we did not see any use in implementing it. For CI backend, it runs all tests defined under the test folder:  [Backend CI](https://github.com/diderikk/idatt2105_project/blob/dev/.github/workflows/backend.yml)
 
 Test coverage (defined by missing test coverage):    
 ![Test Coverage](./assets/TestCoverage.png)
 
 ### CD
-Continous Deployment backend is done on Github when the "dev" branch is being merged with the "master" branch. It ssh'es into the virtual machine hosted on Azure and removes the current backend folder, copies over the latest version, adds the config.properties file and the TLS certificate. It perceeds to stop the docker container which will trigger an server.service file in the VM, that vil start the server again. [Backend CI](https://github.com/diderikk/idatt2105_project/blob/dev/.github/workflows/backend.yml)
+Continuous Deployment on backend is done on Github when the "dev" branch is being merged with the "master" branch. It ssh'es into the virtual machine hosted on Azure and removes the current backend folder, copies over the latest version, adds the config.properties file and the TLS certificate. It perceeds to stop the docker container, which will trigger a server.service file in the VM, that will start the server again. [Backend CI](https://github.com/diderikk/idatt2105_project/blob/dev/.github/workflows/backend.yml)
 
-Continous Deployment frontend is done automatically by Vercel when pushing changes to the "master" branch. It also creates "preview deployments" for branch on every pull request.
+Continuous Deployment on frontend is done automatically by Vercel when pushing changes to the "master" branch. It also creates "preview deployments" for a branch on every pull request.
 
 ## Dependencies
 ### Backend
 - Maven
-	- Build automation tool for our backend application written in Java.
+	- Build automation tool for our backend application written in Java
 - Spring Boot
-	- Application framework for easily creating stand-alone applications with Java.
+	- Application framework for easily creating stand-alone applications with Java
 - Spring Boot Security
-	- Powerful authentication and access-control framework. Standard for Spring-based applications when using Spring Boot.
+	- Powerful authentication and access-control framework. Standard for Spring-based applications when using Spring Boot
 - Swagger
 	- For hosting of API.
 - Java Persistence API (JPA)
-	- A programming interface specification for management of relational data in Java applications.
+	- A programming interface specification for management of relational data in Java applications
 - Docker (optional)
-	- Can be user to safely build and run applications in isolated containers.
+	- Can be user to safely build and run applications in isolated containers
 
 ### Frontend
 - Vue.js 3
-	- Open source JavaScript framework for building interfaces and applications.
+	- Open source JavaScript framework for building interfaces and applications
 - Typescript
 	- A strict syntactical superset of JavaScript programming language, helpful to avoid typical JavaScript errors
 - Babel
-	- Free and open-source JavaScript compiler, so that the code can be run by older JavaScript engines.
+	- Free and open-source JavaScript compiler, so that the code can be run by older JavaScript engines
 - ESlint
 	- Static code analysis tool for problem identification in JavaScript code
+- Bulma
+	- Free open-source framework that provides ready-to-use components to build responsive web interfaces
 
 ## Future work
 ### Reservation of equipment
@@ -113,9 +116,9 @@ You will need [Maven](https://maven.apache.org/install.html) to run backend appl
 
 If you want to run server and client locally (so that they communicate with eachother):
 
-Change constant isTesting to **true** in *frontend/src/backend.ts* and run following commands under depending on how you want to run the application.
+Change constant isTesting to **true** in *frontend/src/backend.ts* and run following commands under, depending on how you want to run the application.
 
-To run Spring Boot you will need a config.properties file in src/main/resources
+To run Spring Boot you will need a config.properties file in *src/main/resources*
 ```
 database.url=DATABASE_URL
 database.username=DATABASE_USERNAME
