@@ -18,6 +18,21 @@ export const dateToString = (date: Date): string => {
 };
 
 /**
+ * Returns a date string as the backend server expects it
+ * @param date
+ * @returns date string
+ */
+export const dateTimeToString = (date: Date): string => {
+  let string = date.getHours() < 10 ? "0" : "";
+  string += date.getHours();
+  const minutes = date.getMinutes();
+  string += ":";
+  string += minutes < 10 ? "0" : "";
+  string += minutes;
+  return dateToString(date) + " " + string.substring(0, 5);
+};
+
+/**
  * Removes the time part of a date
  * @param date
  * @returns date where all time elements are set to 0

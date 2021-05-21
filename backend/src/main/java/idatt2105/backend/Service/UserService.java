@@ -1,6 +1,7 @@
 package idatt2105.backend.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,22 +22,24 @@ import org.springframework.stereotype.Service;
 import idatt2105.backend.Component.EmailComponent;
 import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionAlreadyBookedException;
+import idatt2105.backend.Model.Message;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.UserSecurityDetails;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
-import idatt2105.backend.Model.DTO.GETReservationDTO;
-import idatt2105.backend.Model.DTO.GETRoomDTO;
-import idatt2105.backend.Model.DTO.GETSectionDTO;
-import idatt2105.backend.Model.DTO.GETUserDTO;
-import idatt2105.backend.Model.DTO.POSTReservationDTO;
-import idatt2105.backend.Model.DTO.POSTSectionDTO;
-import idatt2105.backend.Model.DTO.POSTUserDTO;
 import idatt2105.backend.Model.DTO.SortingDTO;
-import idatt2105.backend.Model.DTO.UserStatisticsDTO;
+import idatt2105.backend.Model.DTO.Reservation.GETReservationDTO;
+import idatt2105.backend.Model.DTO.Reservation.POSTReservationDTO;
+import idatt2105.backend.Model.DTO.Room.GETRoomDTO;
+import idatt2105.backend.Model.DTO.Section.GETSectionDTO;
+import idatt2105.backend.Model.DTO.Section.POSTSectionDTO;
+import idatt2105.backend.Model.DTO.User.GETUserDTO;
+import idatt2105.backend.Model.DTO.User.POSTUserDTO;
+import idatt2105.backend.Model.DTO.User.UserStatisticsDTO;
 import idatt2105.backend.Model.Enum.SortingTypeEnum;
+import idatt2105.backend.Repository.MessageRepository;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -62,6 +65,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private MessageRepository messageRepository;
 
     @Autowired(required = false)
     private EmailComponent emailComponent;
@@ -181,7 +187,7 @@ public class UserService implements UserDetailsService {
         Optional<User> optionalUser = userRepository.findById(userId);
         if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + userId);
         User user = optionalUser.get();
-        return user.getReservations().stream().map(reservation -> new GETReservationDTO(reservation))
+        return user.getReservations().stream().filter(reservation -> reservation.getStartTime().isAfter(LocalDateTime.now())).map(reservation -> new GETReservationDTO(reservation))
                 .collect(Collectors.toList());
     }
 
@@ -233,7 +239,8 @@ public class UserService implements UserDetailsService {
         if(!optionalUser.isPresent()) throw new NotFoundException("No user found with id: " + userId);
         User user = optionalUser.get();
         Reservation reservation = new Reservation();
-        reservation.setStartTime(dto.getStartTime());
+        if(dto.getStartTime() != null && dto.getStartTime().isBefore(dto.getEndTime())) reservation.setStartTime(dto.getStartTime());
+        else throw new IllegalArgumentException("Start time must be before endTime");
         reservation.setEndTime(dto.getEndTime());
         reservation.setReservationText(dto.getReservationText());
         reservation.setAmountOfPeople(dto.getAmountOfPeople());
@@ -242,7 +249,7 @@ public class UserService implements UserDetailsService {
             Optional<Section> optionalSection = sectionRepository
                     .findSectionBySectionNameAndRoomCode(section.getSectionName(), section.getRoomCode());
             if(!optionalSection.isPresent()) throw new NotFoundException("No section found with name: " + section.getSectionName());
-            if (checkIfSectionIsBooked(section, dto)) {
+            if (checkIfSectionIsBooked(section, dto, -1)) {
                 throw new SectionAlreadyBookedException("Section is already booked/reserved for the given time period");
             }
             registerSections.add(optionalSection.get());
@@ -275,7 +282,7 @@ public class UserService implements UserDetailsService {
             for(POSTSectionDTO sectionDTO : dto.getSections()){
                 Optional<Section> optionalSection = sectionRepository.findSectionBySectionNameAndRoomCode(sectionDTO.getSectionName(), sectionDTO.getRoomCode());
                 if(optionalSection.isPresent()){
-                    if(checkIfSectionIsBooked(sectionDTO, dto)) throw new SectionAlreadyBookedException("Section is already booked/reserved for the given time period");
+                    if(checkIfSectionIsBooked(sectionDTO, dto, reservationId)) throw new SectionAlreadyBookedException("Section is already booked/reserved for the given time period");
                     reservation.getSections().add(optionalSection.get());
                 }
                 else {
@@ -285,7 +292,8 @@ public class UserService implements UserDetailsService {
                 }
             }
         }
-        if(dto.getStartTime() != null) reservation.setStartTime(dto.getStartTime());
+        if(dto.getStartTime() != null && dto.getStartTime().isBefore(dto.getEndTime())) reservation.setStartTime(dto.getStartTime());
+        else throw new IllegalArgumentException("Start time must be before endTime");
         if(dto.getEndTime() != null) reservation.setEndTime(dto.getEndTime());
         return new GETReservationDTO(reservationRepository.save(reservation));
     }
@@ -333,6 +341,12 @@ public class UserService implements UserDetailsService {
         reservationRepository.saveAll(user.getReservations());
         reservationRepository.deleteAll(user.getReservations());
         user.getReservations().clear();
+
+        if(user.getMessages() != null){
+            for(Message message: user.getMessages()) message.setUser(null);
+            messageRepository.saveAll(user.getMessages());
+        }
+
         user = userRepository.save(user);
         userRepository.delete(user);
         return true;
@@ -463,12 +477,13 @@ public class UserService implements UserDetailsService {
      * @return true if reservation already exists during specified times
      * @throws NotFoundException
      */
-    private boolean checkIfSectionIsBooked(POSTSectionDTO sectionDTO, POSTReservationDTO reservationDTO) throws NotFoundException {
+    private boolean checkIfSectionIsBooked(POSTSectionDTO sectionDTO, POSTReservationDTO reservationDTO, long reservationId) throws NotFoundException {
         Optional<Section> sectionOptional = sectionRepository.findSectionBySectionNameAndRoomCode(sectionDTO.getSectionName(), sectionDTO.getRoomCode());
         if(!sectionOptional.isPresent()) throw new NotFoundException("Section not found with name " + sectionDTO.getSectionName());
         Section section = sectionOptional.get();
         if(section.getReservations() == null) throw new NullPointerException("Section tries to access reservation list that is null");
         for (Reservation reservation : section.getReservations()) {
+            if(reservation.getReservationId() == reservationId) continue;
             if((reservationDTO.getStartTime().isEqual(reservation.getStartTime()))
                 || (reservationDTO.getEndTime().isEqual(reservation.getEndTime()))
                 || (reservationDTO.getStartTime().isAfter(reservation.getStartTime()) && reservationDTO.getStartTime().isBefore(reservation.getEndTime()))

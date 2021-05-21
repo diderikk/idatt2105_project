@@ -18,15 +18,17 @@ import idatt2105.backend.Exception.SectionNotOfThisRoomException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
-import idatt2105.backend.Model.DTO.AvailableSectionDTO;
-import idatt2105.backend.Model.DTO.AvailableSectionsDTO;
-import idatt2105.backend.Model.DTO.GETReservationDTO;
-import idatt2105.backend.Model.DTO.GETRoomDTO;
-import idatt2105.backend.Model.DTO.GETSectionDTO;
-import idatt2105.backend.Model.DTO.POSTRoomDTO;
-import idatt2105.backend.Model.DTO.POSTSectionDTO;
+import idatt2105.backend.Model.DTO.MessageDTO;
 import idatt2105.backend.Model.DTO.TimeIntervalDTO;
-import idatt2105.backend.Model.DTO.RoomStatisticsDTO;
+import idatt2105.backend.Repository.MessageRepository;
+import idatt2105.backend.Model.DTO.Reservation.GETReservationDTO;
+import idatt2105.backend.Model.DTO.Room.GETRoomDTO;
+import idatt2105.backend.Model.DTO.Room.POSTRoomDTO;
+import idatt2105.backend.Model.DTO.Room.RoomStatisticsDTO;
+import idatt2105.backend.Model.DTO.Section.AvailableSectionDTO;
+import idatt2105.backend.Model.DTO.Section.AvailableSectionsDTO;
+import idatt2105.backend.Model.DTO.Section.GETSectionDTO;
+import idatt2105.backend.Model.DTO.Section.POSTSectionDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -43,6 +45,8 @@ public class RoomService {
     private SectionRepository sectionRepository;
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private MessageRepository messageRepository;
 
     /**
      * Returns room based on roomCode stored in the database
@@ -139,6 +143,23 @@ public class RoomService {
     }
 
     /**
+     * Returns all messages
+     * @param roomCode
+     * @return
+     * @throws NotFoundException
+     */
+    public List<MessageDTO> getRoomMessages(String roomCode) throws NotFoundException{
+        LOGGER.info("getRoomMessages(String roomCode) called with roomCode: {}", roomCode);
+        Optional<Room> roomOptional = roomRepository.findById(roomCode);
+        if(!roomOptional.isPresent()) {
+            throw new NotFoundException("No room found with room code: " + roomCode);
+        }
+
+        return messageRepository.getMessages(roomCode, LocalDateTime.now().minusMonths(1)).stream()
+        .map(message -> new MessageDTO(message)).collect(Collectors.toList());
+    }
+
+    /**
      * Creates a new room with a given roomCode
      * Sections are empty.
      * @param roomCode
@@ -147,8 +168,6 @@ public class RoomService {
     public GETRoomDTO createRoom(String roomCode)
     {
         LOGGER.info("createRoomWith(String roomCode) called with roomCode: {}", roomCode);
-
-        // TODO: add ADMIN verification?
 
         Room newRoom = new Room();
         newRoom.setRoomCode(roomCode);
@@ -323,6 +342,9 @@ public class RoomService {
                 }
                 sectionRepository.delete(section);
             }
+        }
+        if(room.get().getMessages() != null){
+            messageRepository.deleteAll(room.get().getMessages());
         }
         roomRepository.deleteById(roomCode);
         return !roomRepository.existsById(roomCode);

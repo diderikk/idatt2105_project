@@ -23,8 +23,8 @@ import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
-import idatt2105.backend.Model.DTO.POSTReservationDTO;
-import idatt2105.backend.Model.DTO.GETUserDTO;
+import idatt2105.backend.Model.DTO.Reservation.POSTReservationDTO;
+import idatt2105.backend.Model.DTO.User.GETUserDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -92,7 +92,7 @@ public class UserControllerTest {
 
         reservation = new Reservation();
         reservation.setAmountOfPeople(10);
-        reservation.setStartTime(LocalDateTime.now());
+        reservation.setStartTime(LocalDateTime.now().plusHours(1));
         reservation.setEndTime(LocalDateTime.now().plusHours(2));
         reservation.setSections(List.of(section));
         reservation.setReservationText("reservationText");
@@ -201,6 +201,8 @@ public class UserControllerTest {
         dto.setAmountOfPeople(10);
         dto.setReservationText("test");
         dto.setSections(new ArrayList<>());
+        dto.setStartTime(LocalDateTime.now().plusHours(12));
+        dto.setEndTime(LocalDateTime.now().plusHours(14));
         String DTOString = objectMapper.writeValueAsString(dto);
         mockMvc.perform(post("/api/v1/users/" + user.getUserId() + "/reservations")
                 .contentType(MediaType.APPLICATION_JSON).content(DTOString)).andExpect(status().isCreated())

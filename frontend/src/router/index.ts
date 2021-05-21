@@ -130,6 +130,16 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
   },
   {
+    path: "/chat/:roomCode",
+    name: "Chat",
+    meta: {
+      title: "Room Chat",
+      permission: "User",
+    },
+    component: () => import("../views/Chat.vue"),
+    props: true,
+  },
+  {
     path: "/:catchAll(.*)",
     name: "NotFound",
     component: () => import("../views/PageNotFound.vue"),

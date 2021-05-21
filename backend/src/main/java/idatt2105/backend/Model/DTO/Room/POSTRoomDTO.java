@@ -1,7 +1,8 @@
-package idatt2105.backend.Model.DTO;
+package idatt2105.backend.Model.DTO.Room;
 
 import java.util.List;
 
+import idatt2105.backend.Model.DTO.Section.POSTSectionDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

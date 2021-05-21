@@ -35,12 +35,13 @@ import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.UserSecurityDetails;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
-import idatt2105.backend.Model.DTO.GETReservationDTO;
-import idatt2105.backend.Model.DTO.POSTReservationDTO;
-import idatt2105.backend.Model.DTO.POSTSectionDTO;
-import idatt2105.backend.Model.DTO.POSTUserDTO;
-import idatt2105.backend.Model.DTO.UserStatisticsDTO;
-import idatt2105.backend.Model.DTO.GETUserDTO;
+import idatt2105.backend.Repository.MessageRepository;
+import idatt2105.backend.Model.DTO.Reservation.GETReservationDTO;
+import idatt2105.backend.Model.DTO.Reservation.POSTReservationDTO;
+import idatt2105.backend.Model.DTO.Section.POSTSectionDTO;
+import idatt2105.backend.Model.DTO.User.GETUserDTO;
+import idatt2105.backend.Model.DTO.User.POSTUserDTO;
+import idatt2105.backend.Model.DTO.User.UserStatisticsDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -65,6 +66,9 @@ public class UserServiceTests {
 
     @Mock
     private ReservationRepository reservationRepository;
+
+    @Mock
+    private MessageRepository messageRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -94,8 +98,8 @@ public class UserServiceTests {
         reservation.setReservationId(1);
         reservation.setReservationText("reservationText");
         reservation.setAmountOfPeople(1);
-        reservation.setStartTime(LocalDateTime.of(2001, 1, 1, 1, 1, 1));
-        reservation.setEndTime(LocalDateTime.of(2001, 1, 1, 3, 1, 1));
+        reservation.setStartTime(LocalDateTime.of(2022, 1, 1, 1, 1, 1));
+        reservation.setEndTime(LocalDateTime.of(2022, 1, 1, 3, 1, 1));
         reservation.setUser(user);
         ArrayList<Reservation> reservations = new ArrayList<>();
         reservations.add(reservation);
@@ -246,7 +250,7 @@ public class UserServiceTests {
     {
         user.setReservations(new ArrayList<>());
         List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO(section.getSectionName(),room.getRoomCode()));
-        POSTReservationDTO dto = new POSTReservationDTO(null, null, "reservationText", 100, tempSections);
+        POSTReservationDTO dto = new POSTReservationDTO(LocalDateTime.now().plusHours(10), LocalDateTime.now().plusDays(1), "reservationText", 100, tempSections);
         dto = userService.addUserReservation(1, dto);
 
         assertNotNull(dto);
@@ -257,7 +261,7 @@ public class UserServiceTests {
     {
         user.setReservations(new ArrayList<>());
         List<POSTSectionDTO> tempSections = List.of(new POSTSectionDTO("fake", room.getRoomCode()));
-        POSTReservationDTO dto = new POSTReservationDTO(null, null, "reservationText", 100, tempSections);
+        POSTReservationDTO dto = new POSTReservationDTO(LocalDateTime.now().plusHours(10), LocalDateTime.now().plusHours(12), "reservationText", 100, tempSections);
 
         assertThrows(NotFoundException.class, () -> userService.addUserReservation(1, dto));
     }
