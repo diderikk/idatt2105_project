@@ -23,9 +23,9 @@
       </nav>
     </div>
     <div class="card-footer">
-      <!--<router-link :to="chatroute" class="card-footer-item"
+      <router-link :to="chatLink" class="card-footer-item"
         >Join Chat</router-link
-      >-->
+      >
       <router-link
         v-if="isAdmin"
         :to="`/edit-room/${room.roomCode}`"
@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, Ref } from "vue";
+import { computed, defineComponent, onMounted, ref, Ref } from "vue";
 import Room from "../interfaces/Room/Room.interface";
 import RoomStats from "../interfaces/Room/RoomStats.interface";
 import { useStore } from "../store";
@@ -75,9 +75,17 @@ export default defineComponent({
       }
     };
 
+    
+
+    const chatLink = computed(() => {
+      return "/chat/" + props.room.roomCode;
+      
+      })
+
     return {
       deleteRoom,
       stats,
+      chatLink,
     };
   },
 });
@@ -86,5 +94,15 @@ export default defineComponent({
 <style scoped>
 li {
   margin: 10px 10px;
+}
+
+.card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-footer {
+  margin-top: auto;
 }
 </style>

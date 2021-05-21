@@ -34,6 +34,9 @@ export default defineComponent({
       }
     };
 
+    /**
+     * The config object to be sent to BaseReservationForm, containing title, and buttons
+     */
     const config = {
       title: "Create reservation",
       buttons: [

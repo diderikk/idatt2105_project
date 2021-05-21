@@ -45,6 +45,10 @@ export default defineComponent({
       await reload(true);
     });
 
+    /**
+     * Reloads all rooms
+     * @editSnackbar defines if the snackbar should be changed when loading the rooms. When a room has been deleted the user should receive feedback from the delete action that the user has been deleted, and therefore editSnackbar has to be false to not override the previous feedback.
+     */
     const reload = async (editSnackBar: boolean) => {
       const response = await store.dispatch("getRooms", editSnackBar);
       if (response === null) return;

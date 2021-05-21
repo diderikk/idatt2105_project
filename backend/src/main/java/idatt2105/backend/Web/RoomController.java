@@ -18,6 +18,7 @@ import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionNameInRoomAlreadyExistsException;
 import idatt2105.backend.Exception.SectionNotOfThisRoomException;
 import idatt2105.backend.Model.DTO.TimeIntervalDTO;
+import idatt2105.backend.Model.DTO.MessageDTO;
 import idatt2105.backend.Model.DTO.Reservation.GETReservationDTO;
 import idatt2105.backend.Model.DTO.Room.GETRoomDTO;
 import idatt2105.backend.Model.DTO.Room.POSTRoomDTO;
@@ -51,6 +52,16 @@ public class RoomController {
         } catch (NotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{room_code}/messages")
+    public ResponseEntity<List<MessageDTO>> getRoomMessages(@PathVariable("room_code") String roomCode){
+        try{
+            return new ResponseEntity<>(roomService.getRoomMessages(roomCode), HttpStatus.OK);
+        } catch(NotFoundException ex){
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

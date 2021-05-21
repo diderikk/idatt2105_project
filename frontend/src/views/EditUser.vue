@@ -78,6 +78,9 @@ export default defineComponent({
       }
     };
 
+    /**
+     * The config object to be sent to BaseUserForm, containing title, and buttons
+     */
     const config = {
       title: "Edit user",
       buttons: [

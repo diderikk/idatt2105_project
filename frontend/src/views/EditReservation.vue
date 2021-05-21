@@ -19,7 +19,7 @@
 import { defineComponent, onMounted, ref, Ref } from "vue";
 import BaseReservationFormConfig from "../components/BaseReservationForm.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
-import POSTReservation from "../interfaces/Reservation/POSTReservation.interface";
+import GETReservation from "../interfaces/Reservation/GETReservation.interface";
 import checksBeforeAsyncCall from "../utils/checksBeforeAsyncCall";
 import ReservationForm from "../interfaces/Reservation/ReservationForm.interface";
 import { useStore } from "../store";
@@ -28,7 +28,6 @@ import {
   reservationFormToPOSTReservtion,
 } from "../utils/reservationUtils";
 import { useRouter } from "vue-router";
-
 
 export default defineComponent({
   name: "EditReservation",
@@ -46,7 +45,7 @@ export default defineComponent({
     const router = useRouter();
 
     onMounted(async () => {
-      const response: POSTReservation = await store.dispatch(
+      const response: GETReservation = await store.dispatch(
         "getReservation",
         props.id
       );
@@ -69,6 +68,13 @@ export default defineComponent({
 
     const isDoneLoading = ref(false);
 
+    /**
+     * If all checks are passed editReservation action in store is called
+     * @param checks in the BaseReservationForm component
+     * @param statuses in the BaseReservationForm component, to check if all checks have finished successfully
+     * @param registerInformation the item to be sent in the POST request from the editReservation action
+     * @param reservationId the id of the reservation to be edited with POST request from the editReservation action
+     */
     const editReservation = async (
       checks: Array<() => void>,
       statuses: Array<Ref<InputFieldFeedbackStatus>>,
@@ -83,14 +89,21 @@ export default defineComponent({
       }
     };
 
+    /**
+     * Deletes a reservation
+     * @param reservationId the id of the reservation to be deleted with DELETE request from the editReservation action
+     */
     const deleteReservation = async (reservationId: number) => {
       if (window.confirm("Are you sure you want to delete the reservation?")) {
-        if(await store.dispatch("deleteReservation", reservationId)){
+        if (await store.dispatch("deleteReservation", reservationId)) {
           router.push("/reservations");
         }
       }
     };
 
+    /**
+     * The config object to be sent to BaseReservationForm, containing title, and buttons
+     */
     const config = {
       title: "Edit reservation",
       buttons: [
