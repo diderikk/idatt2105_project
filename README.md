@@ -42,6 +42,9 @@ Book That Room has security on both both frontend and backend. This is to ensure
 ### CI
 Continuos Integration is done on Github when creating or updating an open pull request. We currently have only implemented CI for backend because we did not see any use in implementing it. For CI backend, it runs alle tests defined under the test folder:  [Backend CI](https://github.com/diderikk/idatt2105_project/blob/dev/.github/workflows/backend.yml)
 
+Test coverage (defined by missing test coverage):    
+![Test Coverage](./assets/TestCoverage.png)
+
 ### CD
 Continous Deployment backend is done on Github when the "dev" branch is being merged with the "master" branch. It ssh'es into the virtual machine hosted on Azure and removes the current backend folder, copies over the latest version, adds the config.properties file and the TLS certificate. It perceeds to stop the docker container which will trigger an server.service file in the VM, that vil start the server again. [Backend CI](https://github.com/diderikk/idatt2105_project/blob/dev/.github/workflows/backend.yml)
 
