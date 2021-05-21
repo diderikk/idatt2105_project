@@ -16,7 +16,7 @@
       <div class="columns is-centered has-text-centered">
         <span v-if="user.isAdmin" class="tag is-dark is-medium">Admin</span>
       </div>
-      <nav class="level">
+      <div class="level">
         <div class="level-item has-text-centered">
           <div>
             <p class="heading">Email</p>
@@ -47,9 +47,9 @@
             <p class="title" v-else>...</p>
           </div>
         </div>
-      </nav>
+      </div>
 
-      <nav class="level">
+      <div class="level">
         <div class="level-item has-text-centered">
           <div>
             <p class="heading">Total reservations</p>
@@ -86,7 +86,7 @@
             <p class="title" v-else>...</p>
           </div>
         </div>
-      </nav>
+      </div>
     </div>
     <div class="card-footer">
       <router-link :to="`/edit-user/${user.userId}`" class="card-footer-item"

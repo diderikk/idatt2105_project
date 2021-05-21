@@ -32,6 +32,10 @@
           <router-link v-if="isLoggedIn" class="navbar-item" to="/rooms"
             >Rooms</router-link
           >
+
+          <router-link v-if="isAdmin" class="navbar-item" to="/statistics"
+            >Statistics</router-link
+          >
         </div>
         <div class="navbar-end">
           <router-link
