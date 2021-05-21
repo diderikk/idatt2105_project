@@ -16,7 +16,7 @@ public class MessageDTO {
     private long userId;
     private String firstName;
     private String lastName;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timeSent;
     private String text;
 
