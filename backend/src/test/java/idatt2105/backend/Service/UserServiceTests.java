@@ -35,6 +35,7 @@ import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.UserSecurityDetails;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
+import idatt2105.backend.Repository.MessageRepository;
 import idatt2105.backend.Model.DTO.Reservation.GETReservationDTO;
 import idatt2105.backend.Model.DTO.Reservation.POSTReservationDTO;
 import idatt2105.backend.Model.DTO.Section.POSTSectionDTO;
@@ -65,6 +66,9 @@ public class UserServiceTests {
 
     @Mock
     private ReservationRepository reservationRepository;
+
+    @Mock
+    private MessageRepository messageRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
