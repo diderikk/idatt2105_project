@@ -14,6 +14,7 @@ import State from "@/interfaces/State.interface";
 import UserForm from "@/interfaces/User/UserForm.interface";
 import UserStats from "@/interfaces/User/UserStats.interface";
 import GETReservation from "@/interfaces/Reservation/GETReservation.interface";
+import GETRoom from "@/interfaces/Room/GETRoom.interface";
 
 export const key: InjectionKey<Store<State>> = Symbol();
 
@@ -361,9 +362,9 @@ export const store: Store<State> = createStore<State>({
       }
     },
     /**
-     *
+     * Calls backend GET /users/${getters.getUser.userId}/reservations/${reservation.reservationId}
      * @param reservationId
-     * @returns
+     * @returns Promise<GETReservation|null>
      */
     async getReservation(
       { commit },
@@ -387,6 +388,15 @@ export const store: Store<State> = createStore<State>({
         return null;
       }
     },
+    /**
+     * If admin and no sortingConfig is given calls backend at GET /reservation
+     * If admin and sortingConfig is given calls backend at GET /reservations/sort
+     * If user and no sortingConfig is given calls backend at GET /users/${currentUser.userId}/reservations
+     * If user and sortingConfig is given calls backend at GET /users/${currentUser.userId}/reservations/sort
+     * @param editSnackbar optional, if false, the snakcbar should only be edited when an error occurs
+     * @param sortingConfig optional, how the reservations shuld be sorted
+     * @returns Promise<GETReservation[]|null>
+     */
     async getReservations(
       { commit },
       editSnackbar: boolean,
@@ -409,7 +419,6 @@ export const store: Store<State> = createStore<State>({
           if (currentUser.isAdmin) {
             response = await backend.post("/reservations/sort", sortingConfig);
           } else {
-            //TODO add endpoint for sorting reservations for user
             response = await backend.post(
               `/users/${currentUser.userId}/reservations/sort`,
               sortingConfig
@@ -428,7 +437,15 @@ export const store: Store<State> = createStore<State>({
         return null;
       }
     },
-    async getRooms({ commit }, editSnackbar?: boolean) {
+    /**
+     * Calls backend at GET /rooms
+     * @param editSnackbar optional, if false, the snakcbar should only be edited when an error occurs
+     * @returns Promise<GETRoom[] | null>
+     */
+    async getRooms(
+      { commit },
+      editSnackbar?: boolean
+    ): Promise<GETRoom[] | null> {
       if (editSnackbar === undefined || editSnackbar === true)
         commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
@@ -470,7 +487,12 @@ export const store: Store<State> = createStore<State>({
         }
       }
     },
-    async getRoom({ commit }, roomCode: string) {
+    /**
+     * Calls backend at GET /rooms/${roomCode}
+     * @param roomCode
+     * @returns Promise<GETRoom|null>
+     */
+    async getRoom({ commit }, roomCode: string): Promise<GETRoom | null> {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         const response = await backend.get(`/rooms/${roomCode}`);
@@ -484,6 +506,11 @@ export const store: Store<State> = createStore<State>({
         return null;
       }
     },
+    /**
+     * Calls backend at POST /rooms
+     * @param room
+     * @returns Promise<boolean>
+     */
     async createRoom({ commit }, room: Room) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
@@ -509,6 +536,11 @@ export const store: Store<State> = createStore<State>({
         return false;
       }
     },
+    /**
+     * Calls backend at POST /rooms/${roomCode}
+     * @param editRoom
+     * @returns Promise<boolean>
+     */
     async editRoom({ commit }, editRoom: EditRoom) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
@@ -539,8 +571,14 @@ export const store: Store<State> = createStore<State>({
             status: SnackbarStatus.ERROR,
           });
         }
+        return false;
       }
     },
+    /**
+     * Calls backend at DELETE /rooms/${roomCode}
+     * @param roomCode
+     * @returns Promise<boolea>
+     */
     async deleteRoom({ commit }, roomCode: string) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
@@ -563,6 +601,7 @@ export const store: Store<State> = createStore<State>({
             status: SnackbarStatus.ERROR,
           });
         }
+        return false;
       }
     },
   },
