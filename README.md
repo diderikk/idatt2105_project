@@ -10,7 +10,7 @@ Last run CI/CD: [Github Actions](https://github.com/diderikk/idatt2105_project/a
 3. [ER-diagram](#er-diagram)
 4. [REST-API](#rest-api)
 5. [Security](#security)
-6. [CI/CD](#ci/cd)
+6. [CI/CD](#cicd)
 7. [Dependencies](#dependencies)
 8. [Future work](#future-work)
 9. [Installation manual](#installation-manual)
