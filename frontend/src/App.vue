@@ -100,7 +100,7 @@ export default defineComponent({
     };
 
     /**
-     * Logs user out throug store
+     * Logs user out through store
      * Sends user to log in page
      */
     const logout = () => {
