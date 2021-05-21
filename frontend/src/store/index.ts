@@ -125,10 +125,12 @@ export const store: Store<State> = createStore<State>({
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return true;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Error could not log in",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Error could not log in",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return false;
       }
     },
@@ -201,10 +203,12 @@ export const store: Store<State> = createStore<State>({
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not get user",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not get user",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
@@ -223,10 +227,12 @@ export const store: Store<State> = createStore<State>({
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not get user statistics",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not get user statistics",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
@@ -292,16 +298,18 @@ export const store: Store<State> = createStore<State>({
         });
         return true;
       } catch (error) {
-        if (error.response.status === 400) {
-          commit("setSnackbar", {
-            content: "Already occupied",
-            status: SnackbarStatus.ERROR,
-          });
-        } else {
-          commit("setSnackbar", {
-            content: "Could not create reservation",
-            status: SnackbarStatus.ERROR,
-          });
+        if (error !== null) {
+          if (error.response.status === 400) {
+            commit("setSnackbar", {
+              content: "Already occupied",
+              status: SnackbarStatus.ERROR,
+            });
+          } else {
+            commit("setSnackbar", {
+              content: "Could not create reservation",
+              status: SnackbarStatus.ERROR,
+            });
+          }
         }
         return false;
       }
@@ -330,10 +338,12 @@ export const store: Store<State> = createStore<State>({
         });
         return true;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Reservation could not be edited",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Reservation could not be edited",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return false;
       }
     },
@@ -357,10 +367,12 @@ export const store: Store<State> = createStore<State>({
         });
         return true;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Reservation could not be deleted",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Reservation could not be deleted",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return false;
       }
     },
@@ -384,10 +396,12 @@ export const store: Store<State> = createStore<State>({
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not find a reservation",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not find a reservation",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
@@ -433,10 +447,12 @@ export const store: Store<State> = createStore<State>({
           commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not find any reservations",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not find any reservations",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
@@ -457,10 +473,12 @@ export const store: Store<State> = createStore<State>({
           commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not find any rooms",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not find any rooms",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
@@ -507,10 +525,12 @@ export const store: Store<State> = createStore<State>({
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not find a room",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not find a room",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
@@ -526,10 +546,12 @@ export const store: Store<State> = createStore<State>({
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not find a room",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not find a room",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return [];
       }
     },
@@ -561,11 +583,13 @@ export const store: Store<State> = createStore<State>({
           commit("setSnackbarStatus", SnackbarStatus.NONE);
           return true;
         },
-        () => {
-          commit("setSnackbar", {
-            content: "Could not connect to room chat",
-            status: SnackbarStatus.ERROR,
-          });
+        (error) => {
+          if (error !== null) {
+            commit("setSnackbar", {
+              content: "Could not connect to room chat",
+              status: SnackbarStatus.ERROR,
+            });
+          }
           return false;
         }
       );
@@ -586,16 +610,18 @@ export const store: Store<State> = createStore<State>({
         });
         return true;
       } catch (error) {
-        if (error.response.status === 400) {
-          commit("setSnackbar", {
-            content: "Room code is already occupied",
-            status: SnackbarStatus.ERROR,
-          });
-        } else {
-          commit("setSnackbar", {
-            content: "Could not create room",
-            status: SnackbarStatus.ERROR,
-          });
+        if (error !== null) {
+          if (error.response.status === 400) {
+            commit("setSnackbar", {
+              content: "Room code is already occupied",
+              status: SnackbarStatus.ERROR,
+            });
+          } else {
+            commit("setSnackbar", {
+              content: "Could not create room",
+              status: SnackbarStatus.ERROR,
+            });
+          }
         }
         return false;
       }
@@ -619,21 +645,23 @@ export const store: Store<State> = createStore<State>({
         });
         return true;
       } catch (error) {
-        if (error.response.status === 400) {
-          commit("setSnackbar", {
-            content: "Room code is already occupied",
-            status: SnackbarStatus.ERROR,
-          });
-        } else if (error.response.status === 404) {
-          commit("setSnackbar", {
-            content: "No room with the given room code exists",
-            status: SnackbarStatus.ERROR,
-          });
-        } else {
-          commit("setSnackbar", {
-            content: "Could not edit room",
-            status: SnackbarStatus.ERROR,
-          });
+        if (error !== null) {
+          if (error.response.status === 400) {
+            commit("setSnackbar", {
+              content: "Room code is already occupied",
+              status: SnackbarStatus.ERROR,
+            });
+          } else if (error.response.status === 404) {
+            commit("setSnackbar", {
+              content: "No room with the given room code exists",
+              status: SnackbarStatus.ERROR,
+            });
+          } else {
+            commit("setSnackbar", {
+              content: "Could not edit room",
+              status: SnackbarStatus.ERROR,
+            });
+          }
         }
         return false;
       }
@@ -654,16 +682,18 @@ export const store: Store<State> = createStore<State>({
         });
         return true;
       } catch (error) {
-        if (error.response.status === 404) {
-          commit("setSnackbar", {
-            content: "No room with the given room code exists",
-            status: SnackbarStatus.ERROR,
-          });
-        } else {
-          commit("setSnackbar", {
-            content: "Could not delete room",
-            status: SnackbarStatus.ERROR,
-          });
+        if (error !== null) {
+          if (error.response.status === 404) {
+            commit("setSnackbar", {
+              content: "No room with the given room code exists",
+              status: SnackbarStatus.ERROR,
+            });
+          } else {
+            commit("setSnackbar", {
+              content: "Could not delete room",
+              status: SnackbarStatus.ERROR,
+            });
+          }
         }
         return false;
       }
