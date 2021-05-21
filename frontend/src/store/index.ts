@@ -15,6 +15,7 @@ import UserForm from "@/interfaces/User/UserForm.interface";
 import UserStats from "@/interfaces/User/UserStats.interface";
 import GETReservation from "@/interfaces/Reservation/GETReservation.interface";
 import GETRoom from "@/interfaces/Room/GETRoom.interface";
+import Message from "@/interfaces/Message.interface";
 
 export const key: InjectionKey<Store<State>> = Symbol();
 
@@ -509,6 +510,25 @@ export const store: Store<State> = createStore<State>({
           status: SnackbarStatus.ERROR,
         });
         return null;
+      }
+    },
+    /**
+     * Gets messages that have been written in a room chat
+     * @param roomCode
+     * @returns a list of messages
+     */
+    async getRoomMessages({ commit }, roomCode: string): Promise<Message[]> {
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        const response = await backend.get(`/rooms/${roomCode}/messages`);
+        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        return response.data;
+      } catch (error) {
+        commit("setSnackbar", {
+          content: "Could not find a room",
+          status: SnackbarStatus.ERROR,
+        });
+        return [];
       }
     },
     /**

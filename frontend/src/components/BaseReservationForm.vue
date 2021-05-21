@@ -352,7 +352,7 @@ export default defineComponent({
      */
     onMounted(async () => {
       if (props.baseReservation !== undefined) {
-        getAvailableRooms();
+        await getAvailableRooms();
       }
 
       mapSections();
