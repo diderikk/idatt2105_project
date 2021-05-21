@@ -2,6 +2,7 @@
   <div>
     <base-feed-header
       :createRoute="'/create-reservation'"
+      :needsToBeAdmin="false"
       @inputChange="changeInput($event, input)"
     ></base-feed-header>
     <div id="select">
@@ -17,7 +18,9 @@
       </div>
     </div>
 
-    <div v-if="reservations.length === 0" class="box">No users available</div>
+    <div v-if="reservations.length === 0" class="box">
+      No reservations available
+    </div>
     <div v-else class="columns is-multiline">
       <div
         v-for="(reservation, index) in availableReservations"
@@ -34,10 +37,11 @@
 import { computed, defineComponent, onMounted, ref } from "vue";
 import ReservationCard from "../components/ReservationCard.vue";
 import BaseFeedHeader from "../components/BaseFeedHeader.vue";
-import Reservation from "../interfaces/Reservation/Reservation.interface";
 import { useStore } from "../store";
 import { POSTReservationToReservationForm } from "../utils/reservationUtils";
 import ReservationForm from "../interfaces/Reservation/ReservationForm.interface";
+import GETReservation from "../interfaces/Reservation/GETReservation.interface";
+import ReservationCardInterface from "../interfaces/Reservation/ReservationCard.interface";
 export default defineComponent({
   name: "ReservationFeed",
   components: { ReservationCard, BaseFeedHeader },
@@ -47,7 +51,7 @@ export default defineComponent({
     const changeInput = (input: string) => {
       searchInput.value = input;
     };
-    const reservations = ref([] as ReservationForm[]);
+    const reservations = ref([] as ReservationCardInterface[]);
     const sortingType = ref("0");
 
     onMounted(async () => {
@@ -57,10 +61,11 @@ export default defineComponent({
     const reload = async (editSnackBar: boolean) => {
       const response = await store.dispatch("getReservations", editSnackBar);
       if (response !== null) {
-        reservations.value = response.map((reservation: Reservation) => {
+        reservations.value = response.map((reservation: GETReservation) => {
           return {
             reservationId: reservation.reservationId,
             ...POSTReservationToReservationForm(reservation),
+            user: reservation.user,
           };
         });
       }
@@ -96,6 +101,9 @@ export default defineComponent({
       return reservationsTemp.filter((reservation) => {
         return (
           reservation.roomCode
+            .toLowerCase()
+            .startsWith(searchInput.value.toLowerCase()) ||
+          reservation.user.email
             .toLowerCase()
             .startsWith(searchInput.value.toLowerCase()) ||
           sectionContainsSearch(reservation)

@@ -109,7 +109,7 @@ export default defineComponent({
         !/^[A-Za-z0-9-_æøåÆØÅ]{4,}$/i.test(registerInformation.roomCode.trim())
       ) {
         roomCodeInputError.value =
-          "Syntax error: Use only alfabet, numbers, -, _, no spaces and length must be grater than 3";
+          "Syntax error: Use only alphabet, numbers, -, _, no spaces and length must be greater than 3";
         roomCodeStatus.value = InputFieldFeedbackStatus.ERROR;
       } else roomCodeStatus.value = InputFieldFeedbackStatus.SUCCESS;
     };

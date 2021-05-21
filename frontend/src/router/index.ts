@@ -41,7 +41,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/create-reservation",
     name: "CreateReservation",
     meta: {
-      permisson: "User",
+      permission: "User",
       title: "Create Reservation",
     },
     component: () => import("../views/CreateReservation.vue"),
@@ -50,7 +50,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/edit-reservation/:id",
     name: "EditReservation",
     meta: {
-      permisson: "User",
+      permission: "User",
       title: "Create Reservation",
     },
     component: () => import("../views/EditReservation.vue"),
@@ -60,7 +60,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/rooms",
     name: "RoomFeed",
     meta: {
-      permisson: "User",
+      permission: "User",
       title: "Rooms",
     },
     component: () => import("../views/RoomFeed.vue"),
@@ -69,7 +69,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/create-room",
     name: "CreateRoom",
     meta: {
-      permisson: "Admin",
+      permission: "Admin",
       title: "Create Room",
     },
     component: () => import("../views/CreateRoom.vue"),
@@ -78,7 +78,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/edit-room/:code",
     name: "EditRoom",
     meta: {
-      permisson: "Admin",
+      permission: "Admin",
       title: "Edit Room",
     },
     component: () => import("../views/EditRoom.vue"),
@@ -97,7 +97,7 @@ const routes: Array<RouteRecordRaw> = [
     name: "ReservationFeed",
     meta: {
       title: "Reservation Feed",
-      parmission: "User",
+      permission: "User",
     },
     component: () => import("../views/ReservationFeed.vue"),
   },
@@ -115,7 +115,7 @@ const routes: Array<RouteRecordRaw> = [
     name: "UserProfile",
     meta: {
       title: "User Profile",
-      permission: "Admin",
+      permission: "User",
     },
     component: () => import("../views/UserProfile.vue"),
     props: true,

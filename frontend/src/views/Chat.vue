@@ -1,19 +1,33 @@
 <template>
-  
   <div class="container">
     <back-button></back-button>
     <div id="chat" class="">
-      <message-component v-for="(message, index) in sortedMessages" :key="index" :message="message"/>
+      <message-component
+        v-for="(message, index) in sortedMessages"
+        :key="index"
+        :message="message"
+      />
     </div>
     <div class="field has-text-centered has-addons">
-       <input type="text" v-model="messageInput" placeholder="Write a message..." class="input">
+      <input
+        type="text"
+        v-model="messageInput"
+        placeholder="Write a message..."
+        class="input"
+      />
       <button class="button is-dark" @click="sendMessage">Send</button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeUnmount, onMounted, ref } from "vue";
+import {
+  computed,
+  defineComponent,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+} from "vue";
 import { useStore } from "../store";
 import Message from "../interfaces/Message.interface";
 import Stomp from "stompjs";
@@ -23,12 +37,12 @@ import { dateTimeToString } from "../utils/date";
 import { URL } from "../backend";
 import MessageComponent from "../components/Message.vue";
 import BackButton from "../components/BackButton.vue";
- 
 
 export default defineComponent({
   name: "Chat",
   components: {
-    MessageComponent, BackButton
+    MessageComponent,
+    BackButton,
   },
   props: {
     roomCode: {
@@ -69,7 +83,7 @@ export default defineComponent({
      * Sends message to websocket server
      */
     const sendMessage = async () => {
-      if(messageInput.value.trim() === "") return
+      if (messageInput.value.trim() === "") return;
       if (!stompClient.connected) await connectWebSocket();
       stompClient.send(
         `/api/v1/chat/${props.roomCode}`,
@@ -93,7 +107,11 @@ export default defineComponent({
      * Uses store to connect to chat
      */
     const connectWebSocket = async () => {
-      await store.dispatch("connectChat", {roomCode: props.roomCode, stompClient: stompClient, messages: messages.value});
+      await store.dispatch("connectChat", {
+        roomCode: props.roomCode,
+        stompClient: stompClient,
+        messages: messages.value,
+      });
     };
 
     /**
@@ -102,29 +120,30 @@ export default defineComponent({
     const sortedMessages = computed(() => {
       const tempMessages = messages.value;
       return tempMessages.sort((message1, message2) => {
-          const sentDate1 = new Date(message1.timeSent);
-          const sentDate2 = new Date(message2.timeSent);
-          if(sentDate1 <= sentDate2) return 1;
-          return -1;
+        const sentDate1 = new Date(message1.timeSent);
+        const sentDate2 = new Date(message2.timeSent);
+        if (sentDate1 <= sentDate2) return 1;
+        return -1;
       });
-    })
+    });
 
     return {
       sendMessage,
       messageInput,
       sortedMessages,
-      messages
+      messages,
     };
   },
 });
 </script>
 
 <style scoped>
-#chat{
-    height: 75vh;
-    display: flex;
-    flex-direction: column-reverse;
-    overflow-y: auto;
-    overflow-x: hidden;
+#chat {
+  height: 75vh;
+  display: flex;
+  flex-direction: column-reverse;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-bottom: 10px;
 }
 </style>

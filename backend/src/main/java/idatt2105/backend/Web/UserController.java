@@ -71,7 +71,7 @@ public class UserController {
     }
 
     @PostMapping("/{user_id}")
-    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<GETUserDTO> editUser(@PathVariable("user_id") long userId, @RequestBody POSTUserDTO inputUser){
         try {
             GETUserDTO createdUser = userService.editUser(userId, inputUser);
@@ -170,7 +170,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{user_id}")
-    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable("user_id") long userId){
         try{
             boolean successful = userService.deleteUser(userId);

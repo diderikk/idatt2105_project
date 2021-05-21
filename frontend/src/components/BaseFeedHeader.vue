@@ -1,13 +1,13 @@
 <template>
   <div>
     <div v-if="windowWidth > 768" class="columns">
-      <div class="column is-one-quarter">
+      <div v-if="!isAdminAndAdminNeeded" class="column is-one-quarter">
         <button @click="toCreate" class="button is-link is-primary">
           + Create
         </button>
       </div>
-      <div class="column"></div>
-      <div class="column is-two-thirds">
+      <div v-if="!isAdminAndAdminNeeded" class="column"></div>
+      <div :class="{ 'is-two-thirds': !isAdminAndAdminNeeded }" class="column">
         <input
           v-model="searchInput"
           class="input"
@@ -29,6 +29,7 @@
       </div>
 
       <button
+        v-if="!isAdminAndAdminNeeded"
         @click="toCreate"
         id="add-button"
         class="button is-link is-primary"
@@ -40,8 +41,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, ref, watch } from "vue";
+import { computed, defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+import { useStore } from "../store";
 export default defineComponent({
   name: "BaseFeedHeader",
   props: {
@@ -49,9 +51,14 @@ export default defineComponent({
       required: true,
       type: String,
     },
+    needsToBeAdmin: {
+      required: true,
+      type: Boolean,
+    },
   },
   setup(props, { emit }) {
     const router = useRouter();
+    const store = useStore();
     const searchInput = ref("");
     watch(
       () => searchInput.value,
@@ -73,10 +80,15 @@ export default defineComponent({
       window.removeEventListener("resize", onResize);
     });
 
+    const isAdminAndAdminNeeded = computed(
+      () => !store.getters.getUser.isAdmin && props.needsToBeAdmin
+    );
+
     return {
       searchInput,
       toCreate,
       windowWidth,
+      isAdminAndAdminNeeded,
     };
   },
 });
