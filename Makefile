@@ -16,3 +16,7 @@ backend_keystore:
 	-mkdir backend/src/main/resources/keystore
 	-rm backend/src/main/resources/keystore/*
 	keytool -genkeypair -dname "cn=, ou=, o=, c=NO" -alias fullstack -storepass password -keypass password -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore backend/src/main/resources/keystore/cert_key.p12 -validity 3650
+
+frontend_serve:
+	@docker build -t frontend-server ./frontend
+	@docker run -p 3000:3000 --name frontend --rm frontend-server

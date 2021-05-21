@@ -43,10 +43,7 @@
       </div>
     </div>
     <div class="has-text-centered">
-      <router-link
-        v-if="isLoggedIn"
-        to="/reservation-feed"
-        class="button is-link"
+      <router-link v-if="isLoggedIn" to="/reservations" class="button is-link"
         >View reservations</router-link
       >
       <router-link v-if="!isLoggedIn" to="/log-in" class="button is-link"
