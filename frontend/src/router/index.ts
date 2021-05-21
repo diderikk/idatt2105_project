@@ -131,18 +131,18 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
   },
   {
+    path: "/statistics",
+    name: "Statistics",
+    meta: {
+      title: "Statistics",
+      permission: "Admin",
+    },
+    component: () => import("../views/Stats.vue"),
+  },
+  {
     path: "/:catchAll(.*)",
     name: "NotFound",
     component: () => import("../views/PageNotFound.vue"),
-  },
-  {
-  path: "/statistics",
-  name: "Statistics",
-  meta: {
-    title: "Statistics",
-    permission: "Admin",
-  },
-  component: () => import("../views/Stats.vue"),
   },
 ];
 
