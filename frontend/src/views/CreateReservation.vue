@@ -27,13 +27,16 @@ export default defineComponent({
       registerInformation: ReservationForm
     ) => {
       if (checksBeforeAsyncCall(checks, statuses)) {
-        store.dispatch(
+        await store.dispatch(
           "createReservation",
           reservationFormToPOSTReservtion(registerInformation)
         );
       }
     };
 
+    /**
+     * The config object to be sent to BaseReservationForm, containing title, and buttons
+     */
     const config = {
       title: "Create reservation",
       buttons: [

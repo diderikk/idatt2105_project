@@ -19,15 +19,6 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
-    path: "/about",
-    name: "About",
-    meta: {
-      permission: "Admin",
-      title: "About",
-    },
-    component: () => import("../views/About.vue"),
-  },
-  {
     path: "/create-user",
     name: "CreateUser",
     meta: {
@@ -50,7 +41,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/create-reservation",
     name: "CreateReservation",
     meta: {
-      permisson: "User",
+      permission: "User",
       title: "Create Reservation",
     },
     component: () => import("../views/CreateReservation.vue"),
@@ -59,7 +50,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/edit-reservation/:id",
     name: "EditReservation",
     meta: {
-      permisson: "User",
+      permission: "User",
       title: "Create Reservation",
     },
     component: () => import("../views/EditReservation.vue"),
@@ -69,7 +60,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/rooms",
     name: "RoomFeed",
     meta: {
-      permisson: "User",
+      permission: "User",
       title: "Rooms",
     },
     component: () => import("../views/RoomFeed.vue"),
@@ -78,7 +69,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/create-room",
     name: "CreateRoom",
     meta: {
-      permisson: "Admin",
+      permission: "Admin",
       title: "Create Room",
     },
     component: () => import("../views/CreateRoom.vue"),
@@ -87,11 +78,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/edit-room/:code",
     name: "EditRoom",
     meta: {
-      permisson: "Admin",
+      permission: "Admin",
       title: "Edit Room",
     },
     component: () => import("../views/EditRoom.vue"),
-    props: true
+    props: true,
   },
   {
     path: "/log-in",
@@ -100,6 +91,15 @@ const routes: Array<RouteRecordRaw> = [
       title: "Log in",
     },
     component: () => import("../views/LogIn.vue"),
+  },
+  {
+    path: "/reservations",
+    name: "ReservationFeed",
+    meta: {
+      title: "Reservation Feed",
+      permission: "User",
+    },
+    component: () => import("../views/ReservationFeed.vue"),
   },
   {
     path: "/users",
@@ -111,17 +111,55 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/UserFeed.vue"),
   },
   {
+    path: "/users/:id",
+    name: "UserProfile",
+    meta: {
+      title: "User Profile",
+      permission: "User",
+    },
+    component: () => import("../views/UserProfile.vue"),
+    props: true,
+  },
+  {
+    path: "/chat/:roomCode",
+    name: "Chat",
+    meta: {
+      title: "Room Chat",
+      permission: "User",
+    },
+    component: () => import("../views/Chat.vue"),
+    props: true,
+  },
+  {
+    path: "/statistics",
+    name: "Statistics",
+    meta: {
+      title: "Statistics",
+      permission: "Admin",
+    },
+    component: () => import("../views/Stats.vue"),
+  },
+  {
     path: "/:catchAll(.*)",
     name: "NotFound",
     component: () => import("../views/PageNotFound.vue"),
   },
 ];
 
+//Creates a router running i history mode, and containing the routes defined in the routes object
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
 });
 
+/**
+ * Handles authorization in frontend
+ * Admins have permission to every page
+ * Users have permission to page marked with permission User, or not marked with permission
+ * Users trying to access admin pages will be sendt to the reservation feed
+ * Not logged in users only have permission to pages not marked with permission
+ * Not logged in users trying to access Admin or User pages will be sendt to log in page
+ */
 router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.permission == "Admin")) {
     if (store.getters.getUser.isAdmin) {
@@ -130,9 +168,7 @@ router.beforeEach((to, from, next) => {
     }
     if (store.getters.isUserLoggedIn) {
       //In case the user is logged in we dont want to kick the user out
-      router.getRoutes().length === 0
-        ? router.replace("/log-in")
-        : router.back();
+      router.replace("/reservations");
       return;
     }
     router.replace("/log-in");
@@ -144,10 +180,14 @@ router.beforeEach((to, from, next) => {
       return;
     }
     router.replace("/log-in");
+    return;
   }
   next();
 });
 
+/**
+ * After each route the title of the tab is changed to the route's title inside the meta tag, or the base title if the route does not define a title
+ */
 router.afterEach((to, from, failure) => {
   document.title = (to.meta.title as string) || baseTitle;
 });

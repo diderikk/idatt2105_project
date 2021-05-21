@@ -23,9 +23,9 @@ import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.User;
-import idatt2105.backend.Model.DTO.POSTReservationDTO;
-import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.SortingDTO;
+import idatt2105.backend.Model.DTO.Reservation.POSTReservationDTO;
+import idatt2105.backend.Model.DTO.Section.POSTSectionDTO;
 import idatt2105.backend.Model.Enum.SortingTypeEnum;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
@@ -105,7 +105,7 @@ public class ReservationControllerTest {
 
         user = userRepository.findById(user.getUserId()).get();
 
-        postReservationDTO = new POSTReservationDTO(null, null, "Edited", 20, 
+        postReservationDTO = new POSTReservationDTO(LocalDateTime.now().plusHours(10),LocalDateTime.now().plusDays(30), "Edited", 20, 
         List.of(new POSTSectionDTO(section.getSectionName(), section.getRoom().getRoomCode())));
     }
 

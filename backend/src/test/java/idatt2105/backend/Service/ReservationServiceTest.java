@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,15 +20,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
 import idatt2105.backend.Model.User;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
-import idatt2105.backend.Model.DTO.GETReservationDTO;
-import idatt2105.backend.Model.DTO.POSTReservationDTO;
-import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.SortingDTO;
+import idatt2105.backend.Model.DTO.Reservation.GETReservationDTO;
+import idatt2105.backend.Model.DTO.Reservation.POSTReservationDTO;
+import idatt2105.backend.Model.DTO.Section.POSTSectionDTO;
 import idatt2105.backend.Model.Enum.SortingTypeEnum;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -70,6 +72,7 @@ public class ReservationServiceTest {
         reservation.setReservationText("reservationText");
         reservation.setAmountOfPeople(1);
         reservation.setUser(user);
+        reservation.setStartTime(LocalDateTime.now().plusHours(10));
 
         user.setReservations(List.of(reservation));
 
@@ -91,7 +94,7 @@ public class ReservationServiceTest {
         sections.add(section);
         reservation.setSections(sections);
 
-        postReservationDTO = new POSTReservationDTO(null, null, "Edited", 20, List.of(new POSTSectionDTO(section.getSectionName(), section.getRoom().getRoomCode())));
+        postReservationDTO = new POSTReservationDTO(LocalDateTime.now().plusHours(10),LocalDateTime.now().plusDays(1), "Edited", 20, List.of(new POSTSectionDTO(section.getSectionName(), section.getRoom().getRoomCode())));
 
         Mockito.lenient()
         .when(sectionRepository.findById(1L))
@@ -147,7 +150,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void editReservation_CorrectInput_ReturnsEditedReservation() throws NotFoundException{
+    public void editReservation_CorrectInput_ReturnsEditedReservation() throws NotFoundException, SectionAlreadyBookedException{
         reservation.setSections(new ArrayList<>());
         GETReservationDTO returnDto = reservationService.editReservation(reservation.getReservationId(),postReservationDTO);
 

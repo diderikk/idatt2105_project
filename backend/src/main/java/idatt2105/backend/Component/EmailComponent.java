@@ -39,7 +39,7 @@ public class EmailComponent {
         String room = (!reservation.getSections().isEmpty()) ? reservation.getSections().get(0).getRoom().getRoomCode() : "No Room";
         message.setSubject("Deleted reservation in room: " + room);
         message.setText("Your reservation in room " + room + getTimeAndDateString(reservation.getStartTime(), reservation.getEndTime()) +
-        "has been deleted\n\n" + 
+        " has been deleted\n\n" + 
         "Hope this bring no inconvenience!\n" +
         "Best regards.\nBookThatRoom");
 
@@ -52,7 +52,7 @@ public class EmailComponent {
         String format1 = startTime.format(dateTimeFormat);
         String format2 = endTime.format(dateTimeFormat);
 
-        return "from " + format1 + "to" + format2;
+        return " from " + format1 + " to " + format2;
     }
 
 

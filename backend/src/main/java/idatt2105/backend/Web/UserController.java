@@ -19,13 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionAlreadyBookedException;
 import idatt2105.backend.Model.DTO.ChangePasswordDTO;
-import idatt2105.backend.Model.DTO.GETReservationDTO;
-import idatt2105.backend.Model.DTO.GETRoomDTO;
-import idatt2105.backend.Model.DTO.GETSectionDTO;
-import idatt2105.backend.Model.DTO.POSTReservationDTO;
-import idatt2105.backend.Model.DTO.POSTUserDTO;
 import idatt2105.backend.Model.DTO.SortingDTO;
-import idatt2105.backend.Model.DTO.GETUserDTO;
+import idatt2105.backend.Model.DTO.Reservation.GETReservationDTO;
+import idatt2105.backend.Model.DTO.Reservation.POSTReservationDTO;
+import idatt2105.backend.Model.DTO.Room.GETRoomDTO;
+import idatt2105.backend.Model.DTO.Section.GETSectionDTO;
+import idatt2105.backend.Model.DTO.User.GETUserDTO;
+import idatt2105.backend.Model.DTO.User.POSTUserDTO;
+import idatt2105.backend.Model.DTO.User.UserStatisticsDTO;
 import idatt2105.backend.Service.UserService;
 import javassist.NotFoundException;
 
@@ -70,7 +71,7 @@ public class UserController {
     }
 
     @PostMapping("/{user_id}")
-    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<GETUserDTO> editUser(@PathVariable("user_id") long userId, @RequestBody POSTUserDTO inputUser){
         try {
             GETUserDTO createdUser = userService.editUser(userId, inputUser);
@@ -108,6 +109,17 @@ public class UserController {
         }
     }
 
+    @GetMapping("/{user_id}/reservations/{reservation_id}")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<GETReservationDTO> getUserReservation(@PathVariable("user_id") long userId, @PathVariable("reservation_id") long reservationId){
+        try{
+            return new ResponseEntity<>(userService.getUserReservation(userId, reservationId), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @PostMapping("/{user_id}/reservations/sort")
     @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<GETReservationDTO>> getSortedAndFilteredUserReservations(@PathVariable("user_id") long userId, @RequestBody SortingDTO dto){
@@ -129,11 +141,26 @@ public class UserController {
         }
     }
 
+    @PostMapping("/{user_id}/reservations/{reservation_id}")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<GETReservationDTO> editUserReservation(@PathVariable("user_id") long userId, @PathVariable("reservation_id") long reservationId, @RequestBody POSTReservationDTO dto){
+        try{
+            GETReservationDTO newDto = userService.editUserReservation(userId, reservationId, dto);
+            return new ResponseEntity<>(newDto, HttpStatus.OK);
+        }catch(NotFoundException ex){
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch(SectionAlreadyBookedException ex ){
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @DeleteMapping("/{user_id}/reservations/{reservation_id}")
     @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<String> removeUserReservation(@PathVariable("user_id") long userId, @PathVariable("reservation_id") long reservationId){
+    public ResponseEntity<String> deleteUserReservation(@PathVariable("user_id") long userId, @PathVariable("reservation_id") long reservationId){
         try {
-            boolean successful = userService.removeUserReservation(userId, reservationId);
+            boolean successful = userService.deleteUserReservation(userId, reservationId);
             if(successful) return new ResponseEntity<>(HttpStatus.OK);
             else return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (NotFoundException e) {
@@ -143,7 +170,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{user_id}")
-    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable("user_id") long userId){
         try{
             boolean successful = userService.deleteUser(userId);
@@ -155,54 +182,21 @@ public class UserController {
         } 
     }
 
-    @GetMapping("/{user_id}/statistics/reservations-total-time")
-    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Long> getSumTimeInHoursOfAllUserReservations(@PathVariable("user_id") long userId){
-        try {
-            return new ResponseEntity<>(userService.getSumTimeInHoursOfAllUserReservations(userId), HttpStatus.OK);
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/{user_id}/statistics/reservations-count")
-    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Integer> getReservationCountOfUser(@PathVariable("user_id") long userId){
-        try {
-            return new ResponseEntity<>(userService.getResevationCountOfUser(userId), HttpStatus.OK);
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    // Only admin should be able to get this information
     @GetMapping("/statistics/top-users")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<GETUserDTO>> getTopUsers(){
         return new ResponseEntity<>(userService.getTopUsers(), HttpStatus.OK);
     }
 
-    @GetMapping("/{user_id}/statistics/favourite-room")
+    @GetMapping("/{user_id}/statistics")
     @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<GETRoomDTO> getFavouriteRoomOfUser(@PathVariable("user_id") long userId){
-        try {
-            return new ResponseEntity<>(userService.getFavouriteRoomOfUser(userId), HttpStatus.OK);
+    public ResponseEntity<UserStatisticsDTO> getStatistics(@PathVariable("user_id") long userId){
+        try{
+            UserStatisticsDTO userStatistics = userService.getStatistics(userId);
+            return new ResponseEntity<>(userStatistics, HttpStatus.OK);
         } catch (NotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/{user_id}/statistics/favourite-section")
-    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<GETSectionDTO> getFavouriteSectionOfUser(@PathVariable("user_id") long userId){
-        try {
-            return new ResponseEntity<>(userService.getFavouriteSectionOfUser(userId), HttpStatus.OK);
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        } 
     }
 }

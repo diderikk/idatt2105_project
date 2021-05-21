@@ -1,11 +1,17 @@
 import ReservationForm from "@/interfaces/Reservation/ReservationForm.interface";
 import POSTReservation from "@/interfaces/Reservation/POSTReservation.interface";
+import AvailableRoom from "@/interfaces/Room/AvailableRoom.interface";
+import GETRoom from "@/interfaces/Room/GETRoom.interface";
+import GETSection from "@/interfaces/Section/GETSection.interface";
+import SectionWithDisable from "@/interfaces/Section/SectionWithDisable.interface";
+import GETReservation from "@/interfaces/Reservation/GETReservation.interface";
+import GETAvailableSections from "@/interfaces/Section/GETAvailableSections.interface";
 
 export const reservationFormToPOSTReservtion = (
   reservation: ReservationForm
 ): POSTReservation => {
-  const sections = reservation.sections.map((s: string) => {
-    return { sectionName: s, roomCode: reservation.roomCode };
+  const sections = reservation.sections.map((s: SectionWithDisable) => {
+    return { sectionName: s.sectionName, roomCode: reservation.roomCode };
   });
   return {
     amountOfPeople: +reservation.amountOfPeople,
@@ -16,7 +22,7 @@ export const reservationFormToPOSTReservtion = (
   };
 };
 
-export const POSTReservationToResrevationForm = (
+export const POSTReservationToReservationForm = (
   reservation: POSTReservation
 ): ReservationForm => {
   const sections = reservation.sections.map((s) => {
@@ -32,6 +38,39 @@ export const POSTReservationToResrevationForm = (
     startTime: splitStartTime[1].substring(0, 5),
     endDate: splitEndTime[0],
     endTime: splitEndTime[1].substring(0, 5),
-    sections: sections,
+    sections: sections.map((section) => {
+      return {
+        sectionName: section,
+        isDisabled: false,
+      };
+    }) as SectionWithDisable[],
   };
+};
+
+export const AvailableRoomsToReservationForm = (
+  availableRooms: GETAvailableSections
+): AvailableRoom[] => {
+  return availableRooms.rooms.map((room) => {
+    return {
+      roomCode: room.roomCode,
+      sections: room.sections.map((section) => {
+        return {
+          sectionName: section.sectionName,
+          isDisabled: !checkIfSectionAvailable(
+            section,
+            availableRooms.idsOfAvailableSections
+          ),
+        };
+      }),
+    };
+  }) as AvailableRoom[];
+};
+
+const checkIfSectionAvailable = (
+  section: GETSection,
+  availableSections: number[]
+): boolean => {
+  for (const availableSection of availableSections)
+    if (section.sectionId === availableSection) return true;
+  return false;
 };

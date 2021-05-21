@@ -22,4 +22,7 @@ public class Room {
 
     @OneToMany(mappedBy = "room")
     private List<Section> sections;
+
+    @OneToMany(mappedBy = "room")
+    private List<Message> messages;
 }

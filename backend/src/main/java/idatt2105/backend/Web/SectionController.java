@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import idatt2105.backend.Model.DTO.GETSectionDTO;
+import idatt2105.backend.Model.DTO.Section.GETSectionDTO;
+import idatt2105.backend.Model.DTO.Section.SectionStatisticsDTO;
 import idatt2105.backend.Service.SectionService;
 import javassist.NotFoundException;
 
@@ -23,16 +24,14 @@ public class SectionController {
     private SectionService sectionService;
     
     @GetMapping("/statistics/top-sections")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<GETSectionDTO>> getTopSections(){
         return new ResponseEntity<>(sectionService.getTopSections(), HttpStatus.OK);
     }
 
-    @GetMapping("/{section_id}/statistics/reservations-total-time")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Long> getTotalTimeBooked(@PathVariable("section_id") long sectionId){
+    @GetMapping("/{section_id}/statistics")
+    public ResponseEntity<SectionStatisticsDTO> getStatistics(@PathVariable("section_id") long sectionId){
         try {
-            return new ResponseEntity<>(sectionService.getTotalHoursBooked(sectionId), HttpStatus.OK);
+            return new ResponseEntity<>(sectionService.getStatistics(sectionId), HttpStatus.OK);
         } catch (NotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

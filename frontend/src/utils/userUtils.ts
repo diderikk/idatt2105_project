@@ -1,30 +1,31 @@
 import UserForm from "@/interfaces/User/UserForm.interface";
 import User from "@/interfaces/User/User.interface";
 
+/**
+ * Creates a new UserForm object from the User object
+ * @param user
+ * @returns UserForm
+ */
 export const UserToUserForm = (user: User): UserForm => {
-  const phoneNumber = user.phoneNumber.split(" ");
   return {
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
-    phoneNationalCode: phoneNumber[0],
-    phoneNumber: phoneNumber[1],
+    phoneNumber: user.phoneNumber,
     expirationDate: user.expirationDate,
+    isAdmin: user.isAdmin,
   };
 };
 
-export const UserFormToUser = (
-  user: UserForm,
-  userId?: number,
-  isAdmin?: boolean
-): User => {
+/**
+ * Creates a new User object from the UserForm object
+ * @param user
+ * @param userId is optional, and -1 is assigned as id if it is not given
+ * @returns User
+ */
+export const UserFormToUser = (user: UserForm, userId?: number): User => {
   return {
     userId: userId ?? -1,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    phoneNumber: `+${user.phoneNationalCode} ${user.phoneNumber}`,
-    expirationDate: user.expirationDate,
-    isAdmin: isAdmin ?? false,
+    ...user,
   };
 };

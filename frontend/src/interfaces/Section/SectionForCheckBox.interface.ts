@@ -1,5 +1,5 @@
-import Section from "./Section.interface";
+import SectionWithDisable from "./SectionWithDisable.interface";
 
-export default interface SectionForCheckBox extends Section {
+export default interface SectionForCheckBox extends SectionWithDisable {
   selected: boolean;
 }

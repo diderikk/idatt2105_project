@@ -1,6 +1,8 @@
+import SectionWithDisable from "../Section/SectionWithDisable.interface";
+
 export default interface ReservationForm {
   roomCode: string;
-  sections: string[];
+  sections: SectionWithDisable[];
   reservationText: string;
   //Of format "HH:mm"
   startTime: string;

@@ -1,5 +1,6 @@
 package idatt2105.backend.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,11 +18,16 @@ import idatt2105.backend.Exception.SectionNotOfThisRoomException;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
-import idatt2105.backend.Model.DTO.GETReservationDTO;
-import idatt2105.backend.Model.DTO.GETRoomDTO;
-import idatt2105.backend.Model.DTO.GETSectionDTO;
-import idatt2105.backend.Model.DTO.POSTRoomDTO;
-import idatt2105.backend.Model.DTO.POSTSectionDTO;
+import idatt2105.backend.Model.DTO.MessageDTO;
+import idatt2105.backend.Model.DTO.TimeIntervalDTO;
+import idatt2105.backend.Repository.MessageRepository;
+import idatt2105.backend.Model.DTO.Reservation.GETReservationDTO;
+import idatt2105.backend.Model.DTO.Room.GETRoomDTO;
+import idatt2105.backend.Model.DTO.Room.POSTRoomDTO;
+import idatt2105.backend.Model.DTO.Room.RoomStatisticsDTO;
+import idatt2105.backend.Model.DTO.Section.AvailableSectionsDTO;
+import idatt2105.backend.Model.DTO.Section.GETSectionDTO;
+import idatt2105.backend.Model.DTO.Section.POSTSectionDTO;
 import idatt2105.backend.Repository.ReservationRepository;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Repository.SectionRepository;
@@ -38,6 +44,8 @@ public class RoomService {
     private SectionRepository sectionRepository;
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private MessageRepository messageRepository;
 
     /**
      * Returns room based on roomCode stored in the database
@@ -64,6 +72,29 @@ public class RoomService {
         LOGGER.info("getRooms() called");
         List<Room> rooms = roomRepository.findAll();
         return rooms.stream().map(room -> new GETRoomDTO(room)).collect(Collectors.toList());
+    }
+
+    /**
+     * Finds room that are available
+     * @param dto Timeintervall contining startTime and endTime
+     * @return List of rooms that have available sections between start time and end time
+     */
+    public AvailableSectionsDTO getAvailableRooms(TimeIntervalDTO dto){
+        List<Long> availableSections = sectionRepository.getAvailableSections(dto.getStartTime(), dto.getEndTime())
+        .stream().map(section -> section.getSectionId()).collect(Collectors.toList());
+        return new AvailableSectionsDTO(getRooms(), availableSections);
+    }
+
+    /**
+     * Finds room that are available with input start time and end time
+     * @param dto Timeintervall contining startTime and endTime
+     * @return List of rooms that have available sections between start time and end time
+     */
+    public AvailableSectionsDTO getAvailableRooms(TimeIntervalDTO dto, long reservationId){
+        List<Long> availableSections = sectionRepository.getAvailableSections(dto.getStartTime(), dto.getEndTime(), reservationId)
+        .stream().map(section -> section.getSectionId()).collect(Collectors.toList());
+        return new AvailableSectionsDTO(getRooms(), availableSections);
+
     }
 
     /**
@@ -109,6 +140,23 @@ public class RoomService {
     }
 
     /**
+     * Returns all messages
+     * @param roomCode
+     * @return
+     * @throws NotFoundException
+     */
+    public List<MessageDTO> getRoomMessages(String roomCode) throws NotFoundException{
+        LOGGER.info("getRoomMessages(String roomCode) called with roomCode: {}", roomCode);
+        Optional<Room> roomOptional = roomRepository.findById(roomCode);
+        if(!roomOptional.isPresent()) {
+            throw new NotFoundException("No room found with room code: " + roomCode);
+        }
+
+        return messageRepository.getMessages(roomCode, LocalDateTime.now().minusMonths(1)).stream()
+        .map(message -> new MessageDTO(message)).collect(Collectors.toList());
+    }
+
+    /**
      * Creates a new room with a given roomCode
      * Sections are empty.
      * @param roomCode
@@ -117,8 +165,6 @@ public class RoomService {
     public GETRoomDTO createRoom(String roomCode)
     {
         LOGGER.info("createRoomWith(String roomCode) called with roomCode: {}", roomCode);
-
-        // TODO: add ADMIN verification?
 
         Room newRoom = new Room();
         newRoom.setRoomCode(roomCode);
@@ -206,7 +252,7 @@ public class RoomService {
     /**
      * Returns list of all resevations of a specific rooms section, given by roomCode and sectionId
      * @param roomCode
-     * @param sectionDTO
+     * @param sectionId
      * @return List of GETReservationDTOs
      * @throws NotFoundException
      * @throws NullPointerException
@@ -233,9 +279,8 @@ public class RoomService {
     }
 
     /**
-     * Adds a section to a room, given by roomCode and sectionDTO
+     * Adds a section to a room
      * New section is also saved in the database
-     * @param roomCode
      * @param sectionDTO
      * @return RoomDTO object
      * @throws NotFoundException
@@ -294,6 +339,9 @@ public class RoomService {
                 sectionRepository.delete(section);
             }
         }
+        if(room.get().getMessages() != null){
+            messageRepository.deleteAll(room.get().getMessages());
+        }
         roomRepository.deleteById(roomCode);
         return !roomRepository.existsById(roomCode);
     }
@@ -344,19 +392,26 @@ public class RoomService {
     }
 
     /**
-     * Get total time (in hours) a room has been booked before.
-     * Room is determined by roomCode parameter.
+     * Get statistics about a room, given by room code.
+     * Statistics such as total hours room has been booked/reserved.
      * @param roomCode
-     * @return Long of total time in hours
-     * @throws NotFoundException if room was not found
+     * @return RoomStatisticsDTO
+     * @throws NotFoundException
      */
-    public Long getTotalHoursBooked(String roomCode) throws NotFoundException {
-        LOGGER.info("getTotalHoursBooked(String roomCode) called with roomCode: {}", roomCode);
-        Optional<Long> sumOptional = roomRepository.getTotalHoursBooked(roomCode);
-        if(!sumOptional.isPresent()) {
-            throw new NotFoundException("No room found with room code: " + roomCode);
+    public RoomStatisticsDTO getStatistics(String roomCode) throws NotFoundException {
+        LOGGER.info("getStatistics(String roomCode) called with roomCode: {}", roomCode);
+        if(!roomRepository.existsById(roomCode)) {
+            LOGGER.warn("Could not find room with code: {}. Throwing exception", roomCode);
+            throw new NotFoundException("No room found with code: " + roomCode);
         }
-        return sumOptional.get();
+
+        Optional<Long> totalHoursBookedOptional = roomRepository.getTotalHoursBooked(roomCode);
+        Long totalHoursBooked = 0L;
+        if(totalHoursBookedOptional.isPresent()) {
+            totalHoursBooked = totalHoursBookedOptional.get();
+        }
+        
+        return new RoomStatisticsDTO(totalHoursBooked);
     }
 
     /**

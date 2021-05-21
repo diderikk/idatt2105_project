@@ -17,10 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionNameInRoomAlreadyExistsException;
 import idatt2105.backend.Exception.SectionNotOfThisRoomException;
-import idatt2105.backend.Model.DTO.GETReservationDTO;
-import idatt2105.backend.Model.DTO.POSTSectionDTO;
-import idatt2105.backend.Model.DTO.GETRoomDTO;
-import idatt2105.backend.Model.DTO.POSTRoomDTO;
+import idatt2105.backend.Model.DTO.TimeIntervalDTO;
+import idatt2105.backend.Model.DTO.MessageDTO;
+import idatt2105.backend.Model.DTO.Reservation.GETReservationDTO;
+import idatt2105.backend.Model.DTO.Room.GETRoomDTO;
+import idatt2105.backend.Model.DTO.Room.POSTRoomDTO;
+import idatt2105.backend.Model.DTO.Room.RoomStatisticsDTO;
+import idatt2105.backend.Model.DTO.Section.AvailableSectionsDTO;
+import idatt2105.backend.Model.DTO.Section.POSTSectionDTO;
 import idatt2105.backend.Service.RoomService;
 import javassist.NotFoundException;
 
@@ -49,6 +53,26 @@ public class RoomController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/{room_code}/messages")
+    public ResponseEntity<List<MessageDTO>> getRoomMessages(@PathVariable("room_code") String roomCode){
+        try{
+            return new ResponseEntity<>(roomService.getRoomMessages(roomCode), HttpStatus.OK);
+        } catch(NotFoundException ex){
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/available")
+    public ResponseEntity<AvailableSectionsDTO> getAvailableRooms(@RequestBody TimeIntervalDTO dto) {
+        return new ResponseEntity<>(roomService.getAvailableRooms(dto), HttpStatus.OK);
+    }
+
+    @PostMapping("/available/{reservation_id}")
+    public ResponseEntity<AvailableSectionsDTO> getAvailableRooms(@PathVariable("reservation_id") long reservationId,@RequestBody TimeIntervalDTO dto) {
+        return new ResponseEntity<>(roomService.getAvailableRooms(dto, reservationId), HttpStatus.OK);
     }
 
     @PostMapping
@@ -157,16 +181,14 @@ public class RoomController {
     }
 
     @GetMapping("/statistics/top-rooms")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<GETRoomDTO>> getTopRooms(){
         return new ResponseEntity<>(roomService.getTopRooms(), HttpStatus.OK);
     }
 
-    @GetMapping("/{room_code}/statistics/reservations-total-time")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Long> getTotalTimeBooked(@PathVariable("room_code") String roomCode){
+    @GetMapping("/{room_code}/statistics")
+    public ResponseEntity<RoomStatisticsDTO> getStatistics(@PathVariable("room_code") String roomCode){
         try {
-            return new ResponseEntity<>(roomService.getTotalHoursBooked(roomCode), HttpStatus.OK);
+            return new ResponseEntity<>(roomService.getStatistics(roomCode), HttpStatus.OK);
         } catch (NotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

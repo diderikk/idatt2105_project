@@ -1,5 +1,6 @@
 package idatt2105.backend.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,5 +30,17 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
     "JOIN reservation_section ON reservation_section.reservation_id = reservation.reservation_id " +
     "WHERE reservation_section.section_id = ?1 AND reservation.end_time <= NOW()", nativeQuery = true)
     Optional<Long> getTotalHoursBooked(long sectionId);
+
+    @Query(value = "SELECT section.* FROM section WHERE section.section_id NOT IN (SELECT section.section_id FROM section JOIN reservation_section" +
+    " ON (section.section_id = reservation_section.section_id) JOIN reservation" +
+    " ON (reservation_section.reservation_id = reservation.reservation_id AND (?1 BETWEEN reservation.start_time AND reservation.end_time OR ?2 BETWEEN reservation.start_time" +
+    " AND reservation.end_time OR (?1 <= reservation.start_time AND ?2 >= reservation.end_time))))", nativeQuery = true)
+    List<Section> getAvailableSections(LocalDateTime startTime, LocalDateTime endTime);
+
+    @Query(value = "SELECT section.* FROM section WHERE section.section_id NOT IN (SELECT section.section_id FROM section JOIN reservation_section" +
+    " ON (section.section_id = reservation_section.section_id) JOIN reservation" +
+    " ON (reservation_section.reservation_id = reservation.reservation_id AND reservation.reservation_id != ?3 AND (?1 BETWEEN reservation.start_time AND reservation.end_time OR ?2 BETWEEN reservation.start_time" +
+    " AND reservation.end_time OR (?1 <= reservation.start_time AND ?2 >= reservation.end_time))))", nativeQuery = true)
+    List<Section> getAvailableSections(LocalDateTime startTime, LocalDateTime endTime, Long reservationId);
 }
 

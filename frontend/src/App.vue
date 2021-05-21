@@ -2,7 +2,9 @@
   <div>
     <nav id="nav" class="navbar is-dark" role="navigation">
       <div class="navbar-brand">
-        <router-link to="/" class="navbar-item">Home</router-link>
+        <router-link to="/home" class="navbar-item"
+          ><img alt="Book that room logo" src="./assets/logo.png"
+        /></router-link>
         <a
           :class="{ 'is-active': navBarIsActive }"
           @click="toggleNavBar"
@@ -20,27 +22,19 @@
       >
         <!--Could not wrap the items in a span and use if-else on the isLoggedIn property since it broke Bulma -->
         <div class="navbar-start">
-          <router-link to="/about" class="navbar-item">About</router-link>
-          <router-link
-            v-if="isLoggedIn"
-            class="navbar-item"
-            to="/create-reservation"
-            >Make reservation</router-link
-          >
-          <router-link class="navbar-item" to="/edit-reservation"
-            >Edit reservation</router-link
-          >
-          <router-link v-if="isAdmin" class="navbar-item" to="/create-user"
-            >Create User</router-link
+          <router-link v-if="isLoggedIn" class="navbar-item" to="/reservations"
+            >Reservations</router-link
           >
           <router-link v-if="isAdmin" class="navbar-item" to="/users"
             >Users</router-link
           >
-          <router-link v-if="isAdmin" class="navbar-item" to="/create-room"
-            >Create Room</router-link
-          >
-          <router-link class="navbar-item" to="/rooms"
+
+          <router-link v-if="isLoggedIn" class="navbar-item" to="/rooms"
             >Rooms</router-link
+          >
+
+          <router-link v-if="isAdmin" class="navbar-item" to="/statistics"
+            >Statistics</router-link
           >
         </div>
         <div class="navbar-end">
@@ -50,7 +44,7 @@
             to="/log-in"
             >Log In</router-link
           >
-          <router-link v-if="isLoggedIn" class="navbar-item" to="/users">
+          <router-link v-if="isLoggedIn" class="navbar-item" :to="profileLink">
             Profile
           </router-link>
           <router-link
@@ -86,10 +80,17 @@ export default defineComponent({
     const isLoggedIn = computed(() => store.getters.isUserLoggedIn);
     const isAdmin = computed(() => store.getters.getUser.isAdmin);
 
+    const profileLink = computed(
+      () => `/users/${store.getters.getUser.userId}`
+    );
+
     const toggleNavBar = () => {
       navBarIsActive.value = !navBarIsActive.value;
     };
 
+    /**
+     * Closing navbar when the active view is changed
+     */
     router.afterEach((to, from, failure) => {
       if (to.fullPath !== from.fullPath) {
         navBarIsActive.value = false;
@@ -102,6 +103,10 @@ export default defineComponent({
       navBarIsActive.value = false;
     };
 
+    /**
+     * Logs user out through store
+     * Sends user to log in page
+     */
     const logout = () => {
       store.dispatch("logout");
       router.replace("/log-in");
@@ -109,6 +114,7 @@ export default defineComponent({
 
     return {
       logout,
+      profileLink,
       navBarIsActive,
       toggleNavBar,
       isAdmin,
@@ -127,14 +133,16 @@ body {
 #application-wrapper {
   width: 60%;
   margin: auto;
-  margin-top: 80px;
+  margin-top: 70px;
+  margin-bottom: 10px;
 }
 
 @media only screen and (max-width: 1020px) {
   #application-wrapper {
     width: 95%;
     margin: auto;
-    margin-top: 80px;
+    margin-top: 70px;
+    margin-bottom: 10px;
   }
 }
 

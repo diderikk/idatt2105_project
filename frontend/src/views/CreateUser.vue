@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, Ref } from "vue";
+import { defineComponent, ref, Ref } from "vue";
 import BaseUserFormConfig from "../components/BaseUserForm.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
 import UserForm from "../interfaces/User/UserForm.interface";
@@ -29,6 +29,9 @@ export default defineComponent({
       }
     };
 
+    /**
+     * The config object to be sent to BaseUserForm, containing title, and buttons
+     */
     const config = {
       title: "Create User",
       buttons: [
