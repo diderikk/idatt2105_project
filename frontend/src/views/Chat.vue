@@ -45,6 +45,10 @@ export default defineComponent({
     });
     const messages = ref([] as Message[]);
 
+    /**
+     * Gets all room messages from database
+     * Connects to the rooms websocket server
+     */
     onMounted(async () => {
       messages.value = await store.dispatch("getRoomMessages", props.roomCode);
 
@@ -54,10 +58,16 @@ export default defineComponent({
       await connectWebSocket();
     });
 
+    /**
+     * When unmounting, disconnect from client
+     */
     onBeforeUnmount(async () => {
       stompClient.disconnect(() => ({}));
     });
 
+    /**
+     * Sends message to websocket server
+     */
     const sendMessage = async () => {
       if(messageInput.value.trim() === "") return
       if (!stompClient.connected) await connectWebSocket();
@@ -79,10 +89,16 @@ export default defineComponent({
       } as Message;
     });
 
+    /**
+     * Uses store to connect to chat
+     */
     const connectWebSocket = async () => {
       await store.dispatch("connectChat", {roomCode: props.roomCode, stompClient: stompClient, messages: messages.value});
     };
 
+    /**
+     * Returns messages sorted by date/time
+     */
     const sortedMessages = computed(() => {
       const tempMessages = messages.value;
       return tempMessages.sort((message1, message2) => {
