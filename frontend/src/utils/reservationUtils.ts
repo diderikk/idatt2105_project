@@ -5,6 +5,7 @@ import GETRoom from "@/interfaces/Room/GETRoom.interface";
 import GETSection from "@/interfaces/Section/GETSection.interface";
 import SectionWithDisable from "@/interfaces/Section/SectionWithDisable.interface";
 import GETReservation from "@/interfaces/Reservation/GETReservation.interface";
+import GETAvailableSections from "@/interfaces/Section/GETAvailableSections.interface";
 
 export const reservationFormToPOSTReservtion = (
   reservation: ReservationForm
@@ -46,10 +47,9 @@ export const POSTReservationToReservationForm = (
   };
 };
 
-export const AvailableRoomsToReservationForm = (availableRooms: {
-  rooms: GETRoom[];
-  availableSections: { sectionId: number }[];
-}): AvailableRoom[] => {
+export const AvailableRoomsToReservationForm = (
+  availableRooms: GETAvailableSections
+): AvailableRoom[] => {
   return availableRooms.rooms.map((room) => {
     return {
       roomCode: room.roomCode,
@@ -58,7 +58,7 @@ export const AvailableRoomsToReservationForm = (availableRooms: {
           sectionName: section.sectionName,
           isDisabled: !checkIfSectionAvailable(
             section,
-            availableRooms.availableSections
+            availableRooms.idsOfAvailableSections
           ),
         };
       }),
@@ -68,9 +68,9 @@ export const AvailableRoomsToReservationForm = (availableRooms: {
 
 const checkIfSectionAvailable = (
   section: GETSection,
-  availableSections: { sectionId: number }[]
+  availableSections: number[]
 ): boolean => {
   for (const availableSection of availableSections)
-    if (section.sectionId === availableSection.sectionId) return true;
+    if (section.sectionId === availableSection) return true;
   return false;
 };

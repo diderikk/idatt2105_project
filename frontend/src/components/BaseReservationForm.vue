@@ -233,6 +233,7 @@ import { useStore } from "../store";
 import SectionWithDisable from "../interfaces/Section/SectionWithDisable.interface";
 import { AvailableRoomsToReservationForm } from "../utils/reservationUtils";
 import BackButton from "./BackButton.vue";
+import GETAvailableSections from "../interfaces/Section/GETAvailableSections.interface";
 export default defineComponent({
   name: "BaseReservationForm",
   components: { BaseFormFieldInput, BackButton },
@@ -636,7 +637,7 @@ export default defineComponent({
           registerInformation.startDate + " " + registerInformation.startTime;
         const endTime =
           registerInformation.endDate + " " + registerInformation.endTime;
-        let response;
+        let response: GETAvailableSections;
         if (props.reservationId)
           response = await store.dispatch("getAvailableRooms", {
             times: {

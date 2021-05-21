@@ -17,6 +17,7 @@ import GETReservation from "@/interfaces/Reservation/GETReservation.interface";
 import GETRoom from "@/interfaces/Room/GETRoom.interface";
 import Message from "@/interfaces/Message.interface";
 import Stomp from "stompjs";
+import GETAvailableSections from "@/interfaces/Section/GETAvailableSections.interface";
 
 export const key: InjectionKey<Store<State>> = Symbol();
 
@@ -466,12 +467,12 @@ export const store: Store<State> = createStore<State>({
     /**
      * Calls backend at POST /rooms/available
      * @param timeInterval
-     * @returns Promise<>
+     * @returns Promise<GETAvailableSections | null>
      */
     async getAvailableRooms(
       { commit },
       timeInterval: { times: TimeInterval; reservationId?: number }
-    ) {
+    ): Promise<GETAvailableSections | null> {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         let response;
@@ -490,8 +491,8 @@ export const store: Store<State> = createStore<State>({
             content: "Could not find any rooms",
             status: SnackbarStatus.ERROR,
           });
-          return null;
         }
+        return null;
       }
     },
     /**
