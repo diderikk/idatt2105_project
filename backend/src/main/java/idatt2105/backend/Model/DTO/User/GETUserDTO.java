@@ -1,4 +1,4 @@
-package idatt2105.backend.Model.DTO;
+package idatt2105.backend.Model.DTO.User;
 
 import java.time.LocalDate;
 

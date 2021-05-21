@@ -1,4 +1,4 @@
-package idatt2105.backend.Model.DTO;
+package idatt2105.backend.Model.DTO.Reservation;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import idatt2105.backend.Model.Reservation;
-
+import idatt2105.backend.Model.DTO.Section.POSTSectionDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
