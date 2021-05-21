@@ -22,10 +22,7 @@
       >
         <!--Could not wrap the items in a span and use if-else on the isLoggedIn property since it broke Bulma -->
         <div class="navbar-start">
-          <router-link
-            v-if="isLoggedIn"
-            class="navbar-item"
-            to="/reservations"
+          <router-link v-if="isLoggedIn" class="navbar-item" to="/reservations"
             >Reservations</router-link
           >
           <router-link v-if="isAdmin" class="navbar-item" to="/users"
@@ -43,7 +40,7 @@
             to="/log-in"
             >Log In</router-link
           >
-          <router-link v-if="isLoggedIn" class="navbar-item" to="/users">
+          <router-link v-if="isLoggedIn" class="navbar-item" :to="profileLink">
             Profile
           </router-link>
           <router-link
@@ -79,10 +76,17 @@ export default defineComponent({
     const isLoggedIn = computed(() => store.getters.isUserLoggedIn);
     const isAdmin = computed(() => store.getters.getUser.isAdmin);
 
+    const profileLink = computed(
+      () => `/users/${store.getters.getUser.userId}`
+    );
+
     const toggleNavBar = () => {
       navBarIsActive.value = !navBarIsActive.value;
     };
 
+    /**
+     * Closing navbar when the active view is changed
+     */
     router.afterEach((to, from, failure) => {
       if (to.fullPath !== from.fullPath) {
         navBarIsActive.value = false;
@@ -95,6 +99,10 @@ export default defineComponent({
       navBarIsActive.value = false;
     };
 
+    /**
+     * Logs user out through store
+     * Sends user to log in page
+     */
     const logout = () => {
       store.dispatch("logout");
       router.replace("/log-in");
@@ -102,6 +110,7 @@ export default defineComponent({
 
     return {
       logout,
+      profileLink,
       navBarIsActive,
       toggleNavBar,
       isAdmin,

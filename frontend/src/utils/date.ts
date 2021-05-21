@@ -1,3 +1,8 @@
+/**
+ * Converts a date to a string
+ * @param date
+ * @returns string
+ */
 export const dateToString = (date: Date): string => {
   //Need to trick compilator
   let string = "" + date.getFullYear();
@@ -14,7 +19,7 @@ export const dateToString = (date: Date): string => {
 
 /**
  * Returns a date string as the backend server expects it
- * @param date 
+ * @param date
  * @returns date string
  */
 export const dateTimeToString = (date: Date): string => {
@@ -24,9 +29,14 @@ export const dateTimeToString = (date: Date): string => {
   string += ":";
   string += minutes < 10 ? "0" : "";
   string += minutes;
-  return dateToString(date) + " " + string.substring(0,5);
-}
+  return dateToString(date) + " " + string.substring(0, 5);
+};
 
+/**
+ * Removes the time part of a date
+ * @param date
+ * @returns date where all time elements are set to 0
+ */
 export const removeTimeFromDate = (date: Date) => {
   return new Date(dateToString(date).split("T")[0]);
 };
