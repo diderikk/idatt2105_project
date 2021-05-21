@@ -65,4 +65,14 @@ export default defineComponent({
 li {
   margin: 10px 10px;
 }
+
+.card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-footer {
+  margin-top: auto;
+}
 </style>

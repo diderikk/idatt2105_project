@@ -22,10 +22,7 @@
       >
         <!--Could not wrap the items in a span and use if-else on the isLoggedIn property since it broke Bulma -->
         <div class="navbar-start">
-          <router-link
-            v-if="isLoggedIn"
-            class="navbar-item"
-            to="/reservations"
+          <router-link v-if="isLoggedIn" class="navbar-item" to="/reservations"
             >Reservations</router-link
           >
           <router-link v-if="isAdmin" class="navbar-item" to="/users"
@@ -83,6 +80,9 @@ export default defineComponent({
       navBarIsActive.value = !navBarIsActive.value;
     };
 
+    /**
+     * Closing navbar when the active view is changed
+     */
     router.afterEach((to, from, failure) => {
       if (to.fullPath !== from.fullPath) {
         navBarIsActive.value = false;
@@ -95,6 +95,10 @@ export default defineComponent({
       navBarIsActive.value = false;
     };
 
+    /**
+     * Logs user out throug store
+     * Sends user to log in page
+     */
     const logout = () => {
       store.dispatch("logout");
       router.replace("/log-in");
