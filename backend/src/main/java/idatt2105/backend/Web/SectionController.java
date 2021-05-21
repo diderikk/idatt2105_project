@@ -24,13 +24,13 @@ public class SectionController {
     private SectionService sectionService;
     
     @GetMapping("/statistics/top-sections")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<GETSectionDTO>> getTopSections(){
         return new ResponseEntity<>(sectionService.getTopSections(), HttpStatus.OK);
     }
 
     @GetMapping("/{section_id}/statistics")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<SectionStatisticsDTO> getStatistics(@PathVariable("section_id") long sectionId){
         try {
             return new ResponseEntity<>(sectionService.getStatistics(sectionId), HttpStatus.OK);
