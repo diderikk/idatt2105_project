@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AvailableSectionsDTO {
     private List<GETRoomDTO> rooms;
-    private List<AvailableSectionDTO> availableSections;
+    private List<Long> idsOfAvailableSections;
 }
