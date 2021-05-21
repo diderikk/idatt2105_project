@@ -18,6 +18,7 @@ import GETRoom from "@/interfaces/Room/GETRoom.interface";
 import Message from "@/interfaces/Message.interface";
 import Stomp from "stompjs";
 import GETAvailableSections from "@/interfaces/Section/GETAvailableSections.interface";
+import GETSection from "@/interfaces/Section/GETSection.interface";
 
 export const key: InjectionKey<Store<State>> = Symbol();
 
@@ -247,26 +248,6 @@ export const store: Store<State> = createStore<State>({
         if (error !== null) {
           commit("setSnackbar", {
             content: "Could not get users",
-            status: SnackbarStatus.ERROR,
-          });
-        }
-        return null;
-      }
-    },
-    /**
-     * Calls backend at GET /users/statistics/top-users
-     * @returns Promise<User[] | null>, User[] if successful, or null if error
-     */
-    async getTopUsers({ commit }): Promise<User[] | null> {
-      commit("setSnackbarStatus", SnackbarStatus.LOADING);
-      try {
-        const response = await backend.get("/users/statistics/top-users");
-        commit("setSnackbarStatus", SnackbarStatus.NONE);
-        return response.data;
-      } catch (error) {
-        if (error !== null) {
-          commit("setSnackbar", {
-            content: "Could not get top users",
             status: SnackbarStatus.ERROR,
           });
         }
@@ -666,6 +647,78 @@ export const store: Store<State> = createStore<State>({
           });
         }
         return false;
+      }
+    },
+    /**
+     * Calls backend at GET /rooms/statistics/top-rooms
+     * @param editSnackbar optional, if false, the snakcbar should only be edited when an error occurs
+     * @returns Promise<GETRoom[] | null>
+     */
+    async getTopRooms(
+      { commit },
+      editSnackbar?: boolean
+    ): Promise<GETRoom[] | null> {
+      if (editSnackbar === undefined || editSnackbar === true)
+        commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        const response = await backend.get("/rooms/statistics/top-rooms");
+        if (editSnackbar === undefined || editSnackbar === true)
+          commit("setSnackbarStatus", SnackbarStatus.NONE);
+        return response.data;
+      } catch (error) {
+        commit("setSnackbar", {
+          content: "Could not find top rooms",
+          status: SnackbarStatus.ERROR,
+        });
+        return null;
+      }
+    },
+    /**
+     * Calls backend at GET /sections/statistics/top-sections
+     * @param editSnackbar optional, if false, the snakcbar should only be edited when an error occurs
+     * @returns Promise<GETSection[] | null>
+     */
+     async getTopSections(
+      { commit },
+      editSnackbar?: boolean
+    ): Promise<GETSection[] | null> {
+      if (editSnackbar === undefined || editSnackbar === true)
+        commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        const response = await backend.get("/sections/statistics/top-sections");
+        if (editSnackbar === undefined || editSnackbar === true)
+          commit("setSnackbarStatus", SnackbarStatus.NONE);
+        return response.data;
+      } catch (error) {
+        commit("setSnackbar", {
+          content: "Could not find top sections",
+          status: SnackbarStatus.ERROR,
+        });
+        return null;
+      }
+    },
+    /**
+     * Calls backend at GET /users/statistics/top-users
+     * @param editSnackbar optional, if false, the snakcbar should only be edited when an error occurs
+     * @returns Promise<GETRoom[] | null>
+     */
+     async getTopUsers(
+      { commit },
+      editSnackbar?: boolean
+    ): Promise<User[] | null> {
+      if (editSnackbar === undefined || editSnackbar === true)
+        commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        const response = await backend.get("/users/statistics/top-users");
+        if (editSnackbar === undefined || editSnackbar === true)
+          commit("setSnackbarStatus", SnackbarStatus.NONE);
+        return response.data;
+      } catch (error) {
+        commit("setSnackbar", {
+          content: "Could not find top users",
+          status: SnackbarStatus.ERROR,
+        });
+        return null;
       }
     },
   },

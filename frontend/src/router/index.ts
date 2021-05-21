@@ -135,6 +135,15 @@ const routes: Array<RouteRecordRaw> = [
     name: "NotFound",
     component: () => import("../views/PageNotFound.vue"),
   },
+  {
+  path: "/statistics",
+  name: "Statistics",
+  meta: {
+    title: "Statistics",
+    permission: "Admin",
+  },
+  component: () => import("../views/Stats.vue"),
+  },
 ];
 
 //Creates a router running i history mode, and containing the routes defined in the routes object
