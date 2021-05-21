@@ -54,4 +54,14 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-footer {
+  margin-top: auto;
+}
+</style>

@@ -1,14 +1,14 @@
 <template>
   <base-room-form-config
-      v-if="isDoneLoading"
-      :baseRoom="room"
-      :config="config"
-    ></base-room-form-config>
-    <base-room-form-config
-      v-else
-      :baseRoom="room"
-      :config="config"
-    ></base-room-form-config>
+    v-if="isDoneLoading"
+    :baseRoom="room"
+    :config="config"
+  ></base-room-form-config>
+  <base-room-form-config
+    v-else
+    :baseRoom="room"
+    :config="config"
+  ></base-room-form-config>
 </template>
 
 <script lang="ts">
@@ -49,11 +49,15 @@ export default defineComponent({
     const editRoom = async (
       checks: Array<() => void>,
       statuses: Array<Ref<InputFieldFeedbackStatus>>,
-      roomForm: RoomForm,
+      roomForm: RoomForm
     ) => {
       if (checksBeforeAsyncCall(checks, statuses)) {
-        await store.dispatch("editRoom", {...RoomFormToRoom(roomForm), originalRoomCode: props.code });
-        if(roomForm.roomCode !== props.code) router.push(`/edit-room/${roomForm.roomCode}`);
+        await store.dispatch("editRoom", {
+          ...RoomFormToRoom(roomForm),
+          originalRoomCode: props.code,
+        });
+        if (roomForm.roomCode !== props.code)
+          router.push(`/edit-room/${roomForm.roomCode}`);
       }
     };
 
@@ -63,10 +67,13 @@ export default defineComponent({
       }
     };
 
+    /**
+     * The config object to be sent to BaseRoomForm, containing title, and buttons
+     */
     const config = {
       title: "Edit Room",
       buttons: [
-          {
+        {
           title: "Confirm edit",
           class: "button is-link is-primary",
           action: { function: editRoom, numberOfArgs: 3 },

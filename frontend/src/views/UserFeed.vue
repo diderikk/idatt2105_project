@@ -39,10 +39,17 @@ export default defineComponent({
       searchInput.value = input;
     };
 
+    /**
+     * Gets the users to be displayed, while also displaying the loading animation with the snackbar
+     */
     onMounted(async () => {
       await reload(true);
     });
 
+    /**
+     * Reloads all users
+     * @editSnackbar defines if the snackbar should be changed when loading the accounts. When an account has been deleted the user should receive feedback from the delete action that the user has been deleted, and therefore editSnackbar has to be false to not override the previous feedback.
+     */
     const reload = async (editSnackbar: boolean) => {
       const response = await store.dispatch("getUsers", editSnackbar);
       if (response !== null) {
@@ -50,10 +57,17 @@ export default defineComponent({
       }
     };
 
+    /**
+     * Computes the availible user based on the filter from the compareUserValues method.
+     */
     const availableUsers = computed(() => {
       return users.value.filter((user) => compareUserValues(user));
     });
 
+    /**
+     * Finds out if the searchInput matches with the start of a users first name, last name, email or phone number.
+     * Ignores caps
+     */
     const compareUserValues = (user: User) => {
       const searchLowerCase = searchInput.value.toLowerCase();
       return (
