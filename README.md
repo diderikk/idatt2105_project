@@ -63,29 +63,29 @@ Continuous Deployment on frontend is done automatically by Vercel when pushing c
 ## Dependencies
 ### Backend
 - Maven
-	- Build automation tool for our backend application written in Java.
+	- Build automation tool for our backend application written in Java
 - Spring Boot
-	- Application framework for easily creating stand-alone applications with Java.
+	- Application framework for easily creating stand-alone applications with Java
 - Spring Boot Security
-	- Powerful authentication and access-control framework. Standard for Spring-based applications when using Spring Boot.
+	- Powerful authentication and access-control framework. Standard for Spring-based applications when using Spring Boot
 - Swagger
 	- For hosting of API.
 - Java Persistence API (JPA)
-	- A programming interface specification for management of relational data in Java applications.
+	- A programming interface specification for management of relational data in Java applications
 - Docker (optional)
-	- Can be user to safely build and run applications in isolated containers.
+	- Can be user to safely build and run applications in isolated containers
 
 ### Frontend
 - Vue.js 3
-	- Open source JavaScript framework for building interfaces and applications.
+	- Open source JavaScript framework for building interfaces and applications
 - Typescript
 	- A strict syntactical superset of JavaScript programming language, helpful to avoid typical JavaScript errors
 - Babel
-	- Free and open-source JavaScript compiler, so that the code can be run by older JavaScript engines.
+	- Free and open-source JavaScript compiler, so that the code can be run by older JavaScript engines
 - ESlint
 	- Static code analysis tool for problem identification in JavaScript code
 - Bulma
-	- Free open-source framework that provides ready-to-use components
+	- Free open-source framework that provides ready-to-use components to build responsive web interfaces
 
 ## Future work
 ### Reservation of equipment
