@@ -9,14 +9,12 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import idatt2105.backend.Model.DTO.MessageDTO;
 import idatt2105.backend.Repository.RoomRepository;
 import idatt2105.backend.Service.MessageService;
 
 @Controller
-@CrossOrigin(originPatterns = "*",allowCredentials = "true", allowedHeaders = "*")
 @Profile("!test")
 public class MessageController {
     

@@ -417,7 +417,6 @@ export const store: Store<State> = createStore<State>({
     },
     /**
      * Gets messages that have been written in a room chat
-     * @param param0 
      * @param roomCode 
      * @returns a list of messages
      */
