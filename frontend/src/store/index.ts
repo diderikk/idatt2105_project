@@ -514,7 +514,11 @@ export const store: Store<State> = createStore<State>({
     },
     /**
      * Gets messages that have been written in a room chat
+<<<<<<< HEAD
      * @param roomCode
+=======
+     * @param roomCode 
+>>>>>>> dev
      * @returns a list of messages
      */
     async getRoomMessages({ commit }, roomCode: string): Promise<Message[]> {

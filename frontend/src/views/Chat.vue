@@ -40,8 +40,10 @@ export default defineComponent({
       const response = await store.dispatch("getRoomMessages", props.roomCode);
       messages.value = response;
 
+      console.log(messages.value);
 
-      const sockJs = new SockJS(`${URL}/chat/${props.roomCode}`);
+
+      const sockJs = new SockJS(`${URL}/websocket`);
       stompClient = Stomp.over(sockJs);
       stompClient.debug = () => ({});
       await connectWebSocket();
