@@ -12,9 +12,9 @@ Last run CI/CD: [Github Actions](https://github.com/diderikk/idatt2105_project/a
 5. [Security](#security)
 6. [CI/CD](#ci/cd)
 7. [Dependencies](#dependencies)
-8. [Future work](#future work)
-9. [Installation manual](#installation manual)
-10. [Running tests](#running tests)
+8. [Future work](#future-work)
+9. [Installation manual](#installation-manual)
+10. [Running tests](#running-tests)
 
 ## Introduction
 Book That Room is an web application made for booking rooms. Users are able to reserver rooms or parts of rooms as an individual. Users and rooms are created by an admins, that have full access to all information on the website. When a user is created, an email with login credentials is sent to the user's email.
