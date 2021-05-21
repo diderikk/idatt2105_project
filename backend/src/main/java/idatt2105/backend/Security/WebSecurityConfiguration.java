@@ -55,7 +55,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/swagger-ui/**").permitAll()
                 .antMatchers("/swagger-resources/**").permitAll()
                 .antMatchers("/v2/api-docs").permitAll()
-                .antMatchers("/v3/api-docs/**").permitAll()
                 .antMatchers("/api/v1/websocket/**").permitAll()
                 .antMatchers("/api/v1/reservations/**").hasRole("ADMIN")
                 .antMatchers("/api/v1/sections/**").hasRole("ADMIN")
