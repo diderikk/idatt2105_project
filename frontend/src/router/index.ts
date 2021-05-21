@@ -19,15 +19,6 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
-    path: "/about",
-    name: "About",
-    meta: {
-      permission: "Admin",
-      title: "About",
-    },
-    component: () => import("../views/About.vue"),
-  },
-  {
     path: "/create-user",
     name: "CreateUser",
     meta: {

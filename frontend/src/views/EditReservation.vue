@@ -24,7 +24,7 @@ import checksBeforeAsyncCall from "../utils/checksBeforeAsyncCall";
 import ReservationForm from "../interfaces/Reservation/ReservationForm.interface";
 import { useStore } from "../store";
 import {
-  GETReservationToReservationForm,
+  POSTReservationToReservationForm,
   reservationFormToPOSTReservtion,
 } from "../utils/reservationUtils";
 import { useRouter } from "vue-router";
@@ -50,7 +50,7 @@ export default defineComponent({
         props.id
       );
       if (response !== null) {
-        reservation.value = GETReservationToReservationForm(response);
+        reservation.value = POSTReservationToReservationForm(response);
         isDoneLoading.value = true;
       }
     });

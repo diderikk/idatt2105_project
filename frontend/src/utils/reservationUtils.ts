@@ -21,8 +21,8 @@ export const reservationFormToPOSTReservtion = (
   };
 };
 
-export const GETReservationToReservationForm = (
-  reservation: GETReservation
+export const POSTReservationToReservationForm = (
+  reservation: POSTReservation
 ): ReservationForm => {
   const sections = reservation.sections.map((s) => {
     return s.sectionName;
