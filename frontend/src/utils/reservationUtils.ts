@@ -4,6 +4,7 @@ import AvailableRoom from "@/interfaces/Room/AvailableRoom.interface";
 import GETRoom from "@/interfaces/Room/GETRoom.interface";
 import GETSection from "@/interfaces/Section/GETSection.interface";
 import SectionWithDisable from "@/interfaces/Section/SectionWithDisable.interface";
+import GETReservation from "@/interfaces/Reservation/GETReservation.interface";
 
 export const reservationFormToPOSTReservtion = (
   reservation: ReservationForm
@@ -16,12 +17,12 @@ export const reservationFormToPOSTReservtion = (
     startTime: reservation.startDate + " " + reservation.startTime,
     endTime: reservation.endDate + " " + reservation.endTime,
     reservationText: reservation.reservationText,
-    sections: sections
+    sections: sections,
   };
 };
 
-export const POSTReservationToReservationForm = (
-  reservation: POSTReservation
+export const GETReservationToReservationForm = (
+  reservation: GETReservation
 ): ReservationForm => {
   const sections = reservation.sections.map((s) => {
     return s.sectionName;
@@ -36,30 +37,40 @@ export const POSTReservationToReservationForm = (
     startTime: splitStartTime[1].substring(0, 5),
     endDate: splitEndTime[0],
     endTime: splitEndTime[1].substring(0, 5),
-    sections: sections.map(section => {
+    sections: sections.map((section) => {
       return {
         sectionName: section,
-        isDisabled: false
-      }
+        isDisabled: false,
+      };
     }) as SectionWithDisable[],
   };
 };
 
-export const AvailableRoomsToReservationForm = (availableRooms: {rooms: GETRoom[], availableSections: {sectionId: number}[]}): AvailableRoom[] => {
-  return availableRooms.rooms.map(room => {
+export const AvailableRoomsToReservationForm = (availableRooms: {
+  rooms: GETRoom[];
+  availableSections: { sectionId: number }[];
+}): AvailableRoom[] => {
+  return availableRooms.rooms.map((room) => {
     return {
       roomCode: room.roomCode,
-      sections: room.sections.map(section => {
+      sections: room.sections.map((section) => {
         return {
           sectionName: section.sectionName,
-          isDisabled: !checkIfSectionAvailable(section, availableRooms.availableSections)
-        }
-      })
-    }
-  }) as AvailableRoom[]
-}
+          isDisabled: !checkIfSectionAvailable(
+            section,
+            availableRooms.availableSections
+          ),
+        };
+      }),
+    };
+  }) as AvailableRoom[];
+};
 
-const checkIfSectionAvailable = (section: GETSection, availableSections: {sectionId: number}[]): boolean =>{
-  for(const availableSection of availableSections) if(section.sectionId === availableSection.sectionId) return true;
+const checkIfSectionAvailable = (
+  section: GETSection,
+  availableSections: { sectionId: number }[]
+): boolean => {
+  for (const availableSection of availableSections)
+    if (section.sectionId === availableSection.sectionId) return true;
   return false;
-}
+};

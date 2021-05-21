@@ -34,7 +34,7 @@ import ReservationCard from "../components/ReservationCard.vue";
 import BaseFeedHeader from "../components/BaseFeedHeader.vue";
 import Reservation from "../interfaces/Reservation/Reservation.interface";
 import { useStore } from "../store";
-import { POSTReservationToReservationForm } from "../utils/reservationUtils";
+import { GETReservationToReservationForm } from "../utils/reservationUtils";
 import ReservationForm from "../interfaces/Reservation/ReservationForm.interface";
 export default defineComponent({
   name: "ReservationFeed",
@@ -58,7 +58,7 @@ export default defineComponent({
         reservations.value = response.map((reservation: Reservation) => {
           return {
             reservationId: reservation.reservationId,
-            ...POSTReservationToReservationForm(reservation),
+            ...GETReservationToReservationForm(reservation),
           };
         });
       }

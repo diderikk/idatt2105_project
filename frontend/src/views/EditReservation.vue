@@ -19,12 +19,12 @@
 import { defineComponent, onMounted, ref, Ref } from "vue";
 import BaseReservationFormConfig from "../components/BaseReservationForm.vue";
 import InputFieldFeedbackStatus from "../enum/InputFieldFeedbackStatus.enum";
-import POSTReservation from "../interfaces/Reservation/POSTReservation.interface";
+import GETReservation from "../interfaces/Reservation/GETReservation.interface";
 import checksBeforeAsyncCall from "../utils/checksBeforeAsyncCall";
 import ReservationForm from "../interfaces/Reservation/ReservationForm.interface";
 import { useStore } from "../store";
 import {
-  POSTReservationToReservationForm,
+  GETReservationToReservationForm,
   reservationFormToPOSTReservtion,
 } from "../utils/reservationUtils";
 import { useRouter } from "vue-router";
@@ -45,12 +45,12 @@ export default defineComponent({
     const router = useRouter();
 
     onMounted(async () => {
-      const response: POSTReservation = await store.dispatch(
+      const response: GETReservation = await store.dispatch(
         "getReservation",
         props.id
       );
       if (response !== null) {
-        reservation.value = POSTReservationToReservationForm(response);
+        reservation.value = GETReservationToReservationForm(response);
         isDoneLoading.value = true;
       }
     });

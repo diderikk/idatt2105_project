@@ -13,6 +13,7 @@ import TimeInterval from "@/interfaces/TimeInterval.interface";
 import State from "@/interfaces/State.interface";
 import UserForm from "@/interfaces/User/UserForm.interface";
 import UserStats from "@/interfaces/User/UserStats.interface";
+import GETReservation from "@/interfaces/Reservation/GETReservation.interface";
 
 export const key: InjectionKey<Store<State>> = Symbol();
 
@@ -359,7 +360,15 @@ export const store: Store<State> = createStore<State>({
         return false;
       }
     },
-    async getReservation({ commit }, reservationId: number) {
+    /**
+     *
+     * @param reservationId
+     * @returns
+     */
+    async getReservation(
+      { commit },
+      reservationId: number
+    ): Promise<GETReservation | null> {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         let response;
@@ -382,7 +391,7 @@ export const store: Store<State> = createStore<State>({
       { commit },
       editSnackbar: boolean,
       sortingConfig?: ReservationSorting
-    ) {
+    ): Promise<GETReservation[] | null> {
       if (editSnackbar === undefined || editSnackbar === true)
         commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {

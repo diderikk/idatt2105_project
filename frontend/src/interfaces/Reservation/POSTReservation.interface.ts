@@ -1,6 +1,6 @@
 import POSTSection from "../Section/POSTSection.interface";
 
-export default interface CreateReservation {
+export default interface POSTReservation {
   sections: POSTSection[];
   reservationText: string;
   //Of format "yyyy-MM-dd HH:mm"
