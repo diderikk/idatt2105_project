@@ -40,7 +40,7 @@
             to="/log-in"
             >Log In</router-link
           >
-          <router-link v-if="isLoggedIn" class="navbar-item" to="/users">
+          <router-link v-if="isLoggedIn" class="navbar-item" :to="profileLink">
             Profile
           </router-link>
           <router-link
@@ -76,6 +76,10 @@ export default defineComponent({
     const isLoggedIn = computed(() => store.getters.isUserLoggedIn);
     const isAdmin = computed(() => store.getters.getUser.isAdmin);
 
+    const profileLink = computed(
+      () => `/users/${store.getters.getUser.userId}`
+    );
+
     const toggleNavBar = () => {
       navBarIsActive.value = !navBarIsActive.value;
     };
@@ -106,6 +110,7 @@ export default defineComponent({
 
     return {
       logout,
+      profileLink,
       navBarIsActive,
       toggleNavBar,
       isAdmin,
