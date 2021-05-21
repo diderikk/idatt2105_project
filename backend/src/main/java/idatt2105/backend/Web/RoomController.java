@@ -170,13 +170,13 @@ public class RoomController {
     }
 
     @GetMapping("/statistics/top-rooms")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<GETRoomDTO>> getTopRooms(){
         return new ResponseEntity<>(roomService.getTopRooms(), HttpStatus.OK);
     }
 
     @GetMapping("/{room_code}/statistics")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("#userId == principal.userId or hasRole('ROLE_ADMIN')")
     public ResponseEntity<RoomStatisticsDTO> getStatistics(@PathVariable("room_code") String roomCode){
         try {
             return new ResponseEntity<>(roomService.getStatistics(roomCode), HttpStatus.OK);

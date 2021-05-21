@@ -11,6 +11,7 @@ import Room from "@/interfaces/Room/Room.interface";
 import EditRoom from "@/interfaces/Room/EditRoom.interface";
 import { UserToUserForm } from "@/utils/userUtils";
 import TimeInterval from "@/interfaces/TimeInterval.interface";
+import RoomStats from "@/interfaces/Room/RoomStats.interface";
 
 export interface State {
   user: string;
@@ -411,6 +412,22 @@ export const store: Store<State> = createStore<State>({
           content: "Could not find a room",
           status: SnackbarStatus.ERROR,
         });
+        return null;
+      }
+    },
+    async getRoomStatistics({ commit }, roomCode: string): Promise<RoomStats | null> {
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        const response = await backend.get(`/rooms/${roomCode}/statistics`);
+        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        return response.data;
+      } catch (error) {
+        if(error !== null){
+          commit("setSnackbar", {
+            content: "Could not get room statistics",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },

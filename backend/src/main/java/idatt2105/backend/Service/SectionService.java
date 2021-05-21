@@ -67,12 +67,12 @@ public class SectionService {
             LOGGER.warn("Could not find section with id: {}. Throwing exception", sectionId);
             throw new NotFoundException("No section found with id: " + sectionId);
         }
-
-        Optional<Long> totalHoursBooked = sectionRepository.getTotalHoursBooked(sectionId);
-        if(!totalHoursBooked.isPresent()) {
-            LOGGER.warn("Could not find total time booked of a section with id: {}. Throwing exception", sectionId);
-            throw new NotFoundException("Could not find total hours of reservations of a section with id: " + sectionId);
+        Optional<Long> totalHoursBookedOptional = sectionRepository.getTotalHoursBooked(sectionId);
+        Long totalHoursBooked = 0L;
+        if(totalHoursBookedOptional.isPresent()) {
+            totalHoursBooked = totalHoursBookedOptional.get();
         }
-        return new SectionStatisticsDTO(totalHoursBooked.get());
+
+        return new SectionStatisticsDTO(totalHoursBooked);
     }
 }

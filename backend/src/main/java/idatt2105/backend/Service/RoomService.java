@@ -387,12 +387,13 @@ public class RoomService {
             throw new NotFoundException("No room found with code: " + roomCode);
         }
 
-        Optional<Long> totalHoursBooked = roomRepository.getTotalHoursBooked(roomCode);
-        if(!totalHoursBooked.isPresent()) {
-            LOGGER.warn("Could not find total time booked of a room with code: {}. Throwing exception", roomCode);
-            throw new NotFoundException("Could not find total hours of reservations of a room with code: " + roomCode);
+        Optional<Long> totalHoursBookedOptional = roomRepository.getTotalHoursBooked(roomCode);
+        Long totalHoursBooked = 0L;
+        if(totalHoursBookedOptional.isPresent()) {
+            totalHoursBooked = totalHoursBookedOptional.get();
         }
-        return new RoomStatisticsDTO(totalHoursBooked.get());
+        
+        return new RoomStatisticsDTO(totalHoursBooked);
     }
 
     /**

@@ -138,14 +138,13 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      const response = await store.dispatch("getUser", props.id);
-      if (response !== null) {
-        user.value = response;
+      const response = await Promise.all([store.dispatch("getUser", props.id), store.dispatch("getUserStatistics", props.id)]);
+      if (response[0] !== null) {
+        user.value = response[0];
       }
-
-      const statistics = await store.dispatch("getUserStatistics", props.id);
-      if (statistics !== null) {
-        userStats.value = statistics;
+     
+      if (response[1] !== null) {
+        userStats.value = response[1];
       }
     });
 
