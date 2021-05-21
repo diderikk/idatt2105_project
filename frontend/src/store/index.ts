@@ -11,6 +11,7 @@ import Room from "@/interfaces/Room/Room.interface";
 import EditRoom from "@/interfaces/Room/EditRoom.interface";
 import { UserToUserForm } from "@/utils/userUtils";
 import TimeInterval from "@/interfaces/TimeInterval.interface";
+import Message from "@/interfaces/Message.interface";
 
 export interface State {
   user: string;
@@ -412,6 +413,26 @@ export const store: Store<State> = createStore<State>({
           status: SnackbarStatus.ERROR,
         });
         return null;
+      }
+    },
+    /**
+     * Gets messages that have been written in a room chat
+     * @param param0 
+     * @param roomCode 
+     * @returns a list of messages
+     */
+    async getRoomMessages({ commit }, roomCode: string): Promise<Message[]>{
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try{
+        const response = await backend.get(`/rooms/${roomCode}/messages`);
+        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        return response.data;
+      } catch (error) {
+        commit("setSnackbar", {
+          content: "Could not find a room",
+          status: SnackbarStatus.ERROR,
+        });
+        return [];
       }
     },
     async createRoom({ commit }, room: Room) {

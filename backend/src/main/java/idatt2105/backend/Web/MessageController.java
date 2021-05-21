@@ -11,6 +11,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import idatt2105.backend.Model.DTO.MessageDTO;
+import idatt2105.backend.Repository.RoomRepository;
+import idatt2105.backend.Service.MessageService;
 
 @Controller
 @Profile("!test")
@@ -21,11 +23,19 @@ public class MessageController {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
+    @Autowired
+    private RoomRepository roomRepository;
+
+    @Autowired
+    private MessageService messageService;
+
     @MessageMapping("/{room_code}")
-    public void connectChat(@DestinationVariable("room_code") long roomCode, @Payload MessageDTO payload){
+    public void connectChat(@DestinationVariable("room_code") String roomCode, @Payload MessageDTO payload){
         LOGGER.info("connectChat(@DestinationVariable(roomCode) long roomCode, @Payload MessageDTO payload) with roomCode {}", roomCode);
-        
-        simpMessagingTemplate.convertAndSend("/api/v1/chat/"+ roomCode +"/messages", payload);
+        if(roomRepository.findById(roomCode).isPresent()){
+            simpMessagingTemplate.convertAndSend("/api/v1/chat/"+ roomCode +"/messages", payload);
+            messageService.saveMessage(roomCode, payload);
+        }
     }
 
 }

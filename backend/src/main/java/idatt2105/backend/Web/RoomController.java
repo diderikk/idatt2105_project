@@ -23,6 +23,7 @@ import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.TimeIntervalDTO;
 import idatt2105.backend.Model.DTO.RoomStatisticsDTO;
 import idatt2105.backend.Model.DTO.GETRoomDTO;
+import idatt2105.backend.Model.DTO.MessageDTO;
 import idatt2105.backend.Model.DTO.POSTRoomDTO;
 import idatt2105.backend.Service.RoomService;
 import javassist.NotFoundException;
@@ -51,6 +52,16 @@ public class RoomController {
         } catch (NotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{room_code}/messages")
+    public ResponseEntity<List<MessageDTO>> getRoomMessages(@PathVariable("room_code") String roomCode){
+        try{
+            return new ResponseEntity<>(roomService.getRoomMessages(roomCode), HttpStatus.OK);
+        } catch(NotFoundException ex){
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

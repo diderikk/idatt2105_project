@@ -47,7 +47,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
      * Configures MessageChannel class so that authorised users are able to send messages
      * @param registration
      */
-    @Override
+    // @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(new ChannelInterceptor() {
             @Override
@@ -58,7 +58,6 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
                     String authToken = accessor.getFirstNativeHeader("Authorization");
                      if(JwtComponent.verifyToken(authToken) == null) return null;
-
                 }
 
                 return message;

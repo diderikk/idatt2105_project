@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import idatt2105.backend.Exception.AlreadyExistsException;
 import idatt2105.backend.Exception.SectionNameInRoomAlreadyExistsException;
 import idatt2105.backend.Exception.SectionNotOfThisRoomException;
-import idatt2105.backend.Model.Message;
 import idatt2105.backend.Model.Reservation;
 import idatt2105.backend.Model.Room;
 import idatt2105.backend.Model.Section;
@@ -24,6 +23,7 @@ import idatt2105.backend.Model.DTO.AvailableSectionsDTO;
 import idatt2105.backend.Model.DTO.GETReservationDTO;
 import idatt2105.backend.Model.DTO.GETRoomDTO;
 import idatt2105.backend.Model.DTO.GETSectionDTO;
+import idatt2105.backend.Model.DTO.MessageDTO;
 import idatt2105.backend.Model.DTO.POSTRoomDTO;
 import idatt2105.backend.Model.DTO.POSTSectionDTO;
 import idatt2105.backend.Model.DTO.TimeIntervalDTO;
@@ -143,6 +143,23 @@ public class RoomService {
     }
 
     /**
+     * Returns all messages
+     * @param roomCode
+     * @return
+     * @throws NotFoundException
+     */
+    public List<MessageDTO> getRoomMessages(String roomCode) throws NotFoundException{
+        LOGGER.info("getRoomMessages(String roomCode) called with roomCode: {}", roomCode);
+        Optional<Room> roomOptional = roomRepository.findById(roomCode);
+        if(!roomOptional.isPresent()) {
+            throw new NotFoundException("No room found with room code: " + roomCode);
+        }
+
+        return messageRepository.getMessages(roomCode, LocalDateTime.now().minusMonths(1)).stream()
+        .map(message -> new MessageDTO(message)).collect(Collectors.toList());
+    }
+
+    /**
      * Creates a new room with a given roomCode
      * Sections are empty.
      * @param roomCode
@@ -151,8 +168,6 @@ public class RoomService {
     public GETRoomDTO createRoom(String roomCode)
     {
         LOGGER.info("createRoomWith(String roomCode) called with roomCode: {}", roomCode);
-
-        // TODO: add ADMIN verification?
 
         Room newRoom = new Room();
         newRoom.setRoomCode(roomCode);
