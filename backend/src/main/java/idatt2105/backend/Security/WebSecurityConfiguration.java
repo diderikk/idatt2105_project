@@ -39,30 +39,36 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
      * Method for configuration of http.
      * CSRF is currently countered by CORS, and this app is only used on localhost currently
      * Authentication by username and password, and JWT.
+     *
      * @param http
      * @throws Exception
      */
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.cors().and()
-        .csrf().disable()
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-        .addFilter(getJwtAuthenticationFilter(authenticationManager()))
-        .addFilterAfter(new JwtTokenFilter(), JwtUsernameAndPasswordAuthenticationFilter.class)
-        .addFilterAfter(new ExceptionHandlerFilter(), JwtTokenFilter.class)
-        .authorizeRequests()
-        .antMatchers("/api/v1/websocket/**").permitAll()
-        .antMatchers("/api/v1/reservations/**").hasRole("ADMIN")
-        .antMatchers("/api/v1/sections/**").hasRole("ADMIN")
-        .antMatchers("/api/v1/**").hasAnyRole("ADMIN","USER")
-        .anyRequest().authenticated();
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .addFilter(getJwtAuthenticationFilter(authenticationManager()))
+                .addFilterAfter(new JwtTokenFilter(), JwtUsernameAndPasswordAuthenticationFilter.class)
+                .addFilterAfter(new ExceptionHandlerFilter(), JwtTokenFilter.class)
+                .authorizeRequests()
+                .antMatchers("/swagger-ui/**").permitAll()
+                .antMatchers("/swagger-resources/**").permitAll()
+                .antMatchers("/v2/api-docs").permitAll()
+                .antMatchers("/v3/api-docs/**").permitAll()
+                .antMatchers("/api/v1/websocket/**").permitAll()
+                .antMatchers("/api/v1/reservations/**").hasRole("ADMIN")
+                .antMatchers("/api/v1/sections/**").hasRole("ADMIN")
+                .antMatchers("/api/v1/**").hasAnyRole("ADMIN", "USER")
+                .anyRequest().authenticated();
     }
 
     /**
      * Sets authentication provider defined in method under
+     *
      * @param auth
      * @throws Exception
-     */ 
+     */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(daoAuthenticationProvider());
@@ -72,6 +78,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
      * Sets passwordEncoder and userDetailsService from service folder
      * Needed for getting users from MySQL Database and not In-Memory database
      * Allows authentication from MySQL Database
+     *
      * @return DaoAuthenticationProvider
      */
     @Bean
@@ -81,12 +88,14 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         provider.setUserDetailsService(userService);
         return provider;
     }
+
     /**
      * Changes login url
+     *
      * @param authenticationManager
      * @return Username and password filter for login
      */
-     public JwtUsernameAndPasswordAuthenticationFilter getJwtAuthenticationFilter(AuthenticationManager authenticationManager){
+    public JwtUsernameAndPasswordAuthenticationFilter getJwtAuthenticationFilter(AuthenticationManager authenticationManager) {
         JwtUsernameAndPasswordAuthenticationFilter filter = new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager);
         filter.setFilterProcessesUrl("/api/v1/login");
         return filter;
