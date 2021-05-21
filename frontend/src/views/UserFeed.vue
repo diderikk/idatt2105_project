@@ -2,6 +2,7 @@
   <div>
     <base-feed-header
       :createRoute="'/create-user'"
+      :needsToBeAdmin="true"
       @inputChange="changeInput($event, input)"
     ></base-feed-header>
     <div v-if="users.length === 0" class="box" id="placeholder">

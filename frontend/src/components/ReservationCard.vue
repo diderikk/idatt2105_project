@@ -4,6 +4,8 @@
       <h2 class="card-header-title">{{ reservation.roomCode }}</h2>
     </div>
     <div class="card-content">
+      <label class="label">Owner email:</label>
+      <p>{{ reservation.user.email }}</p>
       <label class="label">Sections:</label>
       <ul class="menu-list">
         <li

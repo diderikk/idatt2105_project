@@ -62,7 +62,6 @@ export default defineComponent({
       userId: number
     ) => {
       if (checksBeforeAsyncCall(checks, statuses)) {
-        console.log(registerInformation);
         await store.dispatch(
           "editUser",
           UserFormToUser(registerInformation, userId)

@@ -127,12 +127,11 @@ export const store: Store<State> = createStore<State>({
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return true;
       } catch (error) {
-        if (error !== null) {
-          commit("setSnackbar", {
-            content: "Error could not log in",
-            status: SnackbarStatus.ERROR,
-          });
-        }
+        //Does not check for null here we want to give the user feedback even when receiving 401 or 403
+        commit("setSnackbar", {
+          content: "Error could not log in, try a different email or password",
+          status: SnackbarStatus.ERROR,
+        });
         return false;
       }
     },
@@ -144,7 +143,6 @@ export const store: Store<State> = createStore<State>({
     async editUser({ commit }, user: User) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
-        console.log(user);
         await backend.post(`/users/${user.userId}`, UserToUserForm(user));
         commit("setSnackbar", {
           content: `User edited`,
@@ -516,14 +514,17 @@ export const store: Store<State> = createStore<State>({
         return null;
       }
     },
-    async getRoomStatistics({ commit }, roomCode: string): Promise<RoomStats | null> {
+    async getRoomStatistics(
+      { commit },
+      roomCode: string
+    ): Promise<RoomStats | null> {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);
       try {
         const response = await backend.get(`/rooms/${roomCode}/statistics`);
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        if(error !== null){
+        if (error !== null) {
           commit("setSnackbar", {
             content: "Could not get room statistics",
             status: SnackbarStatus.ERROR,
@@ -713,7 +714,7 @@ export const store: Store<State> = createStore<State>({
           commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        if(error !== null) {
+        if (error !== null) {
           commit("setSnackbar", {
             content: "Could not find top rooms",
             status: SnackbarStatus.ERROR,
@@ -727,7 +728,7 @@ export const store: Store<State> = createStore<State>({
      * @param editSnackbar optional, if false, the snakcbar should only be edited when an error occurs
      * @returns Promise<GETSection[] | null>
      */
-     async getTopSections(
+    async getTopSections(
       { commit },
       editSnackbar?: boolean
     ): Promise<GETSection[] | null> {
@@ -739,7 +740,7 @@ export const store: Store<State> = createStore<State>({
           commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        if(error !== null) {
+        if (error !== null) {
           commit("setSnackbar", {
             content: "Could not find top sections",
             status: SnackbarStatus.ERROR,
@@ -753,7 +754,7 @@ export const store: Store<State> = createStore<State>({
      * @param editSnackbar optional, if false, the snakcbar should only be edited when an error occurs
      * @returns Promise<GETRoom[] | null>
      */
-     async getTopUsers(
+    async getTopUsers(
       { commit },
       editSnackbar?: boolean
     ): Promise<User[] | null> {
@@ -765,7 +766,7 @@ export const store: Store<State> = createStore<State>({
           commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        if(error !== null) {
+        if (error !== null) {
           commit("setSnackbar", {
             content: "Could not find top users",
             status: SnackbarStatus.ERROR,

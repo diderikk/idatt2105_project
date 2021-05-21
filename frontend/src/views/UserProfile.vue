@@ -88,7 +88,7 @@
         </div>
       </div>
     </div>
-    <div class="card-footer">
+    <div v-if="isAdmin" class="card-footer">
       <router-link :to="`/edit-user/${user.userId}`" class="card-footer-item"
         >Edit</router-link
       >
@@ -98,7 +98,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, Ref } from "vue";
+import { computed, defineComponent, onMounted, ref, Ref } from "vue";
 import POSTSection from "../interfaces/Section/POSTSection.interface";
 import BackButton from "../components/BackButton.vue";
 import { useRouter } from "vue-router";
@@ -141,11 +141,14 @@ export default defineComponent({
      * Retrieves the user and it's stats
      */
     onMounted(async () => {
-      const response = await Promise.all([store.dispatch("getUser", props.id), store.dispatch("getUserStatistics", props.id)]);
+      const response = await Promise.all([
+        store.dispatch("getUser", props.id),
+        store.dispatch("getUserStatistics", props.id),
+      ]);
       if (response[0] !== null) {
         user.value = response[0];
       }
-     
+
       if (response[1] !== null) {
         userStats.value = response[1];
       }
@@ -162,10 +165,13 @@ export default defineComponent({
       }
     };
 
+    const isAdmin = computed(() => store.getters.getUser.isAdmin);
+
     return {
       user,
       userStats,
       deleteUser,
+      isAdmin,
     };
   },
 });
