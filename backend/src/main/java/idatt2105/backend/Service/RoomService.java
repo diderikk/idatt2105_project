@@ -25,7 +25,6 @@ import idatt2105.backend.Model.DTO.Reservation.GETReservationDTO;
 import idatt2105.backend.Model.DTO.Room.GETRoomDTO;
 import idatt2105.backend.Model.DTO.Room.POSTRoomDTO;
 import idatt2105.backend.Model.DTO.Room.RoomStatisticsDTO;
-import idatt2105.backend.Model.DTO.Section.AvailableSectionDTO;
 import idatt2105.backend.Model.DTO.Section.AvailableSectionsDTO;
 import idatt2105.backend.Model.DTO.Section.GETSectionDTO;
 import idatt2105.backend.Model.DTO.Section.POSTSectionDTO;
@@ -77,25 +76,23 @@ public class RoomService {
 
     /**
      * Finds room that are available
-     * @param startTime
-     * @param endTime
+     * @param dto Timeintervall contining startTime and endTime
      * @return List of rooms that have available sections between start time and end time
      */
     public AvailableSectionsDTO getAvailableRooms(TimeIntervalDTO dto){
-        List<AvailableSectionDTO> availableSections = sectionRepository.getAvailableSections(dto.getStartTime(), dto.getEndTime())
-        .stream().map(section -> new AvailableSectionDTO(section.getSectionId())).collect(Collectors.toList());
+        List<Long> availableSections = sectionRepository.getAvailableSections(dto.getStartTime(), dto.getEndTime())
+        .stream().map(section -> section.getSectionId()).collect(Collectors.toList());
         return new AvailableSectionsDTO(getRooms(), availableSections);
     }
 
     /**
      * Finds room that are available with input start time and end time
-     * @param startTime
-     * @param endTime
+     * @param dto Timeintervall contining startTime and endTime
      * @return List of rooms that have available sections between start time and end time
      */
     public AvailableSectionsDTO getAvailableRooms(TimeIntervalDTO dto, long reservationId){
-        List<AvailableSectionDTO> availableSections = sectionRepository.getAvailableSections(dto.getStartTime(), dto.getEndTime(), reservationId)
-        .stream().map(section -> new AvailableSectionDTO(section.getSectionId())).collect(Collectors.toList());
+        List<Long> availableSections = sectionRepository.getAvailableSections(dto.getStartTime(), dto.getEndTime(), reservationId)
+        .stream().map(section -> section.getSectionId()).collect(Collectors.toList());
         return new AvailableSectionsDTO(getRooms(), availableSections);
 
     }
@@ -255,7 +252,7 @@ public class RoomService {
     /**
      * Returns list of all resevations of a specific rooms section, given by roomCode and sectionId
      * @param roomCode
-     * @param sectionDTO
+     * @param sectionId
      * @return List of GETReservationDTOs
      * @throws NotFoundException
      * @throws NullPointerException
@@ -282,9 +279,8 @@ public class RoomService {
     }
 
     /**
-     * Adds a section to a room, given by roomCode and sectionDTO
+     * Adds a section to a room
      * New section is also saved in the database
-     * @param roomCode
      * @param sectionDTO
      * @return RoomDTO object
      * @throws NotFoundException

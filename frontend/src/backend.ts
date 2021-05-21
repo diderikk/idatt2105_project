@@ -3,7 +3,7 @@ import SnackbarStatus from "./enum/SnackbarStatus.enum";
 import router from "./router";
 import { store } from "./store";
 
-const isTesting = false;
+const isTesting = true;
 const backend = axios.create({
   baseURL: isTesting
     ? "https://localhost:8443/api/v1"
@@ -42,6 +42,8 @@ backend.interceptors.response.use(undefined, (error) => {
   }
 });
 
-export const URL = isTesting ? "https://localhost:8443/api/v1" : "https://bookthatroomserver.northeurope.cloudapp.azure.com:8443/api/v1";
+export const URL = isTesting
+  ? "https://localhost:8443/api/v1"
+  : "https://bookthatroomserver.northeurope.cloudapp.azure.com:8443/api/v1";
 
 export default backend;
