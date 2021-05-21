@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref, Ref } from "vue";
 import { useStore } from "../store";
 import BaseFeedHeader from "../components/BaseFeedHeader.vue";
 import Room from "../interfaces/Room/Room.interface";
@@ -51,9 +51,8 @@ export default defineComponent({
      */
     const reload = async (editSnackBar: boolean) => {
       const response = await store.dispatch("getRooms", editSnackBar);
-      if (response !== null) {
-        rooms.value = response;
-      }
+      if (response === null) return;
+      rooms.value = response;
     };
 
     const availableRooms = computed(() =>

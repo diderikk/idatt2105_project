@@ -10,6 +10,7 @@ import Room from "@/interfaces/Room/Room.interface";
 import EditRoom from "@/interfaces/Room/EditRoom.interface";
 import { UserToUserForm } from "@/utils/userUtils";
 import TimeInterval from "@/interfaces/TimeInterval.interface";
+import RoomStats from "@/interfaces/Room/RoomStats.interface";
 import State from "@/interfaces/State.interface";
 import UserForm from "@/interfaces/User/UserForm.interface";
 import UserStats from "@/interfaces/User/UserStats.interface";
@@ -126,10 +127,12 @@ export const store: Store<State> = createStore<State>({
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return true;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Error could not log in",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Error could not log in",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return false;
       }
     },
@@ -202,10 +205,12 @@ export const store: Store<State> = createStore<State>({
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not get user",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not get user",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
@@ -224,10 +229,12 @@ export const store: Store<State> = createStore<State>({
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not get user statistics",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not get user statistics",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
@@ -273,16 +280,18 @@ export const store: Store<State> = createStore<State>({
         });
         return true;
       } catch (error) {
-        if (error.response.status === 400) {
-          commit("setSnackbar", {
-            content: "Already occupied",
-            status: SnackbarStatus.ERROR,
-          });
-        } else {
-          commit("setSnackbar", {
-            content: "Could not create reservation",
-            status: SnackbarStatus.ERROR,
-          });
+        if (error !== null) {
+          if (error.response.status === 400) {
+            commit("setSnackbar", {
+              content: "Already occupied",
+              status: SnackbarStatus.ERROR,
+            });
+          } else {
+            commit("setSnackbar", {
+              content: "Could not create reservation",
+              status: SnackbarStatus.ERROR,
+            });
+          }
         }
         return false;
       }
@@ -311,10 +320,12 @@ export const store: Store<State> = createStore<State>({
         });
         return true;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Reservation could not be edited",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Reservation could not be edited",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return false;
       }
     },
@@ -338,10 +349,12 @@ export const store: Store<State> = createStore<State>({
         });
         return true;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Reservation could not be deleted",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Reservation could not be deleted",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return false;
       }
     },
@@ -365,10 +378,12 @@ export const store: Store<State> = createStore<State>({
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not find a reservation",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not find a reservation",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
@@ -414,10 +429,12 @@ export const store: Store<State> = createStore<State>({
           commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not find any reservations",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not find any reservations",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
@@ -438,10 +455,12 @@ export const store: Store<State> = createStore<State>({
           commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not find any rooms",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not find any rooms",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
@@ -488,10 +507,28 @@ export const store: Store<State> = createStore<State>({
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not find a room",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not find a room",
+            status: SnackbarStatus.ERROR,
+          });
+        }
+        return null;
+      }
+    },
+    async getRoomStatistics({ commit }, roomCode: string): Promise<RoomStats | null> {
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      try {
+        const response = await backend.get(`/rooms/${roomCode}/statistics`);
+        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        return response.data;
+      } catch (error) {
+        if(error !== null){
+          commit("setSnackbar", {
+            content: "Could not get room statistics",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return null;
       }
     },
@@ -507,10 +544,12 @@ export const store: Store<State> = createStore<State>({
         commit("setSnackbarStatus", SnackbarStatus.NONE);
         return response.data;
       } catch (error) {
-        commit("setSnackbar", {
-          content: "Could not find a room",
-          status: SnackbarStatus.ERROR,
-        });
+        if (error !== null) {
+          commit("setSnackbar", {
+            content: "Could not find a room",
+            status: SnackbarStatus.ERROR,
+          });
+        }
         return [];
       }
     },
@@ -542,11 +581,13 @@ export const store: Store<State> = createStore<State>({
           commit("setSnackbarStatus", SnackbarStatus.NONE);
           return true;
         },
-        () => {
-          commit("setSnackbar", {
-            content: "Could not connect to room chat",
-            status: SnackbarStatus.ERROR,
-          });
+        (error) => {
+          if (error !== null) {
+            commit("setSnackbar", {
+              content: "Could not connect to room chat",
+              status: SnackbarStatus.ERROR,
+            });
+          }
           return false;
         }
       );
@@ -562,21 +603,23 @@ export const store: Store<State> = createStore<State>({
         await backend.post("/rooms", room);
 
         commit("setSnackbar", {
-          content: "Reservation created",
+          content: "Room created",
           status: SnackbarStatus.SUCCESS,
         });
         return true;
       } catch (error) {
-        if (error.response.status === 400) {
-          commit("setSnackbar", {
-            content: "Room code is already occupied",
-            status: SnackbarStatus.ERROR,
-          });
-        } else {
-          commit("setSnackbar", {
-            content: "Could not create room",
-            status: SnackbarStatus.ERROR,
-          });
+        if (error !== null) {
+          if (error.response.status === 400) {
+            commit("setSnackbar", {
+              content: "Room code is already occupied",
+              status: SnackbarStatus.ERROR,
+            });
+          } else {
+            commit("setSnackbar", {
+              content: "Could not create room",
+              status: SnackbarStatus.ERROR,
+            });
+          }
         }
         return false;
       }
@@ -600,21 +643,23 @@ export const store: Store<State> = createStore<State>({
         });
         return true;
       } catch (error) {
-        if (error.response.status === 400) {
-          commit("setSnackbar", {
-            content: "Room code is already occupied",
-            status: SnackbarStatus.ERROR,
-          });
-        } else if (error.response.status === 404) {
-          commit("setSnackbar", {
-            content: "No room with the given room code exists",
-            status: SnackbarStatus.ERROR,
-          });
-        } else {
-          commit("setSnackbar", {
-            content: "Could not edit room",
-            status: SnackbarStatus.ERROR,
-          });
+        if (error !== null) {
+          if (error.response.status === 400) {
+            commit("setSnackbar", {
+              content: "Room code is already occupied",
+              status: SnackbarStatus.ERROR,
+            });
+          } else if (error.response.status === 404) {
+            commit("setSnackbar", {
+              content: "No room with the given room code exists",
+              status: SnackbarStatus.ERROR,
+            });
+          } else {
+            commit("setSnackbar", {
+              content: "Could not edit room",
+              status: SnackbarStatus.ERROR,
+            });
+          }
         }
         return false;
       }
@@ -635,16 +680,18 @@ export const store: Store<State> = createStore<State>({
         });
         return true;
       } catch (error) {
-        if (error.response.status === 404) {
-          commit("setSnackbar", {
-            content: "No room with the given room code exists",
-            status: SnackbarStatus.ERROR,
-          });
-        } else {
-          commit("setSnackbar", {
-            content: "Could not delete room",
-            status: SnackbarStatus.ERROR,
-          });
+        if (error !== null) {
+          if (error.response.status === 404) {
+            commit("setSnackbar", {
+              content: "No room with the given room code exists",
+              status: SnackbarStatus.ERROR,
+            });
+          } else {
+            commit("setSnackbar", {
+              content: "Could not delete room",
+              status: SnackbarStatus.ERROR,
+            });
+          }
         }
         return false;
       }
