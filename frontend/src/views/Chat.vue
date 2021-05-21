@@ -17,7 +17,7 @@ import Stomp from "stompjs";
 import SockJS from "sockjs-client";
 import User from "../interfaces/User/User.interface";
 import { dateTimeToString } from "../utils/date";
-import { webSocketURL } from "../backend";
+import { URL } from "../backend";
 
 export default defineComponent({
   name: "Chat",
@@ -41,7 +41,7 @@ export default defineComponent({
       messages.value = response;
 
 
-      const sockJs = new SockJS(`${webSocketURL}/chat/${props.roomCode}`);
+      const sockJs = new SockJS(`${URL}/chat/${props.roomCode}`);
       stompClient = Stomp.over(sockJs);
       stompClient.debug = () => ({});
       await connectWebSocket();
@@ -65,6 +65,7 @@ export default defineComponent({
       return {
         userId: user.value.userId,
         firstName: user.value.firstName,
+        lastName: user.value.lastName,
         text: messageInput.value,
         timeSent: dateTimeToString(new Date()),
       } as Message;

@@ -36,6 +36,6 @@ backend.interceptors.response.use(undefined, (error) => {
   }
 });
 
-export const webSocketURL = isTesting ? "https://localhost:8443/api/v1" : "https://bookthatroomserver.northeurope.cloudapp.azure.com:8443/api/v1";
+export const URL = isTesting ? "https://localhost:8443/api/v1" : "https://bookthatroomserver.northeurope.cloudapp.azure.com:8443/api/v1";
 
 export default backend;

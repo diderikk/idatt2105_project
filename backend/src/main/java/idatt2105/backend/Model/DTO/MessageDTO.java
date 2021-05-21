@@ -15,13 +15,16 @@ import lombok.NoArgsConstructor;
 public class MessageDTO {
     private long userId;
     private String firstName;
+    private String lastName;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime timeSent;
     private String text;
 
     public MessageDTO(Message message){
         if(message.getUser() != null) this.userId = message.getUser().getUserId();
-        if(message.getUser() != null) this.firstName = message.getUser().getFirstName();
+        this.firstName = (message.getUser() != null) ? message.getUser().getFirstName() : "Anonymous";
+        this.lastName = (message.getUser() != null) ? message.getUser().getLastName() : "";
+
         this.timeSent = message.getTimeSent();
         this.text = message.getText();
     }
