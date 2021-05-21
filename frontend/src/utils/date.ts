@@ -24,7 +24,11 @@ export const dateTimeToString = (date: Date): string => {
   string += ":";
   string += minutes < 10 ? "0" : "";
   string += minutes;
-  return dateToString(date) + " " + string.substring(0,5);
+  const seconds = date.getSeconds();
+  string += ":";
+  string += seconds < 10 ? "0" : "";
+  string += seconds;
+  return dateToString(date) + " " + string;
 }
 
 export const removeTimeFromDate = (date: Date) => {

@@ -12,6 +12,8 @@ import EditRoom from "@/interfaces/Room/EditRoom.interface";
 import { UserToUserForm } from "@/utils/userUtils";
 import TimeInterval from "@/interfaces/TimeInterval.interface";
 import Message from "@/interfaces/Message.interface";
+import Stomp from "stompjs"
+
 
 export interface State {
   user: string;
@@ -433,6 +435,33 @@ export const store: Store<State> = createStore<State>({
         });
         return [];
       }
+    },
+    /**
+     * Connects to the chat room
+     * @param connectInfo roomCode and 
+     */
+    async connectChat({ commit }, connectInfo: {roomCode: string, stompClient: Stomp.Client, messages: Message[]}){
+      commit("setSnackbarStatus", SnackbarStatus.LOADING);
+      await connectInfo.stompClient.connect(
+        {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        () => {
+          connectInfo.stompClient.subscribe(
+            `/api/v1/chat/${connectInfo.roomCode}/messages`,
+            (message) => {
+              connectInfo.messages.push(JSON.parse(message.body));
+            }
+          );
+        commit("setSnackbarStatus", SnackbarStatus.NONE);
+        },
+        () => {
+          commit("setSnackbar", {
+            content: "Could not connect to room chat",
+            status: SnackbarStatus.ERROR,
+          });
+        }
+      );
     },
     async createRoom({ commit }, room: Room) {
       commit("setSnackbarStatus", SnackbarStatus.LOADING);

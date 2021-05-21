@@ -102,7 +102,7 @@ public class ReservationService {
         if(dto.getReservationText() != null) reservation.setReservationText(dto.getReservationText());
         if(dto.getSections() != null && !dto.getSections().isEmpty()) {
             for(POSTSectionDTO sectionDTO : dto.getSections()){
-                dto.setSections(new ArrayList<>());
+                reservation.setSections(new ArrayList<>());
                 Optional<Section> optionalSection = sectionRepository.findSectionBySectionNameAndRoomCode(sectionDTO.getSectionName(), sectionDTO.getRoomCode());
                 if(optionalSection.isPresent()){
                     if(checkIfSectionIsBooked(sectionDTO, dto, reservationId)) throw new SectionAlreadyBookedException("Section is already booked/reserved for the given time period");
