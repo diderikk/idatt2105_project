@@ -4,10 +4,13 @@ import router from "./router";
 import { store } from "./store";
 
 const isTesting = false;
+
+export const URL = isTesting
+  ? "https://localhost:8443/api/v1"
+  : "https://bookthatroomserver.northeurope.cloudapp.azure.com:8443/api/v1";
+
 const backend = axios.create({
-  baseURL: isTesting
-    ? "https://localhost:8443/api/v1"
-    : "https://bookthatroomserver.northeurope.cloudapp.azure.com:8443/api/v1",
+  baseURL: URL,
 });
 
 const token = localStorage.getItem("token");
@@ -41,9 +44,5 @@ backend.interceptors.response.use(undefined, (error) => {
     throw error;
   }
 });
-
-export const URL = isTesting
-  ? "https://localhost:8443/api/v1"
-  : "https://bookthatroomserver.northeurope.cloudapp.azure.com:8443/api/v1";
 
 export default backend;
