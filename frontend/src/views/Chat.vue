@@ -1,6 +1,7 @@
 <template>
   
   <div class="container">
+    <back-button></back-button>
     <div id="chat" class="">
       <message-component v-for="(message, index) in sortedMessages" :key="index" :message="message"/>
     </div>
@@ -21,11 +22,13 @@ import User from "../interfaces/User/User.interface";
 import { dateTimeToString } from "../utils/date";
 import { URL } from "../backend";
 import MessageComponent from "../components/Message.vue";
+import BackButton from "../components/BackButton.vue";
+ 
 
 export default defineComponent({
   name: "Chat",
   components: {
-    MessageComponent
+    MessageComponent, BackButton
   },
   props: {
     roomCode: {
@@ -102,7 +105,7 @@ export default defineComponent({
 
 <style scoped>
 #chat{
-    height: 80vh;
+    height: 75vh;
     display: flex;
     flex-direction: column-reverse;
     overflow-y: auto;

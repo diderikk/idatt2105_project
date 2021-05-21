@@ -3,7 +3,7 @@ import SnackbarStatus from "./enum/SnackbarStatus.enum";
 import router from "./router";
 import { store } from "./store";
 
-const isTesting = true;
+const isTesting = false;
 const backend = axios.create({
   baseURL: isTesting
     ? "https://localhost:8443/api/v1"

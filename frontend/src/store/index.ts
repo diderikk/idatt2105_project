@@ -581,7 +581,7 @@ export const store: Store<State> = createStore<State>({
         await backend.post("/rooms", room);
 
         commit("setSnackbar", {
-          content: "Reservation created",
+          content: "Room created",
           status: SnackbarStatus.SUCCESS,
         });
         return true;
